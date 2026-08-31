@@ -46,9 +46,9 @@
     $peran = auth()->check() ? auth()->user()->getRoleNames()->first() : null;
 @endphp
 
-    <div class="flex min-h-full">
-        <aside class="hidden w-[248px] shrink-0 flex-col bg-navy-900 text-white lg:flex">
-            <div class="flex h-14 items-center gap-2 border-b border-white/10 px-5">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="hidden w-[248px] shrink-0 flex-col overflow-y-auto bg-navy-900 text-white lg:flex">
+            <div class="flex h-14 shrink-0 items-center gap-2 border-b border-white/10 px-5">
                 <span class="text-[15px] font-bold tracking-[0.08em]">AKAR</span>
                 <span class="text-[11px] text-biru-300">Rapor Pendidikan</span>
             </div>
@@ -83,8 +83,8 @@
             </div>
         </aside>
 
-        <div class="flex min-w-0 flex-1 flex-col">
-            <header class="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-krem-300 bg-navy-900 px-6 text-white">
+        <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
+            <header class="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-krem-300 bg-navy-900 px-6 text-white">
                 <div class="flex items-center gap-2 text-[13px] font-semibold">
                     <span class="lg:hidden">AKAR</span>
                     <span class="hidden lg:inline">{{ $header ?? 'Beranda' }}</span>
