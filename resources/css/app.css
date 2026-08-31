@@ -5,28 +5,37 @@
 @source '../views';
 
 /*
-| Sistem warna AKAR — lihat DESIGN.md bagian 2.
-| Skema krem hangat dengan biru tua, konservatif, kesan dokumen resmi.
-| Jangan menambah warna di luar daftar ini.
+| Sistem visual AKAR — turunan DESIGN.md.
+| Skema krem hangat dengan biru tua, kesan dokumen resmi. Modern pada
+| kerapian tipografi, ritme jarak, dan keadaan interaksi — bukan pada
+| gradien, bayangan tebal, atau hiasan. Jangan menambah warna di luar daftar.
 */
 @theme {
     --font-sans: 'Inter', ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
+    /* Latar dan permukaan */
     --color-krem-100: #f5f1e6; /* latar halaman */
+    --color-krem-150: #f0ebdd; /* hover baris ringan, isian nonaktif */
     --color-krem-200: #ebe5d6; /* header tabel, baris terpilih */
     --color-krem-300: #ddd5c2; /* garis, border kartu */
     --color-kartu: #fffdf8; /* latar kartu, putih hangat */
 
+    /* Biru kelembagaan */
     --color-navy-900: #0b2545; /* header utama, sidebar */
-    --color-biru-100: #dee7f3; /* sorotan baris, latar info */
+    --color-navy-800: #133154; /* hover di dalam sidebar */
+    --color-biru-100: #dee7f3; /* sorotan baris, latar informasi */
+    --color-biru-300: #9db8dd; /* aksen di atas navy */
     --color-biru-600: #1a56b0; /* hover tombol primer */
     --color-biru-700: #14448c; /* warna merek, tombol, tautan */
 
+    /* Netral hangat */
     --color-teks-900: #231f1a;
     --color-teks-700: #4a443b;
     --color-teks-500: #6f675b;
+    --color-teks-400: #8b8375;
     --color-teks-300: #ddd5c2;
 
+    /* Status capaian */
     --color-baik: #1b5e36;
     --color-baik-bg: #e2ecdd;
     --color-sedang: #7a4e00;
@@ -36,25 +45,81 @@
     --color-kosong: #615a4e;
     --color-kosong-bg: #e8e2d5;
 
-    --color-emas-700: #8a6d14; /* penanda prioritas tertinggi, sangat hemat */
+    --color-emas-700: #8a6d14; /* penanda prioritas pertama, sangat hemat */
+
+    /* Elevasi — kartu tetap datar (border). Bayangan hanya untuk elemen
+       melayang: panel dropdown, popover. Bernuansa navy, bukan hitam. */
+    --shadow-panel: 0 8px 24px -8px rgb(11 37 69 / 0.16), 0 2px 6px -2px rgb(11 37 69 / 0.10);
+
+    --radius-kartu: 0.5rem;
 }
 
 @layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
         background-color: var(--color-krem-100);
         color: var(--color-teks-900);
         font-size: 14px;
         line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
     }
 
-    /* Angka tabel dan skor sejajar. */
+    /* Judul terasa disengaja: tracking rapat, tak menggantung satu kata. */
+    h1, h2, h3 {
+        letter-spacing: -0.014em;
+        text-wrap: balance;
+    }
+
+    p {
+        text-wrap: pretty;
+    }
+
+    /* Angka pada tabel, skor, dan ringkasan sejajar. */
     table,
     .tabular {
         font-variant-numeric: tabular-nums;
     }
 
+    ::selection {
+        background-color: var(--color-biru-100);
+    }
+
     :focus-visible {
         outline: 2px solid var(--color-biru-700);
         outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    /* Transisi halus pada seluruh elemen interaktif. */
+    a, button, select, input, [role='button'], summary {
+        transition:
+            background-color 150ms ease,
+            border-color 150ms ease,
+            color 150ms ease,
+            box-shadow 150ms ease,
+            transform 120ms ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+}
+
+@layer components {
+    /* Kerangka berdenyut untuk keadaan memuat (DESIGN.md 6). */
+    .rangka-muat {
+        background-color: var(--color-krem-200);
+        border-radius: 0.375rem;
+        animation: rangka-denyut 1.4s ease-in-out infinite;
+    }
+
+    @keyframes rangka-denyut {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.55; }
     }
 }

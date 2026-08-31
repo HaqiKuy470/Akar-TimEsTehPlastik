@@ -6,25 +6,46 @@
     <title>{{ $title ?? 'Masuk' }} — AKAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="flex min-h-full items-center justify-center bg-krem-100 p-6">
-    <div class="w-full max-w-sm">
-        <div class="mb-6 text-center">
-            <div class="text-2xl font-bold tracking-wide text-navy-900">AKAR</div>
-            <p class="mt-1 text-[13px] text-teks-500">Analisis Kausal dan Rekomendasi</p>
+<body class="grid min-h-full lg:grid-cols-[1fr_460px]">
+    {{-- Kolom kiri: pernyataan produk, hanya di layar lebar. --}}
+    <aside class="relative hidden flex-col justify-between bg-navy-900 p-12 text-white lg:flex">
+        <div class="flex items-center gap-2">
+            <span class="text-[17px] font-bold tracking-[0.08em]">AKAR</span>
+            <span class="text-[12px] text-biru-300">Analisis Kausal dan Rekomendasi</span>
         </div>
 
-        <div class="rounded-md border border-krem-300 bg-kartu p-6">
+        <div class="max-w-md">
+            <p class="text-[22px] font-semibold leading-snug">
+                Rapor Pendidikan memberi tahu bahwa nilainya merah.
+                AKAR memberi tahu apa yang harus dilakukan Senin pagi.
+            </p>
+            <p class="mt-4 text-[13px] leading-relaxed text-white/60">
+                Satu logika analisis, dua level pengguna: dinas melihat seluruh
+                kabupatennya, kepala sekolah melihat sekolahnya sendiri.
+            </p>
+        </div>
+
+        <p class="text-[11px] text-white/35">
+            Sumber data: Kementerian Pendidikan Dasar dan Menengah,
+            Portal Satu Data Kemendikdasmen.
+        </p>
+    </aside>
+
+    {{-- Kolom kanan: formulir. --}}
+    <main class="flex items-center justify-center bg-krem-100 p-6">
+        <div class="w-full max-w-sm">
+            <div class="mb-7 lg:hidden">
+                <div class="text-[20px] font-bold tracking-[0.06em] text-navy-900">AKAR</div>
+                <p class="mt-0.5 text-[12px] text-teks-500">Analisis Kausal dan Rekomendasi</p>
+            </div>
+
             {{ $slot }}
         </div>
-
-        <p class="mt-4 text-center text-xs text-teks-500">
-            Rapor Pendidikan menjadi rencana tindak lanjut yang siap dibawa ke rapat.
-        </p>
-    </div>
+    </main>
     @livewireScripts
 </body>
 </html>
