@@ -29,10 +29,13 @@
             </p>
         </div>
 
-        <p class="text-[11px] text-white/35">
-            Sumber data: Kementerian Pendidikan Dasar dan Menengah,
-            Portal Satu Data Kemendikdasmen.
-        </p>
+        <div class="space-y-1 text-[11px] text-white/35">
+            <p>
+                Sumber data: Kementerian Pendidikan Dasar dan Menengah,
+                Portal Satu Data Kemendikdasmen.
+            </p>
+            <p>Dibuat oleh Tim EsTehPlastik untuk HoloDev HOLOGY 9.0.</p>
+        </div>
     </aside>
 
     {{-- Kolom kanan: formulir. --}}

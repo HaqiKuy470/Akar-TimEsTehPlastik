@@ -78,8 +78,9 @@
                 @endforeach
             </nav>
 
-            <div class="border-t border-white/10 px-5 py-4 text-[11px] text-white/35">
-                Sumber: Kemendikdasmen
+            <div class="space-y-1 border-t border-white/10 px-5 py-4 text-[11px] text-white/35">
+                <p>Sumber data: Kemendikdasmen</p>
+                <p>Dibuat oleh Tim EsTehPlastik</p>
             </div>
         </aside>
 

@@ -75,3 +75,10 @@ Target produksi adalah shared hosting **cPanel** dengan MySQL, antrean lewat
 cron, dan tanpa Node/Composer di server. Langkah lengkap ada di `DEPLOYMENT.md`;
 berkas pendukung ada di `deploy/` (`index.php` untuk `public_html`, `dump-db.sh`
 untuk menyiapkan dump data), dan `.env.production.example` sebagai templat `.env`.
+
+---
+
+## Tim
+
+Dikerjakan oleh **Tim EsTehPlastik** untuk HoloDev HOLOGY 9.0 Universitas
+Brawijaya, subtema Pendidikan.

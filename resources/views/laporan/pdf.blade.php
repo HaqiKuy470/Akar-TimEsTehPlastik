@@ -55,6 +55,7 @@
 <body>
     <div class="footer">
         Sumber: Kementerian Pendidikan Dasar dan Menengah, Data Rapor Pendidikan Indonesia, diakses {{ $tanggal_cetak }}.
+        &nbsp;&middot;&nbsp; Disusun dengan AKAR oleh Tim EsTehPlastik.
         &nbsp;&middot;&nbsp; <span class="hal"></span>
     </div>
 
