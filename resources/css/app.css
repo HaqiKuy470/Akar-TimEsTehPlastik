@@ -110,6 +110,18 @@
     }
 }
 
+@layer base {
+    /* Livewire hanya menerbitkan CSS penyembunyi untuk kombinasi modifier
+       tertentu; `wire:loading.delay.flex` (dan sejenisnya) tidak termasuk,
+       sehingga kerangka-muat tampil sebelum ada permintaan. Tutup di sini. */
+    [wire\:loading\.delay\.flex],
+    [wire\:loading\.delay\.inline-flex],
+    [wire\:loading\.delay\.grid],
+    [wire\:loading\.delay\.block] {
+        display: none;
+    }
+}
+
 @layer components {
     /* Kerangka berdenyut untuk keadaan memuat (DESIGN.md 6). */
     .rangka-muat {
