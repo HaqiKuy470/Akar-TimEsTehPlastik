@@ -1101,3 +1101,1051 @@
         }
     }
 }
+/* ========================================================================
+   Prioritas Masalah — editorial ranking dashboard
+   Scope dibatasi ke .prioritas-v2 agar halaman lain tetap aman.
+   ======================================================================== */
+
+@layer components {
+    .prioritas-v2 {
+        --prioritas-page-x: clamp(1rem, 2.2vw, 2rem);
+        --prioritas-section-y: clamp(3rem, 6vw, 6.5rem);
+        --prioritas-line: color-mix(
+            in srgb,
+            var(--color-navy-900) 18%,
+            transparent
+        );
+        --prioritas-muted-line: color-mix(
+            in srgb,
+            var(--color-teks-900) 10%,
+            transparent
+        );
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-top: calc(var(--prioritas-page-x) * -0.5);
+        overflow: clip;
+    }
+
+    .prioritas-v2 * {
+        box-sizing: border-box;
+    }
+
+    .prioritas-hero {
+        padding: clamp(3rem, 6vw, 6.25rem) var(--prioritas-page-x)
+            clamp(2.75rem, 5vw, 4.75rem);
+        border-top: 1px solid var(--prioritas-line);
+        border-bottom: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-hero__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.6fr);
+        gap: clamp(2rem, 7vw, 7rem);
+        align-items: end;
+    }
+
+    .prioritas-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: min(100%, 34rem);
+        color: var(--color-navy-900);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .prioritas-eyebrow__line {
+        flex: 1;
+        height: 1px;
+        background: var(--prioritas-line);
+    }
+
+    .prioritas-display-title {
+        margin-top: clamp(1.5rem, 3vw, 2.75rem);
+        max-width: 10.5ch;
+        color: var(--color-navy-900);
+        font-size: clamp(3.15rem, 7.6vw, 8rem);
+        font-weight: 650;
+        line-height: 0.9;
+        letter-spacing: -0.065em;
+    }
+
+    .prioritas-display-title span {
+        display: block;
+        color: var(--color-teks-400);
+        font-weight: 450;
+    }
+
+    .prioritas-hero__lead {
+        max-width: 44rem;
+        margin-top: clamp(1.65rem, 3vw, 2.5rem);
+        color: var(--color-teks-700);
+        font-size: clamp(1rem, 1.35vw, 1.18rem);
+        line-height: 1.7;
+    }
+
+    .prioritas-hero__context {
+        min-height: 17rem;
+        padding: clamp(1.4rem, 2.6vw, 2rem) 0 0 clamp(1.25rem, 2.5vw, 2rem);
+        border-left: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-kicker {
+        color: var(--color-teks-500);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .prioritas-hero__location {
+        max-width: 14ch;
+        margin-top: 1rem;
+        color: var(--color-teks-900);
+        font-size: clamp(1.7rem, 3vw, 3.1rem);
+        font-weight: 600;
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+    }
+
+    .prioritas-hero__meta {
+        margin-top: 0.8rem;
+        color: var(--color-teks-500);
+        font-size: 0.78rem;
+    }
+
+    .prioritas-hero__metric {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: clamp(2.25rem, 4.5vw, 4.5rem);
+        padding-top: 1rem;
+        border-top: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-hero__metric-side {
+        padding-left: 1rem;
+        border-left: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-hero__metric-value,
+    .prioritas-hero__metric-label {
+        display: block;
+    }
+
+    .prioritas-hero__metric-value {
+        color: var(--color-navy-900);
+        font-size: clamp(2rem, 4vw, 3.8rem);
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -0.055em;
+    }
+
+    .prioritas-hero__metric-label {
+        margin-top: 0.4rem;
+        color: var(--color-teks-500);
+        font-size: 0.7rem;
+    }
+
+    .prioritas-hero__footnote {
+        margin-top: 0.75rem;
+        color: var(--color-teks-400);
+        font-size: 0.65rem;
+    }
+
+    .prioritas-hero__placeholder {
+        display: grid;
+        gap: 0.65rem;
+        margin-top: clamp(3rem, 7vw, 6rem);
+    }
+
+    .prioritas-hero__placeholder span {
+        display: block;
+        width: 100%;
+        height: 1px;
+        background: var(--prioritas-line);
+    }
+
+    .prioritas-hero__placeholder span:nth-child(2) {
+        width: 72%;
+    }
+    .prioritas-hero__placeholder span:nth-child(3) {
+        width: 44%;
+    }
+
+    .prioritas-section {
+        padding: var(--prioritas-section-y) var(--prioritas-page-x);
+        border-bottom: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-section--filter {
+        padding-top: clamp(1.75rem, 3vw, 2.75rem);
+        padding-bottom: clamp(1.75rem, 2.8vw, 2.5rem);
+        background: var(--color-kartu);
+    }
+
+    .prioritas-section__heading {
+        display: grid;
+        grid-template-columns: 3.5rem minmax(0, 1fr) minmax(15rem, 0.55fr);
+        gap: 1rem;
+        align-items: start;
+        margin-bottom: clamp(1.3rem, 2.2vw, 2rem);
+    }
+
+    .prioritas-section__index {
+        color: var(--color-teks-400);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+    .prioritas-section__title {
+        margin-top: 0.45rem;
+        max-width: 20ch;
+        color: var(--color-navy-900);
+        font-size: clamp(1.75rem, 3.6vw, 3.7rem);
+        font-weight: 550;
+        line-height: 1.03;
+        letter-spacing: -0.05em;
+    }
+
+    .prioritas-section__aside {
+        justify-self: end;
+        max-width: 28rem;
+        color: var(--color-teks-500);
+        font-size: 0.78rem;
+        line-height: 1.65;
+        text-align: right;
+    }
+
+    .prioritas-filter-panel {
+        display: grid;
+        grid-template-columns: 0.65fr 1fr 1.25fr 1fr 1fr;
+        border-top: 1px solid var(--prioritas-line);
+        border-bottom: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-field {
+        position: relative;
+        min-width: 0;
+        padding: 1.1rem 1rem 0.95rem;
+        border-right: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-field:first-child {
+        padding-left: 0;
+    }
+    .prioritas-field:last-child {
+        border-right: 0;
+    }
+
+    .prioritas-field__label {
+        display: block;
+        margin-bottom: 0.45rem;
+        color: var(--color-teks-500);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .prioritas-select-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .prioritas-select-wrap::after {
+        content: "↓";
+        position: absolute;
+        top: 50%;
+        right: 0.1rem;
+        transform: translateY(-54%);
+        color: var(--color-teks-500);
+        font-size: 0.8rem;
+        pointer-events: none;
+    }
+
+    .prioritas-select {
+        width: 100%;
+        padding: 0.1rem 1.3rem 0.1rem 0;
+        appearance: none;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--color-teks-900);
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .prioritas-select:disabled {
+        color: var(--color-teks-400);
+        cursor: not-allowed;
+    }
+
+    .prioritas-field:focus-within::before {
+        content: "";
+        position: absolute;
+        right: 0.85rem;
+        bottom: -1px;
+        left: 0.85rem;
+        height: 2px;
+        background: var(--color-biru-700);
+    }
+
+    .prioritas-field:first-child:focus-within::before {
+        left: 0;
+    }
+
+    .prioritas-actionbar {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 2rem;
+        padding-top: 1.15rem;
+    }
+
+    .prioritas-actionbar__copy p {
+        margin-top: 0.35rem;
+        color: var(--color-teks-500);
+        font-size: 0.76rem;
+    }
+
+    .prioritas-actionbar__actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .prioritas-download {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--color-teks-500);
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .prioritas-link-button {
+        border: 0;
+        background: transparent;
+        color: var(--color-navy-900);
+        font: inherit;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: none;
+        letter-spacing: 0;
+        cursor: pointer;
+    }
+
+    .prioritas-link-button:hover {
+        color: var(--color-biru-700);
+        transform: translateY(-1px);
+    }
+
+    .prioritas-run-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        min-height: 3rem;
+        padding: 0.8rem 1rem 0.8rem 1.15rem;
+        border: 1px solid var(--color-navy-900);
+        background: var(--color-navy-900);
+        color: white;
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .prioritas-run-button:hover:not(:disabled) {
+        background: var(--color-biru-700);
+        border-color: var(--color-biru-700);
+        transform: translateY(-1px);
+    }
+
+    .prioritas-run-button:disabled {
+        border-color: var(--color-krem-300);
+        background: var(--color-krem-200);
+        color: var(--color-teks-400);
+        cursor: not-allowed;
+    }
+
+    .prioritas-run-button > span:last-child {
+        font-size: 1rem;
+    }
+
+    .prioritas-loading {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.25rem var(--prioritas-page-x) 2rem;
+    }
+
+    .prioritas-loading__top {
+        height: 5rem;
+    }
+    .prioritas-loading__row {
+        height: 7.5rem;
+    }
+
+    .prioritas-empty {
+        display: grid;
+        grid-template-columns: 3.5rem minmax(7rem, 0.35fr) minmax(0, 1fr);
+        gap: 1rem;
+        min-height: 24rem;
+        padding: clamp(3.5rem, 7vw, 6.5rem) var(--prioritas-page-x);
+        align-items: center;
+        border-bottom: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-empty__index {
+        align-self: start;
+        color: var(--color-teks-400);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+    .prioritas-empty__mark {
+        color: var(--color-navy-900);
+        font-size: clamp(5rem, 11vw, 10rem);
+        font-weight: 300;
+        line-height: 1;
+    }
+
+    .prioritas-empty--good .prioritas-empty__mark {
+        color: var(--color-baik);
+    }
+
+    .prioritas-empty__body h2 {
+        max-width: 15ch;
+        margin-top: 0.7rem;
+        color: var(--color-navy-900);
+        font-size: clamp(2.1rem, 4.6vw, 4.8rem);
+        font-weight: 550;
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+    }
+
+    .prioritas-empty__body > p {
+        max-width: 38rem;
+        margin-top: 1.15rem;
+        color: var(--color-teks-500);
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
+
+    .prioritas-inline-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding: 0.7rem 0;
+        border: 0;
+        border-bottom: 1px solid var(--color-navy-900);
+        background: transparent;
+        color: var(--color-navy-900);
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .prioritas-inline-cta:hover {
+        color: var(--color-biru-700);
+        border-color: var(--color-biru-700);
+    }
+
+    .prioritas-section--ranking {
+        padding-top: clamp(2.75rem, 5vw, 5rem);
+    }
+
+    .prioritas-featured {
+        display: grid;
+        grid-template-columns: minmax(6rem, 0.65fr) minmax(0, 2.6fr) minmax(
+                8rem,
+                0.7fr
+            );
+        gap: clamp(1rem, 2vw, 2rem);
+        padding: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+        border-top: 2px solid var(--color-navy-900);
+        border-bottom: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-featured__rank {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding-right: 1rem;
+        border-right: 1px solid var(--prioritas-line);
+        color: var(--color-emas-700);
+    }
+
+    .prioritas-featured__rank span {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+    .prioritas-featured__rank strong {
+        font-size: clamp(3.4rem, 7vw, 6.8rem);
+        font-weight: 500;
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+    }
+
+    .prioritas-featured__number {
+        color: var(--color-teks-400);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+    }
+
+    .prioritas-featured__main h3 {
+        max-width: 19ch;
+        margin-top: 0.35rem;
+        color: var(--color-navy-900);
+        font-size: clamp(2rem, 4.2vw, 4.5rem);
+        font-weight: 560;
+        line-height: 0.97;
+        letter-spacing: -0.055em;
+    }
+
+    .prioritas-featured__main > p {
+        max-width: 48rem;
+        margin-top: 1.15rem;
+        color: var(--color-teks-700);
+        font-size: 0.84rem;
+        line-height: 1.7;
+    }
+
+    .prioritas-featured__meta,
+    .prioritas-row__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.7rem 1rem;
+        margin-top: 1rem;
+        color: var(--color-teks-500);
+        font-size: 0.7rem;
+    }
+
+    .prioritas-featured__score {
+        padding-left: 1.25rem;
+        border-left: 1px solid var(--prioritas-line);
+        text-align: right;
+    }
+
+    .prioritas-featured__score span {
+        display: block;
+        color: var(--color-teks-500);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .prioritas-featured__score strong {
+        display: block;
+        margin-top: 0.5rem;
+        color: var(--color-navy-900);
+        font-size: clamp(3.25rem, 6.5vw, 6.3rem);
+        font-weight: 550;
+        line-height: 0.9;
+        letter-spacing: -0.065em;
+    }
+
+    .prioritas-featured__actions {
+        grid-column: 2 / 4;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1.4rem;
+        padding: 1.25rem 0;
+        border-top: 1px solid var(--prioritas-muted-line);
+    }
+
+    .prioritas-featured__actions button,
+    .prioritas-row__actions button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--color-navy-900);
+        font: inherit;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .prioritas-featured__actions button:hover,
+    .prioritas-row__actions button:hover {
+        color: var(--color-biru-700);
+    }
+
+    .prioritas-featured__expand {
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 1rem;
+        padding: 0 0 1.5rem;
+    }
+
+    .prioritas-list {
+        margin-top: clamp(3rem, 5vw, 5rem);
+        border-top: 1px solid var(--prioritas-line);
+    }
+
+    .prioritas-row {
+        display: grid;
+        grid-template-columns: minmax(4rem, 0.45fr) minmax(0, 2.7fr) minmax(
+                6rem,
+                0.55fr
+            ) minmax(8rem, 0.75fr);
+        gap: clamp(0.8rem, 2vw, 1.5rem);
+        align-items: start;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--prioritas-line);
+        transition:
+            background-color 180ms ease,
+            padding 180ms ease,
+            margin 180ms ease;
+    }
+
+    .prioritas-row:hover {
+        margin-inline: calc(var(--prioritas-page-x) * -0.3);
+        padding-inline: calc(var(--prioritas-page-x) * 0.3);
+        background: var(--color-kartu);
+    }
+
+    .prioritas-row__rank span {
+        color: var(--color-teks-400);
+        font-size: clamp(1.65rem, 3vw, 2.8rem);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.04em;
+    }
+
+    .prioritas-row__number {
+        color: var(--color-teks-400);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
+
+    .prioritas-row__main h3 {
+        max-width: 30ch;
+        margin-top: 0.25rem;
+        color: var(--color-teks-900);
+        font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+        font-weight: 600;
+        line-height: 1.18;
+    }
+
+    .prioritas-row__main > p {
+        max-width: 46rem;
+        margin-top: 0.65rem;
+        color: var(--color-teks-500);
+        font-size: 0.72rem;
+        line-height: 1.6;
+    }
+
+    .prioritas-row__score {
+        text-align: right;
+    }
+
+    .prioritas-row__score strong {
+        display: block;
+        color: var(--color-navy-900);
+        font-size: clamp(1.85rem, 3vw, 2.8rem);
+        font-weight: 550;
+        line-height: 1;
+        letter-spacing: -0.055em;
+    }
+
+    .prioritas-row__score span {
+        display: block;
+        margin-top: 0.35rem;
+        color: var(--color-teks-400);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .prioritas-row__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding-top: 0.25rem;
+    }
+
+    .prioritas-row__expand {
+        grid-column: 2 / -1;
+        display: grid;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+
+    .prioritas-expand-panel,
+    .prioritas-root-panel {
+        padding: 1.25rem;
+        border: 1px solid var(--prioritas-line);
+        background: var(--color-kartu);
+    }
+
+    .prioritas-expand-panel__head,
+    .prioritas-root-panel__head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--prioritas-muted-line);
+    }
+
+    .prioritas-expand-panel__head p {
+        max-width: 24rem;
+        color: var(--color-teks-500);
+        font-size: 0.7rem;
+        text-align: right;
+    }
+
+    .prioritas-root-panel__head h4 {
+        margin-top: 0.35rem;
+        color: var(--color-navy-900);
+        font-size: clamp(1.2rem, 2vw, 1.7rem);
+        font-weight: 600;
+        line-height: 1.15;
+    }
+
+    .prioritas-root-panel__empty,
+    .prioritas-root-candidate__empty {
+        color: var(--color-teks-500);
+        font-size: 0.78rem;
+        line-height: 1.65;
+    }
+
+    .prioritas-root-candidates {
+        display: grid;
+        gap: 0;
+        border-top: 1px solid var(--prioritas-muted-line);
+    }
+
+    .prioritas-root-candidate {
+        padding: 1.25rem 0;
+        border-bottom: 1px solid var(--prioritas-muted-line);
+    }
+
+    .prioritas-root-candidate:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .prioritas-root-candidate__top {
+        display: grid;
+        grid-template-columns: 3rem 1fr;
+        gap: 0.9rem;
+        align-items: start;
+    }
+
+    .prioritas-root-candidate__index {
+        color: var(--color-teks-400);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+    }
+
+    .prioritas-root-candidate__title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .prioritas-root-candidate__title h5 {
+        color: var(--color-teks-900);
+        font-size: 0.9rem;
+        font-weight: 650;
+        line-height: 1.3;
+    }
+
+    .prioritas-confidence {
+        display: inline-flex;
+        align-items: center;
+        min-height: 1.45rem;
+        padding: 0.2rem 0.45rem;
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        font-size: 0.58rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .prioritas-confidence--strong {
+        color: var(--color-kurang);
+    }
+    .prioritas-confidence--medium {
+        color: var(--color-sedang);
+    }
+    .prioritas-confidence--weak {
+        color: var(--color-kosong);
+    }
+
+    .prioritas-root-candidate__best {
+        color: var(--color-emas-700);
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .prioritas-evidence-list {
+        display: grid;
+        gap: 0;
+        margin-top: 1rem;
+        margin-left: 3.9rem;
+        border-top: 1px solid var(--prioritas-muted-line);
+    }
+
+    .prioritas-evidence {
+        display: grid;
+        grid-template-columns: 3rem minmax(0, 1fr) auto auto;
+        gap: 0.75rem;
+        align-items: center;
+        min-height: 3.25rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--prioritas-muted-line);
+    }
+
+    .prioritas-evidence__number {
+        color: var(--color-teks-400);
+        font-size: 0.64rem;
+        font-weight: 700;
+    }
+
+    .prioritas-evidence strong {
+        color: var(--color-teks-700);
+        font-size: 0.74rem;
+        font-weight: 550;
+    }
+
+    .prioritas-evidence__tag {
+        color: var(--color-biru-700);
+        font-size: 0.6rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 1100px) {
+        .prioritas-hero__grid {
+            grid-template-columns: 1fr;
+            align-items: start;
+        }
+
+        .prioritas-hero__context {
+            min-height: 0;
+            padding-left: 0;
+            border-left: 0;
+            border-top: 1px solid var(--prioritas-line);
+            padding-top: 1.5rem;
+        }
+
+        .prioritas-filter-panel {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .prioritas-field,
+        .prioritas-field:first-child {
+            padding-left: 1rem;
+            border-bottom: 1px solid var(--prioritas-line);
+        }
+
+        .prioritas-field:nth-child(2n) {
+            border-right: 0;
+        }
+        .prioritas-field:last-child {
+            border-bottom: 0;
+        }
+
+        .prioritas-section__heading {
+            grid-template-columns: 3rem minmax(0, 1fr);
+        }
+
+        .prioritas-section__aside {
+            grid-column: 2;
+            justify-self: start;
+            text-align: left;
+        }
+
+        .prioritas-featured {
+            grid-template-columns: 5.5rem minmax(0, 1fr);
+        }
+
+        .prioritas-featured__score {
+            grid-column: 2;
+            padding: 1rem 0 0;
+            border-left: 0;
+            border-top: 1px solid var(--prioritas-muted-line);
+            text-align: left;
+        }
+
+        .prioritas-featured__actions {
+            grid-column: 2;
+            justify-content: flex-start;
+        }
+
+        .prioritas-row {
+            grid-template-columns: 4rem minmax(0, 1fr) 5rem;
+        }
+
+        .prioritas-row__actions {
+            grid-column: 2 / -1;
+            justify-content: flex-start;
+        }
+
+        .prioritas-row__expand {
+            grid-column: 2 / -1;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .prioritas-v2 {
+            --prioritas-page-x: 1rem;
+            margin-top: 0;
+        }
+
+        .prioritas-display-title {
+            font-size: clamp(3rem, 17vw, 5.2rem);
+        }
+
+        .prioritas-filter-panel {
+            grid-template-columns: 1fr;
+        }
+
+        .prioritas-field,
+        .prioritas-field:first-child,
+        .prioritas-field:nth-child(2n) {
+            padding: 1rem 0;
+            border-right: 0;
+            border-bottom: 1px solid var(--prioritas-line);
+        }
+
+        .prioritas-field:last-child {
+            border-bottom: 0;
+        }
+
+        .prioritas-actionbar {
+            align-items: stretch;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .prioritas-actionbar__actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .prioritas-download {
+            justify-content: flex-start;
+        }
+
+        .prioritas-run-button {
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .prioritas-section__heading {
+            grid-template-columns: 2.5rem 1fr;
+        }
+
+        .prioritas-empty {
+            grid-template-columns: 2.5rem 1fr;
+            min-height: 22rem;
+        }
+
+        .prioritas-empty__mark {
+            display: none;
+        }
+
+        .prioritas-featured {
+            grid-template-columns: 1fr;
+        }
+
+        .prioritas-featured__rank {
+            flex-direction: row;
+            align-items: baseline;
+            justify-content: space-between;
+            padding: 0 0 1rem;
+            border-right: 0;
+            border-bottom: 1px solid var(--prioritas-muted-line);
+        }
+
+        .prioritas-featured__rank strong {
+            font-size: 3rem;
+        }
+
+        .prioritas-featured__main,
+        .prioritas-featured__score,
+        .prioritas-featured__actions {
+            grid-column: 1;
+        }
+
+        .prioritas-featured__actions {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .prioritas-row {
+            grid-template-columns: 3rem 1fr;
+        }
+
+        .prioritas-row:hover {
+            margin-inline: 0;
+            padding-inline: 0;
+            background: transparent;
+        }
+
+        .prioritas-row__score {
+            grid-column: 2;
+            text-align: left;
+        }
+
+        .prioritas-row__actions,
+        .prioritas-row__expand {
+            grid-column: 2;
+        }
+
+        .prioritas-evidence-list {
+            margin-left: 0;
+        }
+
+        .prioritas-evidence {
+            grid-template-columns: 2.6rem 1fr;
+            align-items: start;
+        }
+
+        .prioritas-evidence > :nth-child(3),
+        .prioritas-evidence > :nth-child(4) {
+            grid-column: 2;
+        }
+
+        .prioritas-expand-panel__head,
+        .prioritas-root-panel__head {
+            flex-direction: column;
+        }
+
+        .prioritas-expand-panel__head p {
+            text-align: left;
+        }
+    }
+}

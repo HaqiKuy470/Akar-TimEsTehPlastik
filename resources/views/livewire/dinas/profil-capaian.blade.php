@@ -71,7 +71,6 @@
         </div>
     </section>
 
-    {{-- FILTER --}}
     <section class="akar-section akar-section--filter" aria-labelledby="judul-filter-capaian">
         <div class="akar-section__heading">
             <span class="akar-section__index">01</span>
@@ -144,7 +143,6 @@
         </div>
     </section>
 
-    {{-- LOADING --}}
     <div
         wire:loading.delay.flex
         wire:target="tahun,provinsi,wilayahId,jenisSatuan,statusSatuan"
@@ -157,7 +155,6 @@
         <div class="rangka-muat akar-loading__block"></div>
     </div>
 
-    {{-- CONTENT --}}
     <div wire:loading.remove wire:target="tahun,provinsi,wilayahId,jenisSatuan,statusSatuan">
         @if ($profil === null)
             <section class="akar-empty akar-reveal" aria-labelledby="judul-kosong-profil">
@@ -183,7 +180,6 @@
                 </div>
             </section>
         @else
-            {{-- SUMMARY --}}
             <section class="akar-section akar-reveal" aria-labelledby="judul-ringkasan-capaian">
                 <div class="akar-section__heading">
                     <span class="akar-section__index">02</span>
@@ -244,7 +240,6 @@
                 </div>
             </section>
 
-            {{-- DIMENSIONS --}}
             <section class="akar-section akar-section--indicators" aria-labelledby="judul-indikator-capaian">
                 <div class="akar-section__heading akar-section__heading--sticky-intro">
                     <span class="akar-section__index">03</span>
