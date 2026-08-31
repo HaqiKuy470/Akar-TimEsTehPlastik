@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'AKAR' }} — AKAR</title>
+    <title>AKAR — Analisis Kausal dan Rekomendasi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,19 +17,19 @@
             <div class="flex h-14 items-center px-5 text-lg font-bold tracking-wide">AKAR</div>
             <nav class="mt-2 flex flex-col gap-0.5 px-2 text-[13px]">
                 @php
+                    // Hanya menu yang rutenya sudah terdaftar. "Akar masalah"
+                    // adalah penelusuran di dalam halaman Prioritas (DESIGN.md 5).
                     $menu = [
                         ['profil', 'Profil capaian'],
-                        ['prioritas', 'Prioritas masalah'],
-                        ['akar', 'Akar masalah'],
-                        ['banding', 'Perbandingan'],
-                        ['tren', 'Tren'],
+                        ['prioritas', 'Prioritas & akar masalah'],
+                        ['banding', 'Perbandingan antardaerah'],
                         ['rencana', 'Rencana tindak lanjut'],
-                        ['impor', 'Impor berkas'],
                     ];
                 @endphp
                 @foreach ($menu as [$key, $label])
+                    @continue(! \Illuminate\Support\Facades\Route::has("dinas.$key"))
                     @php $aktif = request()->routeIs("dinas.$key"); @endphp
-                    <a href="{{ \Illuminate\Support\Facades\Route::has("dinas.$key") ? route("dinas.$key") : '#' }}"
+                    <a href="{{ route("dinas.$key") }}"
                        @class([
                            'rounded px-3 py-2',
                            'bg-white/10 font-semibold text-white' => $aktif,
