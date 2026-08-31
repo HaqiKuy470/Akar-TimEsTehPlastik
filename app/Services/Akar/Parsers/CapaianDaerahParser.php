@@ -8,6 +8,7 @@ use App\Models\Capaian;
 use App\Models\ImporBerkas;
 use App\Models\Indikator;
 use App\Models\Wilayah;
+use App\Services\Akar\PemetaanJenisLayanan;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
@@ -449,13 +450,7 @@ class CapaianDaerahParser
      */
     private function jenisLayananDari(string $jenisSatuan): string
     {
-        $t = mb_strtolower($jenisSatuan);
-
-        return match (true) {
-            str_starts_with($t, 'paud'), $t === 'ra', str_contains($t, 'anak usia dini') => 'Pendidikan Anak Usia Dini',
-            str_contains($t, 'smk') => 'Vokasional',
-            default => 'Pendidikan Dasar dan Pendidikan Menengah',
-        };
+        return PemetaanJenisLayanan::dari($jenisSatuan);
     }
 
     // ------------------------------------------------------------------

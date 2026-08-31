@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\IndikatorFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Indikator extends Model
 {
+    /** @use HasFactory<IndikatorFactory> */
+    use HasFactory;
+
     protected $table = 'indikator';
 
     protected $fillable = [

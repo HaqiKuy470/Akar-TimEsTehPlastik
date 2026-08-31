@@ -65,4 +65,14 @@ return [
     // hanya dipakai bila fitur tren (F6) dikerjakan.
     'edisi_produksi' => [2024, 2025],
 
+    // Nama lengkap tiap dimensi indikator (huruf awal nomor indikator).
+    // Dipakai untuk mengelompokkan indikator pada profil capaian daerah.
+    'dimensi' => [
+        'A' => 'Mutu dan relevansi hasil belajar peserta didik',
+        'B' => 'Pemerataan pendidikan yang bermutu',
+        'C' => 'Kompetensi dan kinerja pendidik dan tenaga kependidikan',
+        'D' => 'Mutu dan relevansi pembelajaran',
+        'E' => 'Pengelolaan sekolah yang partisipatif, transparan, dan akuntabel',
+    ],
+
 ];
