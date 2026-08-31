@@ -23,6 +23,7 @@
                         ['profil', 'Profil capaian'],
                         ['prioritas', 'Prioritas & akar masalah'],
                         ['banding', 'Perbandingan antardaerah'],
+                        ['tren', 'Tren lintas tahun'],
                         ['rencana', 'Rencana tindak lanjut'],
                     ];
                 @endphp
