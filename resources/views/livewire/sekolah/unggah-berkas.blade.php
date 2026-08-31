@@ -1,58 +1,71 @@
 <div class="flex flex-col gap-6">
-    <div>
-        <h1 class="text-2xl font-bold text-teks-900">Unggah Rapor Pendidikan sekolah</h1>
-        <p class="mt-1 max-w-3xl text-teks-700">
-            Kepala sekolah dan tim dapat mengunggah berkas Rapor Pendidikan satuan pendidikan
-            untuk memperoleh analisis prioritas, akar masalah, dan draf rencana tindak lanjut
-            dengan logika yang sama seperti tingkat daerah.
-        </p>
-    </div>
+    <x-kepala-halaman
+        judul="Unggah Rapor Pendidikan sekolah"
+        lead="Kepala sekolah dan tim kurikulum dapat mengunggah berkas Rapor Pendidikan satuan pendidikan untuk memperoleh analisis prioritas, akar masalah, dan draf rencana kerja dengan logika yang sama seperti tingkat daerah." />
 
-    <div class="rounded-md border border-krem-300 bg-kartu p-5">
-        <h2 class="text-[15px] font-semibold text-teks-900">Cara memperoleh berkas</h2>
-        <ol class="mt-2 list-decimal space-y-1 pl-5 text-[13px] text-teks-700">
-            <li>Masuk ke <span class="font-medium">raporpendidikan.dikdasmen.go.id</span> dengan akun belajar.id sekolah Anda.</li>
-            <li>Buka menu <span class="font-medium">Unduh Rapor</span>, pilih tahun terbaru.</li>
-            <li>Unduh berkas berformat <span class="font-medium">.xlsx</span>. Jangan mengubah isinya.</li>
+    <x-kartu judul="Cara memperoleh berkas">
+        <ol class="flex flex-col gap-2 text-[13px] text-teks-700">
+            @foreach ([
+                'Masuk ke raporpendidikan.dikdasmen.go.id dengan akun belajar.id sekolah Anda.',
+                'Buka menu Unduh Rapor, pilih tahun terbaru.',
+                'Unduh berkas berformat .xlsx. Jangan mengubah isinya.',
+            ] as $n => $langkah)
+                <li class="flex gap-3">
+                    <span class="grid size-5 shrink-0 place-items-center rounded-full bg-krem-200 text-[11px] font-semibold text-teks-700 tabular">{{ $n + 1 }}</span>
+                    <span>{{ $langkah }}</span>
+                </li>
+            @endforeach
         </ol>
-        <p class="mt-3 rounded border border-sedang bg-sedang-bg p-2 text-[12px] text-sedang">
+        <p class="mt-4 rounded-md border border-sedang bg-sedang-bg px-3 py-2 text-[12px] leading-relaxed text-sedang">
             Catatan: mode satuan pendidikan belum diuji tim dengan berkas asli. Bila struktur berkas Anda
-            berbeda dari yang diharapkan, sistem akan menolaknya dengan penjelasan, bukan menampilkan data keliru.
+            berbeda dari yang diharapkan, sistem menolaknya dengan penjelasan, bukan menampilkan data keliru.
         </p>
-    </div>
+    </x-kartu>
 
     @if ($this->impor === null)
-        <form wire:submit="proses" class="rounded-md border border-krem-300 bg-kartu p-5">
-            <label class="flex flex-col gap-1 text-xs font-medium text-teks-700">
-                Berkas Rapor Pendidikan (.xlsx, maksimal 25 MB)
-                <input type="file" wire:model="berkas" accept=".xlsx"
-                       class="mt-1 text-[13px] file:mr-3 file:rounded file:border file:border-biru-700 file:bg-kartu file:px-3 file:py-1.5 file:text-[13px] file:font-semibold file:text-biru-700">
-            </label>
-            @error('berkas')
-                <p class="mt-2 text-[13px] font-medium text-kurang">{{ $message }}</p>
-            @enderror
+        <x-kartu>
+            <form wire:submit="proses" class="flex flex-col gap-4">
+                <label class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed border-krem-300 bg-krem-100 px-6 py-10 text-center hover:border-teks-400">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="size-8 text-teks-400" aria-hidden="true">
+                        <path d="M12 4v11m0-11L9 7m3-3l3 3M5 20h14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    @if ($berkas)
+                        <span class="text-[13px] font-medium text-teks-900">{{ $berkas->getClientOriginalName() }}</span>
+                        <span class="text-[12px] text-teks-500">Klik untuk mengganti berkas</span>
+                    @else
+                        <span class="text-[13px] font-medium text-teks-900">Pilih berkas .xlsx</span>
+                        <span class="text-[12px] text-teks-500">Berkas Rapor Pendidikan satuan pendidikan, maksimal 25 MB</span>
+                    @endif
+                    <input type="file" wire:model="berkas" accept=".xlsx" class="sr-only">
+                </label>
 
-            <div wire:loading wire:target="berkas" class="mt-2 text-[13px] text-teks-500">Mengunggah berkas…</div>
+                @error('berkas')
+                    <p class="text-[13px] font-medium text-kurang">{{ $message }}</p>
+                @enderror
 
-            @if ($galat)
-                <div class="mt-3 rounded border border-kurang bg-kurang-bg p-3">
-                    <p class="text-[13px] font-semibold text-kurang">Berkas tidak dapat diproses</p>
-                    <p class="mt-1 text-[13px] text-teks-700">{{ $galat }}</p>
+                <div wire:loading wire:target="berkas" class="text-[13px] text-teks-500">Mengunggah berkas…</div>
+
+                @if ($galat)
+                    <div class="rounded-md border border-kurang bg-kurang-bg p-3">
+                        <p class="text-[13px] font-semibold text-kurang">Berkas tidak dapat diproses</p>
+                        <p class="mt-1 text-[13px] text-teks-700">{{ $galat }}</p>
+                    </div>
+                @endif
+
+                <div>
+                    <x-tombol jenis="primer" type="submit" wire:loading.attr="disabled" wire:target="proses,berkas">
+                        Proses berkas
+                    </x-tombol>
                 </div>
-            @endif
-
-            <button type="submit" wire:loading.attr="disabled" wire:target="proses,berkas"
-                    class="mt-4 h-9 rounded bg-biru-700 px-4 text-[13px] font-semibold text-white hover:bg-biru-600 disabled:opacity-60">
-                Proses berkas
-            </button>
-        </form>
+            </form>
+        </x-kartu>
     @else
         @php $impor = $this->impor; @endphp
-        <div class="rounded-md border border-krem-300 bg-kartu p-5"
-             @if (in_array($impor->status, ['antre', 'proses'])) wire:poll.3s="periksaSelesai" @endif>
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[15px] font-semibold text-teks-900">{{ $impor->nama_berkas }}</p>
+        <div @if (in_array($impor->status, ['antre', 'proses'])) wire:poll.3s="periksaSelesai" @endif>
+        <x-kartu>
+            <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                    <p class="text-[14px] font-semibold text-teks-900">{{ $impor->nama_berkas }}</p>
                     <p class="mt-0.5 text-[13px] text-teks-500">
                         @switch($impor->status)
                             @case('antre') Menunggu diproses… @break
@@ -62,14 +75,18 @@
                         @endswitch
                     </p>
                 </div>
-                <button type="button" wire:click="ulangi"
-                        class="h-8 rounded border border-biru-700 px-3 text-xs font-semibold text-biru-700">
-                    Unggah berkas lain
-                </button>
+                <x-tombol jenis="sekunder" ukuran="kecil" wire:click="ulangi">Unggah berkas lain</x-tombol>
             </div>
 
+            @if (in_array($impor->status, ['antre', 'proses']))
+                <div class="mt-4 flex flex-col gap-2">
+                    <div class="rangka-muat h-8"></div>
+                    <div class="rangka-muat h-8 w-2/3"></div>
+                </div>
+            @endif
+
             @if ($impor->status === 'gagal' && $impor->catatan_galat)
-                <div class="mt-3 rounded border border-kurang bg-kurang-bg p-3 text-[13px] text-teks-700">
+                <div class="mt-3 rounded-md border border-kurang bg-kurang-bg p-3 text-[13px] text-teks-700">
                     {{ $impor->catatan_galat }}
                 </div>
             @endif
@@ -77,14 +94,14 @@
             @if ($impor->status === 'selesai' && $this->wilayahSatuan)
                 <div class="mt-4 border-t border-krem-300 pt-4">
                     <p class="text-[13px] text-teks-700">
-                        Data <span class="font-medium">{{ $this->wilayahSatuan->nama_satuan }}</span> siap dianalisis.
+                        Data <span class="font-medium text-teks-900">{{ $this->wilayahSatuan->nama_satuan }}</span> siap dianalisis.
                     </p>
-                    <button type="button" wire:click="keBeranda"
-                            class="mt-2 inline-block h-9 rounded bg-biru-700 px-4 text-[13px] font-semibold leading-9 text-white hover:bg-biru-600">
-                        Buka beranda sekolah
-                    </button>
+                    <div class="mt-2">
+                        <x-tombol jenis="primer" wire:click="keBeranda">Buka beranda sekolah</x-tombol>
+                    </div>
                 </div>
             @endif
+        </x-kartu>
         </div>
     @endif
 </div>

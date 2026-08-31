@@ -1,81 +1,94 @@
 <div class="flex flex-col gap-6">
-    <div>
-        <h1 class="text-2xl font-bold text-teks-900">Prioritas &amp; akar masalah</h1>
-        <p class="mt-1 max-w-3xl text-teks-700">
-            Indikator sekolah yang berlabel merah dan kuning, diurutkan menurut skor prioritas.
-            Setiap skor dapat ditelusuri ke komponen pembentuknya, dan tiap indikator prioritas
-            dapat ditelusuri akar masalahnya.
-        </p>
-    </div>
+    <x-kepala-halaman
+        judul="Prioritas & akar masalah"
+        lead="Indikator sekolah berlabel merah dan kuning, diurutkan menurut skor prioritas. Setiap skor dapat ditelusuri ke komponen pembentuknya, dan tiap indikator dapat ditelusuri akar masalahnya." />
 
     @if ($this->sekolah === null)
-        <div class="rounded-md border border-krem-300 bg-kartu p-10 text-center">
-            <p class="text-teks-700">Belum ada berkas Rapor Pendidikan yang diunggah.</p>
-            <a href="{{ route('sekolah.unggah') }}" class="mt-2 inline-block text-[13px] font-semibold text-biru-700 underline">Unggah berkas sekolah</a>
-        </div>
+        <x-kartu rapat>
+            <x-kosong
+                ikon="unggah"
+                judul="Belum ada berkas Rapor Pendidikan sekolah"
+                pesan="Unggah berkas dari akun belajar.id sekolah Anda untuk menjalankan analisis.">
+                <x-slot:aksi>
+                    <x-tombol jenis="primer" :href="route('sekolah.unggah')">Unggah berkas</x-tombol>
+                </x-slot:aksi>
+            </x-kosong>
+        </x-kartu>
     @else
-        <div class="rounded-md border border-krem-300 bg-kartu p-5">
-            <div class="flex flex-wrap items-center gap-3">
-                <button type="button" wire:click="jalankan" wire:loading.attr="disabled"
-                        class="h-9 rounded bg-biru-700 px-4 text-[13px] font-semibold text-white hover:bg-biru-600 disabled:bg-krem-300 disabled:text-teks-500">
+        <x-kartu rapat>
+            <div class="flex flex-wrap items-center gap-3 p-4">
+                <x-tombol jenis="primer" wire:click="jalankan" wire:loading.attr="disabled" wire:target="jalankan">
                     {{ $sudahDijalankan ? 'Jalankan ulang analisis' : 'Jalankan analisis' }}
-                </button>
+                </x-tombol>
                 <span wire:loading wire:target="jalankan" class="text-[13px] text-teks-500">Menghitung skor prioritas…</span>
             </div>
-        </div>
+        </x-kartu>
 
         <div wire:loading.delay.flex wire:target="jalankan" class="flex-col gap-3">
-            @for ($i = 0; $i < 3; $i++)
-                <div class="h-28 animate-pulse rounded-md border border-krem-300 bg-krem-200"></div>
-            @endfor
+            <div class="rangka-muat h-28"></div>
+            <div class="rangka-muat h-28"></div>
+            <div class="rangka-muat h-28"></div>
         </div>
 
         <div wire:loading.remove wire:target="jalankan" class="flex flex-col gap-4">
             @if (! $sudahDijalankan)
-                <div class="rounded-md border border-krem-300 bg-kartu p-10 text-center">
-                    <p class="text-teks-700">Belum ada analisis untuk sekolah ini.</p>
-                    <p class="mt-1 text-[13px] text-teks-500">Klik “Jalankan analisis” untuk menghitung skor prioritas.</p>
-                </div>
+                <x-kartu rapat>
+                    <x-kosong
+                        ikon="grafik"
+                        judul="Belum ada analisis untuk sekolah ini"
+                        pesan="Tekan “Jalankan analisis” untuk menghitung skor prioritas dari capaian sekolah." />
+                </x-kartu>
             @elseif (count($daftar) === 0)
-                <div class="rounded-md border border-baik bg-baik-bg p-6">
-                    <p class="font-semibold text-baik">Tidak ada indikator bermasalah</p>
+                <x-kartu>
+                    <p class="text-[14px] font-semibold text-baik">Tidak ada indikator bermasalah</p>
                     <p class="mt-1 text-[13px] text-teks-700">
                         Tidak ditemukan indikator berlabel Kurang atau Sedang. Pertahankan praktik yang sudah berjalan.
                     </p>
-                </div>
+                </x-kartu>
             @else
-                <p class="text-[13px] text-teks-500">{{ count($daftar) }} indikator masuk daftar prioritas.</p>
+                <p class="text-[12px] text-teks-500">{{ count($daftar) }} indikator masuk daftar prioritas.</p>
 
                 @foreach ($daftar as $item)
-                    <div wire:key="prioritas-{{ $item['id'] }}" class="rounded-md border border-krem-300 bg-kartu p-5">
+                    @php
+                        $pembanding = collect($item['komponen_skor'])->first(fn ($k) => ! empty($k['pembanding']['tersedia']))['pembanding'] ?? null;
+                    @endphp
+                    <x-kartu wire:key="prioritas-{{ $item['id'] }}">
                         <div class="flex items-start gap-4">
-                            <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-biru-700 text-xs font-bold text-white tabular">
-                                {{ $item['peringkat_prioritas'] }}
-                            </span>
+                            <span @class([
+                                'mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-[12px] font-bold text-white tabular',
+                                'bg-emas-700' => $item['peringkat_prioritas'] === 1,
+                                'bg-biru-700' => $item['peringkat_prioritas'] !== 1,
+                            ])>{{ $item['peringkat_prioritas'] }}</span>
 
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-start justify-between gap-4">
                                     <h2 class="text-[15px] font-semibold text-teks-900">{{ $item['nomor'] }} {{ $item['nama'] }}</h2>
                                     <div class="shrink-0 text-right">
-                                        <div class="tabular text-[32px] font-bold leading-none text-teks-900">{{ rtrim(rtrim(number_format((float) $item['skor'], 1, ',', '.'), '0'), ',') }}</div>
-                                        <div class="text-[11px] font-medium uppercase text-teks-500">Skor prioritas</div>
+                                        <div class="tabular text-[30px] font-bold leading-none tracking-tight text-teks-900">{{ rtrim(rtrim(number_format((float) $item['skor'], 1, ',', '.'), '0'), ',') }}</div>
+                                        <div class="text-[11px] font-medium uppercase tracking-[0.04em] text-teks-500">Skor prioritas</div>
                                     </div>
                                 </div>
 
-                                <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                                <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                                     <x-badge-capaian :label="$item['label']" />
                                     <x-arah-perubahan :nilai="$item['perubahan']" />
+                                    @if ($pembanding)
+                                        <span class="inline-flex items-center gap-1.5 text-[12px] text-teks-500">
+                                            vs rata-rata {{ $pembanding['nama'] }}:
+                                            <x-badge-capaian :label="$pembanding['label']" />
+                                        </span>
+                                    @endif
                                 </div>
 
-                                <p class="mt-2 max-w-3xl text-[13px] text-teks-700">{{ $item['kalimat_penjelas'] }}</p>
+                                <p class="mt-2 max-w-3xl text-[13px] leading-relaxed text-teks-700">{{ $item['kalimat_penjelas'] }}</p>
 
-                                <div class="mt-3 flex flex-wrap gap-4 text-[13px] font-medium text-biru-700">
-                                    <button type="button" wire:click="toggleRincian({{ $item['id'] }})" class="hover:text-biru-600">
+                                <div class="mt-3 flex flex-wrap gap-4">
+                                    <x-tombol jenis="tersier" ukuran="kecil" wire:click="toggleRincian({{ $item['id'] }})">
                                         {{ $item['rincian_terbuka'] ? '▾' : '▸' }} Rincian skor
-                                    </button>
-                                    <button type="button" wire:click="toggleAkar({{ $item['id'] }})" class="hover:text-biru-600">
+                                    </x-tombol>
+                                    <x-tombol jenis="tersier" ukuran="kecil" wire:click="toggleAkar({{ $item['id'] }})">
                                         {{ $item['akar_terbuka'] ? '▾' : '▸' }} Telusuri akar masalah
-                                    </button>
+                                    </x-tombol>
                                 </div>
 
                                 @if ($item['rincian_terbuka'])
@@ -85,13 +98,13 @@
                                 @endif
 
                                 @if ($item['akar_terbuka'] && $item['akar'])
-                                    <div class="mt-3 rounded border border-krem-300 bg-krem-100 p-4">
+                                    <div class="mt-3 rounded-md border border-krem-300 bg-krem-100 p-4">
                                         @if (! $item['akar']['dipetakan'])
                                             <p class="text-[13px] text-teks-700">
                                                 Rekomendasi akar masalah belum tersedia untuk indikator ini.
                                             </p>
                                         @else
-                                            <div class="flex items-center gap-2 text-[13px] font-semibold text-teks-900">
+                                            <div class="flex flex-wrap items-center gap-2 text-[13px] font-semibold text-teks-900">
                                                 <span>{{ $item['nomor'] }} {{ $item['nama'] }}</span>
                                                 <x-badge-capaian :label="$item['akar']['induk_label']" />
                                             </div>
@@ -107,7 +120,7 @@
                                                             'border-kosong text-kosong' => in_array($kandidat['keyakinan_kode'], ['lemah', 'tidak_cukup_bukti']),
                                                         ])>{{ $kandidat['keyakinan'] }}</span>
                                                         @if ($kIndex === 0 && $kandidat['keyakinan_kode'] !== 'tidak_cukup_bukti')
-                                                            <span class="text-[11px] font-medium uppercase text-emas-700">Akar terkuat</span>
+                                                            <span class="text-[11px] font-medium uppercase tracking-[0.04em] text-emas-700">Akar terkuat</span>
                                                         @endif
                                                     </div>
 
@@ -134,13 +147,16 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
+                    </x-kartu>
                 @endforeach
 
-                <div class="rounded-md border border-krem-300 bg-kartu p-4 text-[13px] text-teks-700">
-                    Lanjutkan ke <a href="{{ route('sekolah.rkt') }}" class="font-semibold text-biru-700 underline">Rencana Kerja Tahunan</a>
-                    untuk menyusun draf kegiatan dari hasil analisis ini.
-                </div>
+                <x-kartu>
+                    <p class="text-[13px] text-teks-700">
+                        Lanjutkan ke
+                        <a href="{{ route('sekolah.rkt') }}" class="font-semibold text-biru-700 hover:underline">Rencana Kerja Tahunan</a>
+                        untuk menyusun draf kegiatan dari hasil analisis ini.
+                    </p>
+                </x-kartu>
             @endif
         </div>
     @endif

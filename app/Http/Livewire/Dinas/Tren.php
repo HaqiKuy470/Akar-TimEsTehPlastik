@@ -114,6 +114,7 @@ class Tren extends Component
 
     public function render()
     {
-        return view('livewire.dinas.tren');
+        return view('livewire.dinas.tren')
+            ->layout('layouts::app', ['header' => 'Tren lintas tahun']);
     }
 }

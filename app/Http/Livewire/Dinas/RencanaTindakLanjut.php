@@ -241,6 +241,7 @@ class RencanaTindakLanjut extends Component
 
     public function render()
     {
-        return view('livewire.dinas.rencana-tindak-lanjut');
+        return view('livewire.dinas.rencana-tindak-lanjut')
+            ->layout('layouts::app', ['header' => 'Rencana tindak lanjut']);
     }
 }

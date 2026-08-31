@@ -210,6 +210,7 @@ class RencanaKerja extends Component
 
     public function render()
     {
-        return view('livewire.sekolah.rencana-kerja');
+        return view('livewire.sekolah.rencana-kerja')
+            ->layout('layouts::app', ['header' => 'Rencana Kerja']);
     }
 }

@@ -155,6 +155,7 @@ class ProfilCapaian extends Component
 
     public function render()
     {
-        return view('livewire.dinas.profil-capaian');
+        return view('livewire.dinas.profil-capaian')
+            ->layout('layouts::app', ['header' => 'Profil capaian daerah']);
     }
 }

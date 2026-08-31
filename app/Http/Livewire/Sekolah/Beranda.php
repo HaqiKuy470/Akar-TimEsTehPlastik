@@ -72,6 +72,7 @@ class Beranda extends Component
 
     public function render()
     {
-        return view('livewire.sekolah.beranda');
+        return view('livewire.sekolah.beranda')
+            ->layout('layouts::app', ['header' => 'Beranda']);
     }
 }

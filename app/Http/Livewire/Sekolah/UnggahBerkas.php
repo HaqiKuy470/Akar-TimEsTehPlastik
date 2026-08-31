@@ -140,6 +140,7 @@ class UnggahBerkas extends Component
 
     public function render()
     {
-        return view('livewire.sekolah.unggah-berkas');
+        return view('livewire.sekolah.unggah-berkas')
+            ->layout('layouts::app', ['header' => 'Unggah berkas']);
     }
 }

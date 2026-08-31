@@ -273,6 +273,7 @@ class Perbandingan extends Component
 
     public function render()
     {
-        return view('livewire.dinas.perbandingan');
+        return view('livewire.dinas.perbandingan')
+            ->layout('layouts::app', ['header' => 'Perbandingan antardaerah']);
     }
 }

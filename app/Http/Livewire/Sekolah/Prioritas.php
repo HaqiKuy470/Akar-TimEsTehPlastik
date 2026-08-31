@@ -126,7 +126,7 @@ class Prioritas extends Component
         return view('livewire.sekolah.prioritas', [
             'daftar' => $analisis !== null ? $this->susunDaftar($analisis) : [],
             'sudahDijalankan' => $analisis !== null,
-        ]);
+        ])->layout('layouts::app', ['header' => 'Prioritas']);
     }
 
     /**

@@ -95,6 +95,7 @@ class ProfilCapaian extends Component
 
     public function render()
     {
-        return view('livewire.sekolah.profil-capaian');
+        return view('livewire.sekolah.profil-capaian')
+            ->layout('layouts::app', ['header' => 'Profil capaian']);
     }
 }

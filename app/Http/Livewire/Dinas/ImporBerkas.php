@@ -40,6 +40,7 @@ class ImporBerkas extends Component
 
     public function render()
     {
-        return view('livewire.dinas.impor-berkas');
+        return view('livewire.dinas.impor-berkas')
+            ->layout('layouts::app', ['header' => 'Impor berkas']);
     }
 }
