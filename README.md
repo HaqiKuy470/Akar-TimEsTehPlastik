@@ -6,7 +6,7 @@ tindak lanjut yang siap dibawa ke rapat perencanaan.
 
 Dibangun untuk HoloDev HOLOGY 9.0 Universitas Brawijaya, subtema Pendidikan.
 
-Dokumen rujukan: `PRD.md`, `ARCHITECTURE.md`, `DESIGN.md`.
+Dokumen rujukan: `PRD.md`, `ARCHITECTURE.md`, `DESIGN.md`, `DEPLOYMENT.md`.
 
 ---
 
@@ -19,15 +19,24 @@ composer install
 npm install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate:fresh --seed
 npm run build
+```
+
+Basis data mengikuti `DB_CONNECTION` di `.env`. Untuk pengembangan cepat, SQLite
+sudah cukup (`DB_CONNECTION=sqlite`, `touch database/database.sqlite`). Produksi
+memakai MySQL — lihat `DEPLOYMENT.md`.
+
+### Basis data siap-demo
+
+Satu perintah menyiapkan skema, peran, akun demo, indikator, dan satu provinsi
+contoh (bila folder `dataset/` tersedia):
+
+```bash
+php artisan akar:demo --fresh
 php artisan serve
 ```
 
-Basis data default memakai SQLite (`database/database.sqlite`); untuk produksi
-cPanel gunakan MySQL, lihat `ARCHITECTURE.md`.
-
-### Mengisi data Rapor Pendidikan
+### Mengisi data Rapor Pendidikan secara manual
 
 Impor dilakukan di mesin lokal, bukan di server produksi (lihat
 `ARCHITECTURE.md` bagian 4). Berkas Metadata indikator wajib diimpor lebih dulu.
@@ -57,3 +66,12 @@ Dibuat otomatis oleh `php artisan migrate:fresh --seed`. Kata sandi ketiganya
 ```bash
 php artisan test
 ```
+
+---
+
+## Deployment
+
+Target produksi adalah shared hosting **cPanel** dengan MySQL, antrean lewat
+cron, dan tanpa Node/Composer di server. Langkah lengkap ada di `DEPLOYMENT.md`;
+berkas pendukung ada di `deploy/` (`index.php` untuk `public_html`, `dump-db.sh`
+untuk menyiapkan dump data), dan `.env.production.example` sebagai templat `.env`.

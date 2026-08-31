@@ -20,21 +20,22 @@
                     // Hanya menu yang rutenya sudah terdaftar. "Akar masalah"
                     // adalah penelusuran di dalam halaman Prioritas (DESIGN.md 5).
                     $menu = [
-                        ['profil', 'Profil capaian'],
-                        ['prioritas', 'Prioritas & akar masalah'],
-                        ['banding', 'Perbandingan antardaerah'],
-                        ['tren', 'Tren lintas tahun'],
-                        ['rencana', 'Rencana tindak lanjut'],
+                        ['dinas.profil', 'Profil capaian'],
+                        ['dinas.prioritas', 'Prioritas & akar masalah'],
+                        ['dinas.banding', 'Perbandingan antardaerah'],
+                        ['dinas.tren', 'Tren lintas tahun'],
+                        ['dinas.rencana', 'Rencana tindak lanjut'],
+                        ['dinas.impor', 'Impor berkas'],
+                        ['sekolah.unggah', 'Mode satuan pendidikan'],
                     ];
                 @endphp
-                @foreach ($menu as [$key, $label])
-                    @continue(! \Illuminate\Support\Facades\Route::has("dinas.$key"))
-                    @php $aktif = request()->routeIs("dinas.$key"); @endphp
-                    <a href="{{ route("dinas.$key") }}"
+                @foreach ($menu as [$nama, $label])
+                    @continue(! \Illuminate\Support\Facades\Route::has($nama))
+                    <a href="{{ route($nama) }}"
                        @class([
                            'rounded px-3 py-2',
-                           'bg-white/10 font-semibold text-white' => $aktif,
-                           'text-white/70 hover:bg-white/5 hover:text-white' => ! $aktif,
+                           'bg-white/10 font-semibold text-white' => request()->routeIs($nama),
+                           'text-white/70 hover:bg-white/5 hover:text-white' => ! request()->routeIs($nama),
                        ])>{{ $label }}</a>
                 @endforeach
             </nav>

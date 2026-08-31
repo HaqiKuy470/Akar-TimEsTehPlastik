@@ -142,6 +142,51 @@ class CapaianDaerahParser
     }
 
     /**
+     * Daftar nama sheet provinsi dalam berkas (tanpa Metadata dan Nasional).
+     *
+     * Dipakai jalur antrean (ProsesImporBerkas) yang memecah impor menjadi
+     * satu job per sheet.
+     *
+     * @return list<string>
+     */
+    public function sheetProvinsi(string $path): array
+    {
+        return $this->daftarSheetProvinsi($path);
+    }
+
+    /**
+     * Deteksi tahun edisi dari isi berkas (judul kolom "Label Capaian YYYY" di
+     * baris 8 sheet provinsi pertama). Dipakai jalur antrean untuk mengunci
+     * tahun sekali di awal, sebelum sheet dipecah menjadi job terpisah.
+     */
+    public function deteksiTahunBerkas(string $path): int
+    {
+        $sheet = $this->daftarSheetProvinsi($path);
+        if ($sheet === []) {
+            throw new RuntimeException(
+                'Berkas tidak memuat satu pun sheet provinsi. '.
+                'Pastikan berkas adalah Data Rapor Pendidikan Indonesia yang diunduh dari data.kemendikdasmen.go.id.'
+            );
+        }
+
+        return $this->deteksiTahun($path, $sheet[0]);
+    }
+
+    /**
+     * Hapus seluruh capaian satu provinsi (satu sheet) untuk sebuah impor.
+     *
+     * Membuat ProsesSheetProvinsi aman diulang: bila job sebuah sheet gagal di
+     * tengah jalan lalu dicoba lagi, baris parsial dibersihkan lebih dulu.
+     */
+    public function bersihkanSheet(int $imporId, string $provinsi): void
+    {
+        Capaian::query()
+            ->where('impor_id', $imporId)
+            ->whereIn('wilayah_id', Wilayah::query()->where('provinsi', $provinsi)->select('id'))
+            ->delete();
+    }
+
+    /**
      * Impor satu sheet provinsi. Mengembalikan jumlah baris data yang diproses.
      */
     public function imporSheet(string $path, string $namaSheet, ImporBerkas $impor, ?int $tahun = null): int

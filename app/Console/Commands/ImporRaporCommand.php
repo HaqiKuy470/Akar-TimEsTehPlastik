@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Jobs\ProsesImporBerkas;
 use App\Services\Akar\Parsers\CapaianDaerahParser;
 use App\Services\Akar\Parsers\MetadataIndikatorParser;
 use Illuminate\Console\Command;
@@ -24,7 +25,9 @@ use Throwable;
  */
 class ImporRaporCommand extends Command
 {
-    protected $signature = 'akar:impor {path : Path berkas Metadata (.csv) atau Data Rapor Pendidikan (.xlsx)}';
+    protected $signature = 'akar:impor
+        {path : Path berkas Metadata (.csv) atau Data Rapor Pendidikan (.xlsx)}
+        {--async : Untuk .xlsx, jalankan lewat antrean (satu job per sheet) alih-alih langsung}';
 
     protected $description = 'Impor berkas Rapor Pendidikan ke basis data lokal';
 
@@ -64,6 +67,14 @@ class ImporRaporCommand extends Command
 
     private function imporDaerah(CapaianDaerahParser $parser, string $path): int
     {
+        if ($this->option('async')) {
+            ProsesImporBerkas::dispatch(realpath($path));
+            $this->info('Berkas dijadwalkan. Jalankan antrean: php artisan queue:work --stop-when-empty');
+            $this->line('Pantau status di halaman Impor berkas.');
+
+            return self::SUCCESS;
+        }
+
         // Memuat satu sheet provinsi sekaligus butuh memori lebih besar dari
         // default. Ini aman karena impor hanya dijalankan di mesin lokal.
         $sebelumnya = ini_get('memory_limit');
