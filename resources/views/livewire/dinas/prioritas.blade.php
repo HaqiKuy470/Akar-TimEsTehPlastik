@@ -73,6 +73,20 @@
             @endunless
             <span wire:loading wire:target="jalankan" class="text-[13px] text-teks-500">Menghitung skor prioritas…</span>
         </div>
+
+        @if ($sudahDijalankan && count($daftar) > 0)
+            <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-krem-300 pt-3">
+                <span class="text-xs font-medium text-teks-500">Unduh laporan</span>
+                <button type="button" wire:click="unduhPdf"
+                        class="h-9 rounded border border-biru-700 bg-kartu px-4 text-[13px] font-semibold text-biru-700 hover:bg-biru-100">
+                    Unduh PDF
+                </button>
+                <button type="button" wire:click="unduhExcel"
+                        class="h-9 rounded border border-biru-700 bg-kartu px-4 text-[13px] font-semibold text-biru-700 hover:bg-biru-100">
+                    Unduh Excel
+                </button>
+            </div>
+        @endif
     </div>
 
     {{-- Kerangka saat analisis berjalan --}}

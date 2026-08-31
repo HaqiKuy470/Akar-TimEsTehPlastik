@@ -14,10 +14,14 @@ use App\Models\Wilayah;
 use App\Services\Akar\Analysis\AkarMasalahAnalyzer;
 use App\Services\Akar\Analysis\AnalisisRunner;
 use App\Services\Akar\Analysis\BenchmarkService;
+use App\Services\Akar\Output\LaporanExporter;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * F3 — Deteksi & Prioritisasi Masalah, dengan penelusuran akar masalah (F4)
@@ -205,6 +209,43 @@ class Prioritas extends Component
         $this->rincianTerbuka = [];
         $this->akarTerbuka = [];
         unset($this->analisis);
+    }
+
+    /**
+     * Unduh laporan PDF untuk analisis yang sedang ditampilkan. Perakitan
+     * dokumen ada di LaporanExporter; komponen ini hanya meneruskan responsnya.
+     */
+    public function unduhPdf(LaporanExporter $exporter): ?StreamedResponse
+    {
+        $analisis = $this->analisis;
+        if ($analisis === null) {
+            return null;
+        }
+
+        $pdf = $exporter->pdf($analisis);
+        $nama = $exporter->namaBerkas($analisis, 'pdf');
+
+        return response()->streamDownload(
+            fn () => print $pdf->output(),
+            $nama,
+            ['Content-Type' => 'application/pdf'],
+        );
+    }
+
+    /**
+     * Unduh data mentah analisis sebagai berkas Excel.
+     */
+    public function unduhExcel(LaporanExporter $exporter): ?Response
+    {
+        $analisis = $this->analisis;
+        if ($analisis === null) {
+            return null;
+        }
+
+        return Excel::download(
+            $exporter->excel($analisis),
+            $exporter->namaBerkas($analisis, 'xlsx'),
+        );
     }
 
     public function toggleRincian(int $prioritasId): void

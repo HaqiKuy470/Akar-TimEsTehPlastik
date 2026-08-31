@@ -7,11 +7,15 @@ namespace App\Http\Livewire\Dinas;
 use App\Models\Analisis;
 use App\Models\RencanaAksi;
 use App\Models\RencanaAksiItem;
+use App\Services\Akar\Output\LaporanExporter;
 use App\Services\Akar\Output\RencanaAksiGenerator;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * F7 - Generator Rencana Tindak Lanjut.
@@ -95,6 +99,43 @@ class RencanaTindakLanjut extends Component
         app(RencanaAksiGenerator::class)->hasilkan($analisis, auth()->id(), $paksaUlang);
 
         $this->muatRencana();
+    }
+
+    /**
+     * Unduh laporan lengkap (profil, prioritas, akar masalah, rencana) sebagai
+     * PDF. Perakitan dokumen ada di LaporanExporter.
+     */
+    public function unduhPdf(LaporanExporter $exporter): ?StreamedResponse
+    {
+        $analisis = $this->analisis;
+        if ($analisis === null) {
+            return null;
+        }
+
+        $pdf = $exporter->pdf($analisis);
+        $nama = $exporter->namaBerkas($analisis, 'pdf');
+
+        return response()->streamDownload(
+            fn () => print $pdf->output(),
+            $nama,
+            ['Content-Type' => 'application/pdf'],
+        );
+    }
+
+    /**
+     * Unduh data mentah analisis sebagai berkas Excel.
+     */
+    public function unduhExcel(LaporanExporter $exporter): ?Response
+    {
+        $analisis = $this->analisis;
+        if ($analisis === null) {
+            return null;
+        }
+
+        return Excel::download(
+            $exporter->excel($analisis),
+            $exporter->namaBerkas($analisis, 'xlsx'),
+        );
     }
 
     public function tambahBaris(): void

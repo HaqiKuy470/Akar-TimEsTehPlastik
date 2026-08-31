@@ -43,7 +43,30 @@
         <div class="flex min-w-0 flex-1 flex-col">
             <header class="flex h-14 items-center justify-between border-b border-krem-300 bg-navy-900 px-6 text-white">
                 <span class="text-sm font-semibold">{{ $header ?? 'Rapor Pendidikan' }}</span>
-                <span class="text-[13px] text-white/70">Dinas Pendidikan</span>
+                @auth
+                    @php
+                        $labelPeran = [
+                            'admin' => 'Administrator',
+                            'analis_dinas' => 'Analis Dinas',
+                            'kepala_sekolah' => 'Kepala Sekolah',
+                        ];
+                        $peran = auth()->user()->getRoleNames()->first();
+                    @endphp
+                    <div class="flex items-center gap-3 text-[13px]">
+                        <span class="text-white/70">
+                            {{ auth()->user()->name }}
+                            @if ($peran)
+                                <span class="text-white/40">·</span> {{ $labelPeran[$peran] ?? $peran }}
+                            @endif
+                        </span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="rounded border border-white/30 px-2.5 py-1 text-white/80 hover:bg-white/10 hover:text-white">
+                                Keluar
+                            </button>
+                        </form>
+                    </div>
+                @endauth
             </header>
 
             <main class="mx-auto w-full max-w-[1440px] flex-1 p-6">

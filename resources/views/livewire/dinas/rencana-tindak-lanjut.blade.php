@@ -47,6 +47,16 @@
             @if ($tersimpan)
                 <span class="text-[13px] font-medium text-baik">Tersimpan.</span>
             @endif
+
+            <span class="mx-1 h-6 w-px bg-krem-300"></span>
+            <button type="button" wire:click="unduhPdf"
+                    class="h-9 rounded border border-biru-700 bg-kartu px-4 text-[13px] font-semibold text-biru-700 hover:bg-biru-100">
+                Unduh PDF
+            </button>
+            <button type="button" wire:click="unduhExcel"
+                    class="h-9 rounded border border-biru-700 bg-kartu px-4 text-[13px] font-semibold text-biru-700 hover:bg-biru-100">
+                Unduh Excel
+            </button>
         </div>
 
         @if ($rencanaId === null)

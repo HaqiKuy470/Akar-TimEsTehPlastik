@@ -6,6 +6,7 @@ use App\Http\Livewire\Dinas\ProfilCapaian;
 use App\Models\Capaian;
 use App\Models\ImporBerkas;
 use App\Models\Indikator;
+use App\Models\User;
 use App\Models\Wilayah;
 use App\Services\Akar\PemetaanJenisLayanan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,7 +47,8 @@ class ProfilCapaianTest extends TestCase
     {
         $this->withoutVite();
 
-        $this->get(route('dinas.profil'))->assertOk()->assertSee('Profil capaian daerah');
+        $this->actingAs(User::factory()->create())
+            ->get(route('dinas.profil'))->assertOk()->assertSee('Profil capaian daerah');
     }
 
     public function test_tahun_terisi_otomatis_dari_edisi_terbaru(): void
