@@ -53,6 +53,17 @@ return [
     // turunan (proporsi anak berlabel Kurang atau Sedang).
     'label_bermasalah' => ['Kurang', 'Sedang'],
 
+    // Urutan mutu label capaian, dipakai saat memeringkat sebuah wilayah
+    // terhadap wilayah lain (komponen "posisi relatif" skor prioritas).
+    // Angka lebih besar berarti lebih baik. "Tidak Tersedia" tidak diberi
+    // peringkat: wilayah tanpa data dikeluarkan dari populasi pemeringkatan,
+    // bukan ditempatkan di posisi terbawah.
+    'peringkat_label' => [
+        'Baik' => 3,
+        'Sedang' => 2,
+        'Kurang' => 1,
+    ],
+
     // Label yang dihitung sebagai "merah" dan "kuning" pada ringkasan profil.
     'label_merah' => ['Kurang'],
     'label_kuning' => ['Sedang'],

@@ -1,0 +1,279 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\Akar\Analysis;
+
+use App\Models\Indikator;
+use App\Models\Wilayah;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * F5 — Perbandingan Antardaerah.
+ *
+ * Menempatkan capaian satu kabupaten/kota dalam konteks: peringkatnya terhadap
+ * seluruh kabupaten/kota lain di provinsi yang sama pada indikator, tahun,
+ * jenjang, dan status satuan yang sama, serta pembanding terhadap agregat
+ * provinsi dan nasional. Fitur ini tidak tersedia di portal resmi dan menjadi
+ * pembeda utama produk (PRD F5).
+ *
+ * Catatan metode.
+ *
+ *  1. Label capaian hanya memiliki tiga tingkat berjenjang (Baik > Sedang >
+ *     Kurang), sehingga banyak daerah akan berbagi peringkat yang sama. Itu
+ *     bukan cacat, melainkan konsekuensi datanya yang memang kasar. Karena itu
+ *     selain `peringkat` (posisi terbaik yang mungkin dalam kelompok label yang
+ *     sama) dikembalikan pula `peringkat_hingga` agar antarmuka bisa jujur
+ *     menampilkan rentang, misalnya "11-25 dari 38".
+ *
+ *  2. Peringkat dihitung dengan kueri agregat COUNT per label, bukan dengan
+ *     memuat seluruh baris capaian ke PHP (ARCHITECTURE.md bagian 6.4).
+ *
+ *  3. Indikator berlabel "Tidak Tersedia" dikeluarkan dari populasi
+ *     pemeringkatan, bukan ditempatkan di posisi terbawah. (Baris seperti itu
+ *     memang tidak disimpan saat impor, tetapi filter tetap dipasang eksplisit
+ *     sebagai jaring pengaman.)
+ */
+class BenchmarkService
+{
+    /** Nilai berjenjang tiap label untuk pengurutan. Makin besar makin baik. */
+    private const NILAI_LABEL = ['Baik' => 3, 'Sedang' => 2, 'Kurang' => 1];
+
+    private const TIDAK_TERSEDIA = 'Tidak Tersedia';
+
+    /**
+     * Peringkat sebuah wilayah terhadap kabupaten/kota lain di provinsinya.
+     *
+     * @return array{
+     *   label_wilayah: string|null,
+     *   perubahan_wilayah: string|null,
+     *   peringkat: int|null,
+     *   peringkat_hingga: int|null,
+     *   dari: int,
+     *   persentil: float|null,
+     *   catatan: string|null
+     * }
+     */
+    public function peringkat(
+        Wilayah $wilayah,
+        Indikator $indikator,
+        int $tahun,
+        string $jenisSatuan,
+        string $statusSatuan,
+    ): array {
+        $indikatorId = $indikator->id;
+
+        $kosong = [
+            'label_wilayah' => null,
+            'perubahan_wilayah' => null,
+            'peringkat' => null,
+            'peringkat_hingga' => null,
+            'dari' => 0,
+            'persentil' => null,
+            'catatan' => null,
+        ];
+
+        if ($wilayah->provinsi === null || $wilayah->provinsi === '') {
+            return [...$kosong, 'catatan' => 'Wilayah tidak memiliki induk provinsi sehingga tidak dapat dibandingkan.'];
+        }
+
+        $baris = DB::table('capaian')
+            ->where('wilayah_id', $wilayah->id)
+            ->where('indikator_id', $indikatorId)
+            ->where('tahun', $tahun)
+            ->where('jenis_satuan', $jenisSatuan)
+            ->where('status_satuan', $statusSatuan)
+            ->first(['label_capaian', 'perubahan_nilai']);
+
+        if ($baris === null || $baris->label_capaian === self::TIDAK_TERSEDIA) {
+            return [
+                ...$kosong,
+                'dari' => $this->populasi($wilayah->provinsi, $indikatorId, $tahun, $jenisSatuan, $statusSatuan)->sum(),
+                'catatan' => 'Wilayah ini tidak memiliki data untuk indikator ini, sehingga tidak masuk pemeringkatan.',
+            ];
+        }
+
+        $jumlahPerLabel = $this->populasi($wilayah->provinsi, $indikatorId, $tahun, $jenisSatuan, $statusSatuan);
+        $total = (int) $jumlahPerLabel->sum();
+
+        $nilaiSaya = self::NILAI_LABEL[$baris->label_capaian] ?? 0;
+
+        $lebihBaik = 0;
+        foreach ($jumlahPerLabel as $label => $jumlah) {
+            if ((self::NILAI_LABEL[$label] ?? 0) > $nilaiSaya) {
+                $lebihBaik += (int) $jumlah;
+            }
+        }
+        $sama = (int) ($jumlahPerLabel[$baris->label_capaian] ?? 0); // termasuk wilayah ini sendiri
+
+        $peringkat = $lebihBaik + 1;
+        $peringkatHingga = $lebihBaik + $sama;
+
+        // Peringkat tengah kelompok label yang sama, dipakai untuk persentil
+        // agar daerah di tengah kelompok besar tidak dianggap berada di puncak.
+        $peringkatTengah = $lebihBaik + ($sama + 1) / 2;
+        $persentil = $total > 1
+            ? round(($total - $peringkatTengah) / ($total - 1), 4)
+            : 1.0;
+
+        return [
+            'label_wilayah' => $baris->label_capaian,
+            'perubahan_wilayah' => $baris->perubahan_nilai,
+            'peringkat' => $peringkat,
+            'peringkat_hingga' => $peringkatHingga,
+            'dari' => $total,
+            'persentil' => $persentil,
+            'catatan' => null,
+        ];
+    }
+
+    /**
+     * Tabel peringkat seluruh kabupaten/kota satu provinsi untuk satu indikator,
+     * terurut dari label terbaik. Memuat satu baris per kabupaten/kota (puluhan
+     * baris), bukan seluruh tabel capaian.
+     *
+     * @return list<array{
+     *   wilayah_id: int, nama: string, label_capaian: string,
+     *   perubahan_nilai: string, peringkat: int
+     * }>
+     */
+    public function tabelPeringkat(
+        string $provinsi,
+        Indikator $indikator,
+        int $tahun,
+        string $jenisSatuan,
+        string $statusSatuan,
+    ): array {
+        $indikatorId = $indikator->id;
+
+        $baris = DB::table('capaian as c')
+            ->join('wilayah as w', 'w.id', '=', 'c.wilayah_id')
+            ->where('w.level', 'kabkota')
+            ->where('w.provinsi', $provinsi)
+            ->where('c.indikator_id', $indikatorId)
+            ->where('c.tahun', $tahun)
+            ->where('c.jenis_satuan', $jenisSatuan)
+            ->where('c.status_satuan', $statusSatuan)
+            ->where('c.label_capaian', '!=', self::TIDAK_TERSEDIA)
+            ->get(['w.id as wilayah_id', 'w.kabupaten_kota', 'c.label_capaian', 'c.perubahan_nilai']);
+
+        $terurut = $baris->all();
+        usort($terurut, function ($a, $b) {
+            $selisih = (self::NILAI_LABEL[$b->label_capaian] ?? 0) <=> (self::NILAI_LABEL[$a->label_capaian] ?? 0);
+
+            return $selisih !== 0
+                ? $selisih
+                : strcmp((string) $a->kabupaten_kota, (string) $b->kabupaten_kota);
+        });
+
+        return array_map(function ($r) use ($terurut) {
+            $nilai = self::NILAI_LABEL[$r->label_capaian] ?? 0;
+            $lebihBaik = count(array_filter(
+                $terurut,
+                fn ($lain) => (self::NILAI_LABEL[$lain->label_capaian] ?? 0) > $nilai
+            ));
+
+            return [
+                'wilayah_id' => (int) $r->wilayah_id,
+                'nama' => (string) $r->kabupaten_kota,
+                'label_capaian' => $r->label_capaian,
+                'perubahan_nilai' => $r->perubahan_nilai,
+                'peringkat' => $lebihBaik + 1,
+            ];
+        }, $terurut);
+    }
+
+    /**
+     * Capaian wilayah ini disandingkan dengan agregat provinsi dan nasional.
+     *
+     * Untuk mode satuan pendidikan, pemanggil cukup memberikan Wilayah level
+     * 'satuan'; pembanding tetap agregat kabupaten dan provinsi karena data
+     * sekolah lain tidak tersedia untuk publik (PRD F5, F10).
+     *
+     * @return array{
+     *   wilayah: array{nama: string, label: string|null, perubahan: string|null},
+     *   provinsi: array{nama: string, label: string|null, perubahan: string|null, tersedia: bool},
+     *   nasional: array{nama: string, label: string|null, perubahan: string|null, tersedia: bool}
+     * }
+     */
+    public function pembanding(
+        Wilayah $wilayah,
+        Indikator $indikator,
+        int $tahun,
+        string $jenisSatuan,
+        string $statusSatuan,
+    ): array {
+        $indikatorId = $indikator->id;
+
+        $ambil = function (?int $wilayahId) use ($indikatorId, $tahun, $jenisSatuan, $statusSatuan) {
+            if ($wilayahId === null) {
+                return null;
+            }
+
+            return DB::table('capaian')
+                ->where('wilayah_id', $wilayahId)
+                ->where('indikator_id', $indikatorId)
+                ->where('tahun', $tahun)
+                ->where('jenis_satuan', $jenisSatuan)
+                ->where('status_satuan', $statusSatuan)
+                ->first(['label_capaian', 'perubahan_nilai']);
+        };
+
+        $provinsiWilayah = $wilayah->provinsi !== null
+            ? Wilayah::query()->where('level', 'provinsi')->where('provinsi', $wilayah->provinsi)->first()
+            : null;
+        $nasionalWilayah = Wilayah::query()->where('level', 'nasional')->first();
+
+        $sendiri = $ambil($wilayah->id);
+        $provinsi = $ambil($provinsiWilayah?->id);
+        $nasional = $ambil($nasionalWilayah?->id);
+
+        return [
+            'wilayah' => [
+                'nama' => $wilayah->namaTampilan(),
+                'label' => $sendiri->label_capaian ?? null,
+                'perubahan' => $sendiri->perubahan_nilai ?? null,
+            ],
+            'provinsi' => [
+                'nama' => $provinsiWilayah?->namaTampilan() ?? ('Provinsi '.($wilayah->provinsi ?? '')),
+                'label' => $provinsi->label_capaian ?? null,
+                'perubahan' => $provinsi->perubahan_nilai ?? null,
+                'tersedia' => $provinsi !== null,
+            ],
+            'nasional' => [
+                'nama' => 'Nasional',
+                'label' => $nasional->label_capaian ?? null,
+                'perubahan' => $nasional->perubahan_nilai ?? null,
+                'tersedia' => $nasional !== null,
+            ],
+        ];
+    }
+
+    /**
+     * Jumlah kabupaten/kota per label di satu provinsi, tanpa "Tidak Tersedia".
+     *
+     * @return Collection<string, int>
+     */
+    private function populasi(
+        string $provinsi,
+        int $indikatorId,
+        int $tahun,
+        string $jenisSatuan,
+        string $statusSatuan,
+    ) {
+        return DB::table('capaian as c')
+            ->join('wilayah as w', 'w.id', '=', 'c.wilayah_id')
+            ->where('w.level', 'kabkota')
+            ->where('w.provinsi', $provinsi)
+            ->where('c.indikator_id', $indikatorId)
+            ->where('c.tahun', $tahun)
+            ->where('c.jenis_satuan', $jenisSatuan)
+            ->where('c.status_satuan', $statusSatuan)
+            ->where('c.label_capaian', '!=', self::TIDAK_TERSEDIA)
+            ->groupBy('c.label_capaian')
+            ->selectRaw('c.label_capaian as label, count(*) as jumlah')
+            ->pluck('jumlah', 'label')
+            ->map(fn ($n) => (int) $n);
+    }
+}
