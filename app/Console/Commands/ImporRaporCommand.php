@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Akar\Parsers\CapaianDaerahParser;
 use App\Services\Akar\Parsers\MetadataIndikatorParser;
 use Illuminate\Console\Command;
 use Throwable;
@@ -15,16 +16,19 @@ use Throwable;
  * dilakukan di lokal lewat perintah ini, bukan di server produksi. Hasilnya
  * dikirim ke produksi sebagai dump SQL.
  *
- * Tahap saat ini: impor berkas Metadata indikator (CSV). Impor sheet provinsi
- * (XLSX) menyusul pada tahap berikutnya.
+ *   .csv   -> berkas Metadata indikator  -> tabel indikator
+ *   .xlsx  -> Data Rapor Pendidikan      -> tabel wilayah + capaian
+ *
+ * Impor Metadata harus dijalankan lebih dulu; sheet provinsi merujuk indikator
+ * lewat nomor dan namanya.
  */
 class ImporRaporCommand extends Command
 {
-    protected $signature = 'akar:impor {path : Path berkas Metadata (.csv) atau Rapor Pendidikan (.xlsx)}';
+    protected $signature = 'akar:impor {path : Path berkas Metadata (.csv) atau Data Rapor Pendidikan (.xlsx)}';
 
     protected $description = 'Impor berkas Rapor Pendidikan ke basis data lokal';
 
-    public function handle(MetadataIndikatorParser $metadataParser): int
+    public function handle(MetadataIndikatorParser $metadataParser, CapaianDaerahParser $capaianParser): int
     {
         $path = (string) $this->argument('path');
 
@@ -39,7 +43,7 @@ class ImporRaporCommand extends Command
         try {
             return match ($ekstensi) {
                 'csv' => $this->imporMetadata($metadataParser, $path),
-                'xlsx' => $this->belumDidukung(),
+                'xlsx' => $this->imporDaerah($capaianParser, $path),
                 default => $this->tolakEkstensi($ekstensi),
             };
         } catch (Throwable $e) {
@@ -58,11 +62,29 @@ class ImporRaporCommand extends Command
         return self::SUCCESS;
     }
 
-    private function belumDidukung(): int
+    private function imporDaerah(CapaianDaerahParser $parser, string $path): int
     {
-        $this->warn('Impor berkas .xlsx (sheet provinsi) belum tersedia pada tahap ini.');
+        // Memuat satu sheet provinsi sekaligus butuh memori lebih besar dari
+        // default. Ini aman karena impor hanya dijalankan di mesin lokal.
+        $sebelumnya = ini_get('memory_limit');
+        ini_set('memory_limit', '1024M');
 
-        return self::FAILURE;
+        $this->info('Membaca Data Rapor Pendidikan: '.basename($path));
+
+        try {
+            $impor = $parser->impor($path, function (string $sheet, int $i, int $total) {
+                $this->line("  [{$i}/{$total}] {$sheet}");
+            });
+        } finally {
+            ini_set('memory_limit', (string) $sebelumnya);
+        }
+
+        $this->info("Selesai. Edisi {$impor->tahun_edisi}, {$impor->jumlah_baris} baris data diproses.");
+        if ($impor->catatan_galat !== null) {
+            $this->warn($impor->catatan_galat);
+        }
+
+        return self::SUCCESS;
     }
 
     private function tolakEkstensi(string $ekstensi): int
