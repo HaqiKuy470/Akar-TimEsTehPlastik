@@ -27,6 +27,12 @@ use Illuminate\Support\Facades\DB;
  * Analisis satu wilayah menyentuh ratusan baris, bukan jutaan, dan seluruh
  * pemeringkatan dilakukan lewat kueri agregat, bukan dengan memuat semua baris
  * capaian ke PHP.
+ *
+ * Mode satuan pendidikan. Bila wilayah berlevel 'satuan', tidak ada sekolah
+ * lain sebagai pembanding (data sekolah lain tidak dipublikasikan, PRD F10),
+ * sehingga komponen "posisi relatif" diganti: label sekolah dibandingkan
+ * terhadap agregat kabupaten induknya. Bobotnya tetap sama dan skor tetap pada
+ * skala 0-100 sehingga hasil dinas dan sekolah tetap sebanding.
  */
 class AnalisisRunner
 {
@@ -74,14 +80,20 @@ class AnalisisRunner
 
             $indikatorIds = $bermasalah->pluck('indikator_id')->all();
 
-            $bobotPosisi = $this->hitungPosisiRelatif(
-                $wilayah, $tahun, $jenisSatuan, $statusSatuan, $indikatorIds, $peringkatLabel
-            );
+            $satuan = $wilayah->level === 'satuan';
+
+            $bobotPosisi = $satuan
+                ? $this->hitungPosisiTerhadapKabupaten(
+                    $wilayah, $tahun, $jenisSatuan, $statusSatuan, $indikatorIds, $peringkatLabel
+                )
+                : $this->hitungPosisiRelatif(
+                    $wilayah, $tahun, $jenisSatuan, $statusSatuan, $indikatorIds, $peringkatLabel
+                );
             $bobotTurunan = $this->hitungDampakTurunan(
                 $wilayah, $tahun, $jenisSatuan, $statusSatuan, $indikatorIds, $labelBermasalah
             );
 
-            $baris = $bermasalah->map(function (Capaian $capaian) use ($bobotPosisi, $bobotTurunan) {
+            $baris = $bermasalah->map(function (Capaian $capaian) use ($bobotPosisi, $bobotTurunan, $satuan) {
                 $hasil = $this->kalkulator->hitung([
                     'label' => $capaian->label_capaian,
                     'perubahan' => $capaian->perubahan_nilai,
@@ -92,13 +104,24 @@ class AnalisisRunner
                 $posisi = $bobotPosisi[$capaian->indikator_id] ?? null;
                 $turunan = $bobotTurunan[$capaian->indikator_id] ?? null;
 
+                if ($satuan) {
+                    $hasil['komponen'] = $this->tandaiPosisiSatuan($hasil['komponen'], $posisi);
+                }
+
                 $kalimat = $this->penjelas->untuk($hasil['komponen'], [
                     'label' => $capaian->label_capaian,
                     'perubahan' => $capaian->perubahan_nilai,
+                    // Untuk satuan, peringkat/dari null → PenjelasGenerator tidak
+                    // membuat kalimat "peringkat X dari Y kabupaten/kota".
                     'peringkat' => $posisi['peringkat'] ?? null,
                     'dari' => $posisi['dari'] ?? null,
                     'anak_bermasalah' => $turunan['bermasalah'] ?? null,
                     'anak_total' => $turunan['total'] ?? null,
+                    'pembanding_kabupaten' => $satuan ? [
+                        'nama' => $posisi['pembanding_nama'] ?? null,
+                        'label' => $posisi['pembanding_kab'] ?? null,
+                        'tersedia' => (bool) ($posisi['pembanding_tersedia'] ?? false),
+                    ] : null,
                 ]);
 
                 return [
@@ -223,6 +246,105 @@ class AnalisisRunner
         }
 
         return $hasil;
+    }
+
+    /**
+     * Komponen "posisi" untuk mode satuan pendidikan: bukan peringkat
+     * antarsekolah (data itu tidak publik), melainkan perbandingan label
+     * sekolah terhadap agregat kabupaten induknya pada indikator yang sama.
+     *
+     *   sekolah lebih buruk daripada kabupaten -> nilai 1.0
+     *   sama                                    -> nilai 0.5
+     *   sekolah lebih baik                      -> nilai 0.0
+     *   kabupaten tidak punya data              -> nilai 0.0 (pembanding kosong)
+     *
+     * @param  list<int>  $indikatorIds
+     * @param  array<string, int>  $peringkatLabel
+     * @return array<int, array{nilai: float, peringkat: null, dari: null, pembanding_kab: string|null, pembanding_nama: string|null, pembanding_tersedia: bool}>
+     */
+    private function hitungPosisiTerhadapKabupaten(
+        Wilayah $wilayah,
+        int $tahun,
+        string $jenisSatuan,
+        string $statusSatuan,
+        array $indikatorIds,
+        array $peringkatLabel,
+    ): array {
+        $kabupaten = $wilayah->induk; // level 'kabkota' (bisa null bila berkas tak memuat kab)
+        $namaKabupaten = $kabupaten?->namaTampilan();
+
+        $labelSekolah = Capaian::query()
+            ->where('wilayah_id', $wilayah->id)
+            ->where('tahun', $tahun)
+            ->where('jenis_satuan', $jenisSatuan)
+            ->where('status_satuan', $statusSatuan)
+            ->whereIn('indikator_id', $indikatorIds)
+            ->pluck('label_capaian', 'indikator_id');
+
+        // Berkas daerah kadang memakai istilah jenjang yang sedikit berbeda dari
+        // berkas sekolah (mis. "SD Umum" vs "SD Negeri"); kalau tidak ada baris
+        // untuk jenjang yang sama persis, pembanding dianggap tidak tersedia.
+        $labelKabupaten = $kabupaten
+            ? Capaian::query()
+                ->where('wilayah_id', $kabupaten->id)
+                ->where('tahun', $tahun)
+                ->where('jenis_satuan', $jenisSatuan)
+                ->where('status_satuan', $statusSatuan)
+                ->whereIn('indikator_id', $indikatorIds)
+                ->pluck('label_capaian', 'indikator_id')
+            : collect();
+
+        $hasil = [];
+        foreach ($indikatorIds as $id) {
+            $rankSekolah = $peringkatLabel[$labelSekolah[$id] ?? ''] ?? null;
+            $labelKabIni = $labelKabupaten[$id] ?? null;
+            $rankKab = $peringkatLabel[$labelKabIni ?? ''] ?? null;
+
+            $nilai = match (true) {
+                $rankSekolah === null || $rankKab === null => 0.0,
+                $rankSekolah < $rankKab => 1.0,  // sekolah lebih buruk
+                $rankSekolah === $rankKab => 0.5,
+                default => 0.0,                  // sekolah lebih baik
+            };
+
+            $hasil[$id] = [
+                'nilai' => $nilai,
+                'peringkat' => null,
+                'dari' => null,
+                'pembanding_kab' => $labelKabIni,
+                'pembanding_nama' => $namaKabupaten,
+                'pembanding_tersedia' => $rankKab !== null,
+            ];
+        }
+
+        return $hasil;
+    }
+
+    /**
+     * Ganti label komponen "posisi" pada rincian skor agar sesuai konteks
+     * sekolah, dan lampirkan pembanding kabupaten. Jumlah komponen tetap empat
+     * dan kontribusinya tidak diubah, sehingga skor tetap dapat ditelusuri.
+     *
+     * @param  list<array<string, mixed>>  $komponen
+     * @param  array<string, mixed>|null  $posisi
+     * @return list<array<string, mixed>>
+     */
+    private function tandaiPosisiSatuan(array $komponen, ?array $posisi): array
+    {
+        foreach ($komponen as $i => $k) {
+            if (($k['kode'] ?? null) !== 'posisi') {
+                continue;
+            }
+            $komponen[$i]['nama'] = 'Posisi relatif terhadap kabupaten';
+            $komponen[$i]['pembanding'] = [
+                'jenis' => 'kabupaten',
+                'nama' => $posisi['pembanding_nama'] ?? null,
+                'label' => $posisi['pembanding_kab'] ?? null,
+                'tersedia' => (bool) ($posisi['pembanding_tersedia'] ?? false),
+            ];
+        }
+
+        return $komponen;
     }
 
     /**

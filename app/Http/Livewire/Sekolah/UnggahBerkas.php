@@ -104,6 +104,28 @@ class UnggahBerkas extends Component
         $this->galat = null;
     }
 
+    /**
+     * Setelah berkas selesai diproses, arahкан ke beranda sekolah tempat
+     * seluruh analisis (profil, prioritas, RKT) dapat dibuka.
+     */
+    public function keBeranda()
+    {
+        return redirect()->route('sekolah.beranda');
+    }
+
+    /**
+     * Dipanggil oleh wire:poll selama impor berjalan. Begitu status berubah
+     * menjadi "selesai", pengguna langsung dibawa ke beranda.
+     */
+    public function periksaSelesai()
+    {
+        if ($this->impor?->status === 'selesai') {
+            return redirect()->route('sekolah.beranda');
+        }
+
+        return null;
+    }
+
     #[Computed]
     public function impor(): ?ImporBerkas
     {

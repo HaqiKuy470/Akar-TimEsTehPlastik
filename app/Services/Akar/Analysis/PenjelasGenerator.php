@@ -24,6 +24,7 @@ class PenjelasGenerator
      *   perubahan?: string,
      *   peringkat?: int|null,
      *   dari?: int|null,
+     *   pembanding_kabupaten?: array{nama?: string, label?: string, tersedia?: bool}|null,
      *   anak_bermasalah?: int|null,
      *   anak_total?: int|null
      * }  $konteks
@@ -40,6 +41,13 @@ class PenjelasGenerator
         $peringkat = $this->kalimatPeringkat($konteks['peringkat'] ?? null, $konteks['dari'] ?? null);
         if ($peringkat !== null) {
             $kalimat[] = $peringkat;
+        }
+
+        // Mode satuan pendidikan tidak punya peringkat antarsekolah; pembandingnya
+        // adalah agregat kabupaten induk.
+        $kabupaten = $this->kalimatKabupaten($konteks['pembanding_kabupaten'] ?? null, $konteks['label'] ?? null);
+        if ($kabupaten !== null) {
+            $kalimat[] = $kabupaten;
         }
 
         $turunan = $this->kalimatTurunan(
@@ -81,6 +89,32 @@ class PenjelasGenerator
         }
 
         return "Berada di peringkat {$peringkat} dari {$dari} kabupaten/kota di provinsi yang sama.";
+    }
+
+    /**
+     * @param  array{nama?: string, label?: string, tersedia?: bool}|null  $kabupaten
+     */
+    private function kalimatKabupaten(?array $kabupaten, ?string $labelSekolah): ?string
+    {
+        if ($kabupaten === null || ($kabupaten['tersedia'] ?? false) !== true) {
+            return null;
+        }
+
+        $nama = $kabupaten['nama'] ?? 'kabupaten';
+        $labelKab = $kabupaten['label'] ?? null;
+
+        $peringkatMutu = ['Kurang' => 1, 'Sedang' => 2, 'Baik' => 3];
+        $s = $peringkatMutu[$labelSekolah] ?? null;
+        $k = $peringkatMutu[$labelKab] ?? null;
+
+        $banding = match (true) {
+            $s !== null && $k !== null && $s < $k => "lebih rendah daripada rata-rata {$nama}",
+            $s !== null && $k !== null && $s > $k => "lebih baik daripada rata-rata {$nama}",
+            $s !== null && $k !== null => "setara dengan rata-rata {$nama}",
+            default => "dapat dibandingkan dengan rata-rata {$nama} yang berlabel {$labelKab}",
+        };
+
+        return "Capaian sekolah {$banding}.";
     }
 
     private function kalimatTurunan(?int $bermasalah, ?int $total): ?string

@@ -17,17 +17,29 @@
             <div class="flex h-14 items-center px-5 text-lg font-bold tracking-wide">AKAR</div>
             <nav class="mt-2 flex flex-col gap-0.5 px-2 text-[13px]">
                 @php
-                    // Hanya menu yang rutenya sudah terdaftar. "Akar masalah"
-                    // adalah penelusuran di dalam halaman Prioritas (DESIGN.md 5).
-                    $menu = [
-                        ['dinas.profil', 'Profil capaian'],
-                        ['dinas.prioritas', 'Prioritas & akar masalah'],
-                        ['dinas.banding', 'Perbandingan antardaerah'],
-                        ['dinas.tren', 'Tren lintas tahun'],
-                        ['dinas.rencana', 'Rencana tindak lanjut'],
-                        ['dinas.impor', 'Impor berkas'],
-                        ['sekolah.unggah', 'Mode satuan pendidikan'],
-                    ];
+                    // Menu mengikuti peran pengguna. Kepala sekolah bekerja di
+                    // area satuan pendidikan; admin dan analis dinas di area
+                    // daerah. "Akar masalah" adalah penelusuran di dalam halaman
+                    // Prioritas (DESIGN.md 5).
+                    $kepalaSekolah = auth()->check() && auth()->user()->hasRole('kepala_sekolah');
+
+                    $menu = $kepalaSekolah
+                        ? [
+                            ['sekolah.beranda', 'Beranda'],
+                            ['sekolah.profil', 'Profil capaian'],
+                            ['sekolah.prioritas', 'Prioritas & akar masalah'],
+                            ['sekolah.rkt', 'Rencana Kerja Tahunan'],
+                            ['sekolah.unggah', 'Unggah berkas'],
+                        ]
+                        : [
+                            ['dinas.profil', 'Profil capaian'],
+                            ['dinas.prioritas', 'Prioritas & akar masalah'],
+                            ['dinas.banding', 'Perbandingan antardaerah'],
+                            ['dinas.tren', 'Tren lintas tahun'],
+                            ['dinas.rencana', 'Rencana tindak lanjut'],
+                            ['dinas.impor', 'Impor berkas'],
+                            ['sekolah.unggah', 'Mode satuan pendidikan'],
+                        ];
                 @endphp
                 @foreach ($menu as [$nama, $label])
                     @continue(! \Illuminate\Support\Facades\Route::has($nama))

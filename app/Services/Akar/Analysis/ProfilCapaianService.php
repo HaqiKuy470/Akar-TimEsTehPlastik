@@ -23,6 +23,15 @@ use Illuminate\Support\Collection;
  * bukan dari seluruh 274 indikator metadata. Sebuah indikator yang menjadi
  * kolom di sheet namun tidak punya baris untuk wilayah terpilih diperlakukan
  * sebagai "Tidak Tersedia" dan ditampilkan terpisah, bukan sebagai nilai nol.
+ *
+ * Mode satuan pendidikan. Bila wilayah berlevel 'satuan', sumber datanya adalah
+ * berkas yang diunggah kepala sekolah (ImporBerkas jenis 'satuan'), bukan berkas
+ * Rapor Pendidikan daerah. Bentuk keluaran identik sehingga antarmuka dinas dan
+ * sekolah dapat memakai lapisan yang sama. Untuk satuan, "indikator relevan"
+ * disaring dengan kolom `tersedia_satuan` dan berasal dari satu berkas sekolah
+ * itu saja; karena hanya ada satu wilayah dalam berkas tersebut, daftar
+ * "Tidak Tersedia" cenderung pendek (indikator yang jadi kolom tetapi bernilai
+ * "Tidak Tersedia" tidak ikut tersimpan, sama seperti jalur daerah).
  */
 class ProfilCapaianService
 {
@@ -51,13 +60,18 @@ class ProfilCapaianService
             'tidak_tersedia' => [],
         ];
 
-        $impor = $this->imporTerakhir($tahun);
+        $satuan = $wilayah->level === 'satuan';
+
+        $impor = $satuan
+            ? $this->imporSatuan($wilayah, $tahun)
+            : $this->imporDaerah($tahun);
         if ($impor === null) {
             return $rangka;
         }
 
         $jenisLayanan = PemetaanJenisLayanan::dari($jenisSatuan);
-        $universe = $this->indikatorRelevan($impor->id, $jenisSatuan, $jenisLayanan);
+        $kolomKetersediaan = $satuan ? 'tersedia_satuan' : 'tersedia_kabkota';
+        $universe = $this->indikatorRelevan($impor->id, $jenisSatuan, $jenisLayanan, $kolomKetersediaan);
         if ($universe->isEmpty()) {
             return $rangka;
         }
@@ -138,7 +152,7 @@ class ProfilCapaianService
     /**
      * Impor berkas daerah terakhir yang berhasil untuk sebuah tahun edisi.
      */
-    private function imporTerakhir(int $tahun): ?ImporBerkas
+    private function imporDaerah(int $tahun): ?ImporBerkas
     {
         return ImporBerkas::query()
             ->where('jenis', 'daerah')
@@ -149,12 +163,38 @@ class ProfilCapaianService
     }
 
     /**
-     * Indikator yang menjadi kolom di sheet untuk jenjang ini (pernah punya
+     * Impor berkas satuan pendidikan terakhir yang menghasilkan capaian untuk
+     * sekolah ini pada tahun tersebut.
+     */
+    private function imporSatuan(Wilayah $wilayah, int $tahun): ?ImporBerkas
+    {
+        $imporIds = Capaian::query()
+            ->where('wilayah_id', $wilayah->id)
+            ->where('tahun', $tahun)
+            ->distinct()
+            ->pluck('impor_id');
+
+        if ($imporIds->isEmpty()) {
+            return null;
+        }
+
+        return ImporBerkas::query()
+            ->whereIn('id', $imporIds)
+            ->where('jenis', 'satuan')
+            ->where('status', 'selesai')
+            ->latest('id')
+            ->first();
+    }
+
+    /**
+     * Indikator yang menjadi kolom di berkas untuk jenjang ini (pernah punya
      * baris capaian), diurutkan menurut nomor indikator secara natural.
      *
+     * @param  string  $kolomKetersediaan  'tersedia_kabkota' untuk jalur daerah,
+     *                                     'tersedia_satuan' untuk mode sekolah
      * @return Collection<int, Indikator>
      */
-    private function indikatorRelevan(int $imporId, string $jenisSatuan, string $jenisLayanan): Collection
+    private function indikatorRelevan(int $imporId, string $jenisSatuan, string $jenisLayanan, string $kolomKetersediaan): Collection
     {
         $idRelevan = Capaian::query()
             ->where('impor_id', $imporId)
@@ -170,7 +210,7 @@ class ProfilCapaianService
             ->with('induk:id,nomor')
             ->whereIn('id', $idRelevan)
             ->where('jenis_layanan', $jenisLayanan)
-            ->where('tersedia_kabkota', true)
+            ->where($kolomKetersediaan, true)
             ->get()
             ->sortBy(fn (Indikator $i) => $this->kunciUrut($i->nomor), SORT_NATURAL)
             ->values();

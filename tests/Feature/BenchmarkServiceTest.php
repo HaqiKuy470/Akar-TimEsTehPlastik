@@ -213,4 +213,63 @@ class BenchmarkServiceTest extends TestCase
         $this->assertFalse($hasil['nasional']['tersedia']);
         $this->assertNull($hasil['nasional']['label']);
     }
+
+    public function test_peringkat_wilayah_daerah_berlaku(): void
+    {
+        $kab = $this->kabkota('Jawa Timur', 'Kota Surabaya');
+        $this->capaian($kab, 'Baik');
+
+        $this->assertTrue($this->peringkat($kab)['berlaku']);
+    }
+
+    public function test_peringkat_tidak_berlaku_untuk_satuan_pendidikan(): void
+    {
+        $kab = $this->kabkota('Jawa Timur', 'Kabupaten Sidoarjo');
+        $sekolah = Wilayah::factory()->create([
+            'level' => 'satuan', 'provinsi' => 'Jawa Timur',
+            'kabupaten_kota' => 'Kabupaten Sidoarjo', 'nama_satuan' => 'SMP Negeri 2 Sidoarjo',
+            'induk_id' => $kab->id,
+        ]);
+        $this->capaian($sekolah, 'Kurang');
+
+        $hasil = $this->peringkat($sekolah);
+
+        $this->assertFalse($hasil['berlaku']);
+        $this->assertNull($hasil['peringkat']);
+        $this->assertNotNull($hasil['catatan']);
+    }
+
+    public function test_pembanding_satuan_menyandingkan_sekolah_kabupaten_dan_provinsi(): void
+    {
+        $prov = 'Jawa Timur';
+        $agregatProvinsi = Wilayah::factory()->provinsi()->create(['provinsi' => $prov]);
+        $kab = $this->kabkota($prov, 'Kabupaten Gresik');
+        $sekolah = Wilayah::factory()->create([
+            'level' => 'satuan', 'provinsi' => $prov, 'kabupaten_kota' => 'Kabupaten Gresik',
+            'nama_satuan' => 'SMP Negeri 1 Gresik', 'induk_id' => $kab->id,
+        ]);
+
+        $this->capaian($sekolah, 'Kurang', 'Turun');
+        $this->capaian($kab, 'Sedang', 'Naik');
+        $this->capaian($agregatProvinsi, 'Sedang', 'Tidak berubah');
+
+        $hasil = $this->service->pembanding($sekolah, $this->indikator, self::TAHUN, self::JENIS, self::STATUS);
+
+        $this->assertSame('Kurang', $hasil['wilayah']['label']);
+        $this->assertTrue($hasil['kabupaten']['tersedia']);
+        $this->assertSame('Sedang', $hasil['kabupaten']['label']);
+        $this->assertStringContainsString('Gresik', $hasil['kabupaten']['nama']);
+        $this->assertSame('Sedang', $hasil['provinsi']['label']);
+    }
+
+    public function test_pembanding_kabupaten_tidak_berlaku_untuk_wilayah_daerah(): void
+    {
+        $kab = $this->kabkota('Bali', 'Kabupaten Tabanan');
+        $this->capaian($kab, 'Baik');
+
+        $hasil = $this->service->pembanding($kab, $this->indikator, self::TAHUN, self::JENIS, self::STATUS);
+
+        $this->assertFalse($hasil['kabupaten']['tersedia']);
+        $this->assertNull($hasil['kabupaten']['nama']);
+    }
 }

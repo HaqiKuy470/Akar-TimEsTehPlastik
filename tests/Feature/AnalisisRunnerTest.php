@@ -167,4 +167,64 @@ class AnalisisRunnerTest extends TestCase
         $this->assertSame(0, $analisis->prioritas->count());
         $this->assertDatabaseHas('analisis', ['id' => $analisis->id]);
     }
+
+    public function test_mode_satuan_menghitung_posisi_terhadap_kabupaten(): void
+    {
+        $sekolah = Wilayah::factory()->create([
+            'level' => 'satuan', 'provinsi' => 'Jawa Timur',
+            'kabupaten_kota' => 'Kabupaten Bangkalan', 'nama_satuan' => 'SMP Negeri 3 Bangkalan',
+            'induk_id' => $this->bangkalan->id,
+        ]);
+
+        // Sekolah lebih buruk daripada kabupaten pada A.1 (Kurang vs Sedang) →
+        // komponen posisi bernilai maksimum. D.2: sama (Sedang vs Sedang) → 0.5.
+        $this->capaian($sekolah, $this->a1, 'Kurang', 'Turun');
+        $this->capaian($sekolah, $this->d2, 'Sedang', 'Tidak berubah');
+        $this->capaian($this->bangkalan, $this->a1, 'Sedang', 'Tidak berubah');
+        $this->capaian($this->bangkalan, $this->d2, 'Sedang', 'Tidak berubah');
+
+        $analisis = app(AnalisisRunner::class)->jalankan($sekolah, 2025, self::JENIS, self::STATUS);
+
+        $a1 = $analisis->prioritas->firstWhere('indikator_id', $this->a1->id);
+        $d2 = $analisis->prioritas->firstWhere('indikator_id', $this->d2->id);
+
+        $posisiA1 = collect($a1->komponen_skor)->firstWhere('kode', 'posisi');
+        $posisiD2 = collect($d2->komponen_skor)->firstWhere('kode', 'posisi');
+
+        $this->assertSame('Posisi relatif terhadap kabupaten', $posisiA1['nama']);
+        $this->assertEqualsWithDelta(1.0, $posisiA1['nilai_0_1'], 0.0001);
+        $this->assertEqualsWithDelta(0.5, $posisiD2['nilai_0_1'], 0.0001);
+        $this->assertSame('kabupaten', $posisiA1['pembanding']['jenis']);
+        $this->assertSame('Sedang', $posisiA1['pembanding']['label']);
+
+        // Skor tetap 0-100 dan jumlah kontribusi tepat sama dengan skor.
+        foreach ([$a1, $d2] as $p) {
+            $this->assertCount(4, $p->komponen_skor);
+            $jumlah = round(array_sum(array_column($p->komponen_skor, 'kontribusi')), 2);
+            $this->assertSame((float) $p->skor, $jumlah);
+            $this->assertLessThanOrEqual(100.0, (float) $p->skor);
+        }
+
+        // Kalimat penjelas tidak menyebut "peringkat ... kabupaten/kota".
+        $this->assertStringNotContainsString('kabupaten/kota di provinsi', $a1->kalimat_penjelas);
+        $this->assertNotEmpty($a1->kalimat_penjelas);
+    }
+
+    public function test_mode_satuan_tanpa_data_kabupaten_menandai_pembanding_kosong(): void
+    {
+        $sekolah = Wilayah::factory()->create([
+            'level' => 'satuan', 'provinsi' => 'Jawa Timur',
+            'kabupaten_kota' => 'Kabupaten Bangkalan', 'nama_satuan' => 'SD Negeri Tanpa Pembanding',
+            'induk_id' => $this->bangkalan->id,
+        ]);
+        $this->capaian($sekolah, $this->a1, 'Kurang', 'Turun');
+        // Kabupaten Bangkalan tidak punya baris A.1.
+
+        $analisis = app(AnalisisRunner::class)->jalankan($sekolah, 2025, self::JENIS, self::STATUS);
+        $posisi = collect($analisis->prioritas->firstWhere('indikator_id', $this->a1->id)->komponen_skor)
+            ->firstWhere('kode', 'posisi');
+
+        $this->assertEqualsWithDelta(0.0, $posisi['nilai_0_1'], 0.0001);
+        $this->assertFalse($posisi['pembanding']['tersedia']);
+    }
 }

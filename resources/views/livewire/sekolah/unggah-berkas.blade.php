@@ -49,7 +49,7 @@
     @else
         @php $impor = $this->impor; @endphp
         <div class="rounded-md border border-krem-300 bg-kartu p-5"
-             @if (in_array($impor->status, ['antre', 'proses'])) wire:poll.3s @endif>
+             @if (in_array($impor->status, ['antre', 'proses'])) wire:poll.3s="periksaSelesai" @endif>
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-[15px] font-semibold text-teks-900">{{ $impor->nama_berkas }}</p>
@@ -79,10 +79,10 @@
                     <p class="text-[13px] text-teks-700">
                         Data <span class="font-medium">{{ $this->wilayahSatuan->nama_satuan }}</span> siap dianalisis.
                     </p>
-                    <a href="{{ route('dinas.prioritas') }}"
-                       class="mt-2 inline-block h-9 rounded bg-biru-700 px-4 text-[13px] font-semibold leading-9 text-white hover:bg-biru-600">
-                        Lihat prioritas masalah
-                    </a>
+                    <button type="button" wire:click="keBeranda"
+                            class="mt-2 inline-block h-9 rounded bg-biru-700 px-4 text-[13px] font-semibold leading-9 text-white hover:bg-biru-600">
+                        Buka beranda sekolah
+                    </button>
                 </div>
             @endif
         </div>

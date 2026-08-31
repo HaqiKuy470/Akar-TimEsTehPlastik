@@ -45,7 +45,14 @@ class BenchmarkService
     /**
      * Peringkat sebuah wilayah terhadap kabupaten/kota lain di provinsinya.
      *
+     * Hanya berlaku untuk wilayah level 'kabkota'. Untuk 'satuan' (sekolah)
+     * peringkat antarsekolah tidak tersedia — data sekolah lain tidak
+     * dipublikasikan (PRD F10) — sehingga `berlaku` bernilai false dan
+     * pemanggil sebaiknya memakai pembanding() terhadap agregat kabupaten
+     * dan provinsi.
+     *
      * @return array{
+     *   berlaku: bool,
      *   label_wilayah: string|null,
      *   perubahan_wilayah: string|null,
      *   peringkat: int|null,
@@ -65,6 +72,7 @@ class BenchmarkService
         $indikatorId = $indikator->id;
 
         $kosong = [
+            'berlaku' => true,
             'label_wilayah' => null,
             'perubahan_wilayah' => null,
             'peringkat' => null,
@@ -73,6 +81,14 @@ class BenchmarkService
             'persentil' => null,
             'catatan' => null,
         ];
+
+        if ($wilayah->level === 'satuan') {
+            return [
+                ...$kosong,
+                'berlaku' => false,
+                'catatan' => 'Peringkat antarsekolah tidak tersedia; data sekolah lain tidak dipublikasikan.',
+            ];
+        }
 
         if ($wilayah->provinsi === null || $wilayah->provinsi === '') {
             return [...$kosong, 'catatan' => 'Wilayah tidak memiliki induk provinsi sehingga tidak dapat dibandingkan.'];
@@ -118,6 +134,7 @@ class BenchmarkService
             : 1.0;
 
         return [
+            'berlaku' => true,
             'label_wilayah' => $baris->label_capaian,
             'perubahan_wilayah' => $baris->perubahan_nilai,
             'peringkat' => $peringkat,
@@ -185,14 +202,19 @@ class BenchmarkService
     }
 
     /**
-     * Capaian wilayah ini disandingkan dengan agregat provinsi dan nasional.
+     * Capaian wilayah ini disandingkan dengan agregat kabupaten, provinsi, dan
+     * nasional.
      *
-     * Untuk mode satuan pendidikan, pemanggil cukup memberikan Wilayah level
-     * 'satuan'; pembanding tetap agregat kabupaten dan provinsi karena data
-     * sekolah lain tidak tersedia untuk publik (PRD F5, F10).
+     * Ini pembanding utama untuk mode satuan pendidikan (PRD F5, F10): sekolah
+     * dibandingkan terhadap agregat kabupaten dan provinsinya, bukan terhadap
+     * sekolah lain (data sekolah lain tidak tersedia untuk publik). Baris
+     * `kabupaten` hanya terisi bila `$wilayah` berlevel 'satuan' dan berkasnya
+     * memuat kabupaten induk; untuk wilayah level daerah baris itu ditandai
+     * tidak berlaku.
      *
      * @return array{
      *   wilayah: array{nama: string, label: string|null, perubahan: string|null},
+     *   kabupaten: array{nama: string|null, label: string|null, perubahan: string|null, tersedia: bool},
      *   provinsi: array{nama: string, label: string|null, perubahan: string|null, tersedia: bool},
      *   nasional: array{nama: string, label: string|null, perubahan: string|null, tersedia: bool}
      * }
@@ -220,12 +242,17 @@ class BenchmarkService
                 ->first(['label_capaian', 'perubahan_nilai']);
         };
 
+        // Untuk sekolah, kabupaten pembanding adalah induk langsungnya.
+        $kabupatenWilayah = $wilayah->level === 'satuan' && $wilayah->induk?->level === 'kabkota'
+            ? $wilayah->induk
+            : null;
         $provinsiWilayah = $wilayah->provinsi !== null
             ? Wilayah::query()->where('level', 'provinsi')->where('provinsi', $wilayah->provinsi)->first()
             : null;
         $nasionalWilayah = Wilayah::query()->where('level', 'nasional')->first();
 
         $sendiri = $ambil($wilayah->id);
+        $kabupaten = $ambil($kabupatenWilayah?->id);
         $provinsi = $ambil($provinsiWilayah?->id);
         $nasional = $ambil($nasionalWilayah?->id);
 
@@ -234,6 +261,12 @@ class BenchmarkService
                 'nama' => $wilayah->namaTampilan(),
                 'label' => $sendiri->label_capaian ?? null,
                 'perubahan' => $sendiri->perubahan_nilai ?? null,
+            ],
+            'kabupaten' => [
+                'nama' => $kabupatenWilayah?->namaTampilan(),
+                'label' => $kabupaten->label_capaian ?? null,
+                'perubahan' => $kabupaten->perubahan_nilai ?? null,
+                'tersedia' => $kabupaten !== null,
             ],
             'provinsi' => [
                 'nama' => $provinsiWilayah?->namaTampilan() ?? ('Provinsi '.($wilayah->provinsi ?? '')),

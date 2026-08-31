@@ -49,7 +49,11 @@ class Login extends Component
         RateLimiter::clear($this->kunciPembatas());
         session()->regenerate();
 
-        $this->redirectIntended(route('dinas.profil'), navigate: true);
+        $beranda = Auth::user()->hasRole('kepala_sekolah')
+            ? route('sekolah.beranda')
+            : route('dinas.profil');
+
+        $this->redirectIntended($beranda, navigate: true);
     }
 
     /**

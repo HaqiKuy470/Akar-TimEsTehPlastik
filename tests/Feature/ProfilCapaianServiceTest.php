@@ -147,4 +147,67 @@ class ProfilCapaianServiceTest extends TestCase
 
         $this->assertSame(['A.2', 'A.10'], $nomor);
     }
+
+    public function test_menyusun_profil_untuk_wilayah_level_satuan(): void
+    {
+        // Berkas sekolah = ImporBerkas jenis 'satuan'; sumbernya bukan berkas
+        // Rapor Pendidikan daerah.
+        $imporSekolah = ImporBerkas::factory()->create(['jenis' => 'satuan', 'tahun_edisi' => null, 'status' => 'selesai']);
+        $sekolah = Wilayah::factory()->create([
+            'level' => 'satuan',
+            'provinsi' => 'Jawa Timur',
+            'kabupaten_kota' => 'Kabupaten Bangkalan',
+            'nama_satuan' => 'SMP Negeri 1 Bangkalan',
+            'induk_id' => $this->wilayah->id,
+        ]);
+
+        $literasi = $this->indikator('A.1', 'Kemampuan literasi');
+        Capaian::factory()->create([
+            'impor_id' => $imporSekolah->id,
+            'wilayah_id' => $sekolah->id,
+            'indikator_id' => $literasi->id,
+            'tahun' => 2025,
+            'jenis_satuan' => self::JENIS,
+            'status_satuan' => self::STATUS,
+            'label_capaian' => 'Kurang',
+            'perubahan_nilai' => 'Turun',
+        ]);
+
+        $profil = app(ProfilCapaianService::class)
+            ->untukWilayah($sekolah, 2025, self::JENIS, self::STATUS);
+
+        $this->assertTrue($profil['tersedia']);
+        $this->assertSame('satuan', $profil['wilayah']['level']);
+        $this->assertStringContainsString('SMP Negeri 1 Bangkalan', $profil['wilayah']['nama']);
+        $this->assertSame(1, $profil['ringkasan']['merah']);
+        $this->assertSame('A.1', $profil['dimensi']['A']['indikator'][0]['nomor']);
+    }
+
+    public function test_profil_satuan_hanya_memakai_indikator_tersedia_di_tingkat_satuan(): void
+    {
+        $imporSekolah = ImporBerkas::factory()->create(['jenis' => 'satuan', 'status' => 'selesai']);
+        $sekolah = Wilayah::factory()->create([
+            'level' => 'satuan', 'provinsi' => 'Jawa Timur', 'kabupaten_kota' => 'Kabupaten Bangkalan',
+            'nama_satuan' => 'SD Negeri Contoh', 'induk_id' => $this->wilayah->id,
+        ]);
+
+        $adaDiSatuan = $this->indikator('A.1', 'Kemampuan literasi');
+        $hanyaDaerah = Indikator::factory()->nomor('B.10')->create([
+            'nama' => 'Angka Partisipasi Kasar', 'jenis_layanan' => PemetaanJenisLayanan::DASAR_MENENGAH,
+            'tersedia_satuan' => false,
+        ]);
+
+        foreach ([$adaDiSatuan, $hanyaDaerah] as $ind) {
+            Capaian::factory()->create([
+                'impor_id' => $imporSekolah->id, 'wilayah_id' => $sekolah->id, 'indikator_id' => $ind->id,
+                'tahun' => 2025, 'jenis_satuan' => self::JENIS, 'status_satuan' => self::STATUS,
+                'label_capaian' => 'Kurang', 'perubahan_nilai' => 'Turun',
+            ]);
+        }
+
+        $profil = app(ProfilCapaianService::class)->untukWilayah($sekolah, 2025, self::JENIS, self::STATUS);
+
+        $this->assertSame(1, $profil['ringkasan']['total']);
+        $this->assertArrayNotHasKey('B', $profil['dimensi']);
+    }
 }
