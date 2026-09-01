@@ -24,11 +24,15 @@ use App\Models\Wilayah;
  */
 class TrenService
 {
-    /** Nomor kelas seri grafik menurut klasifikasi, memakai warna status DESIGN.md. */
+    /**
+     * Warna garis grafik menurut klasifikasi. Memakai isian grafik AKAR
+     * (hue status yang dinaikkan agar terpisah untuk mata buta warna);
+     * lihat token --color-grafik-* di app.css.
+     */
     private const WARNA_KLASIFIKASI = [
-        'memburuk_berturut' => '#95201F',  // kurang
-        'membaik_konsisten' => '#1B5E36',  // baik
-        'stabil' => '#615A4E',             // kosong/netral hangat
+        'memburuk_berturut' => '#b4231a',
+        'membaik_konsisten' => '#2f7d3f',
+        'stabil' => '#a89f8e',
     ];
 
     /**
@@ -192,9 +196,12 @@ class TrenService
     }
 
     /**
-     * Satu garis per indikator (DESIGN.md 5). Diprioritaskan indikator yang
-     * memburuk berturut lalu yang membaik konsisten, dibatasi agar grafik tetap
-     * terbaca. Warna garis mengikuti klasifikasi (palet warna status).
+     * Satu garis per indikator (DESIGN.md 5). Grafik hanya menampilkan
+     * indikator yang BERGERAK — memburuk berturut atau membaik konsisten —
+     * karena garis datar dari indikator stabil hanya menambah keramaian dan
+     * tidak menceritakan apa pun. Bila hampir tidak ada yang bergerak,
+     * ditambahkan beberapa indikator stabil sebagai konteks. Dibatasi tujuh
+     * garis agar tetap terbaca.
      *
      * @param  list<array<string, mixed>>  $baris
      * @return list<array<string, mixed>>
@@ -202,12 +209,26 @@ class TrenService
     private function seriGrafik(array $baris): array
     {
         $prioritas = ['memburuk_berturut' => 0, 'membaik_konsisten' => 1, 'stabil' => 2];
-        $terurut = $baris;
-        usort($terurut, fn ($a, $b) => [$prioritas[$a['klasifikasi']], $this->kunciUrut($a['nomor'])]
+
+        $bergerak = array_values(array_filter(
+            $baris,
+            fn ($r) => $r['klasifikasi'] !== 'stabil',
+        ));
+        $stabil = array_values(array_filter(
+            $baris,
+            fn ($r) => $r['klasifikasi'] === 'stabil',
+        ));
+
+        $terpilih = $bergerak;
+        if (count($terpilih) < 3) {
+            $terpilih = array_merge($terpilih, array_slice($stabil, 0, 3 - count($terpilih)));
+        }
+
+        usort($terpilih, fn ($a, $b) => [$prioritas[$a['klasifikasi']], $this->kunciUrut($a['nomor'])]
             <=> [$prioritas[$b['klasifikasi']], $this->kunciUrut($b['nomor'])]);
 
         $seri = [];
-        foreach (array_slice($terurut, 0, 8) as $r) {
+        foreach (array_slice($terpilih, 0, 7) as $r) {
             $seri[] = [
                 'nomor' => $r['nomor'],
                 'nama' => $r['nama'],

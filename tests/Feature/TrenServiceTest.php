@@ -123,7 +123,7 @@ class TrenServiceTest extends TestCase
 
         $this->assertSame(['2023', '2024', '2025'], $grafik['tahun']);
         $this->assertSame('A.1', $grafik['seri'][0]['nomor']);
-        $this->assertSame('#95201F', $grafik['seri'][0]['warna']);
+        $this->assertSame('#b4231a', $grafik['seri'][0]['warna']); // isian grafik "memburuk"
         $this->assertSame([3, 2, 1], $grafik['seri'][0]['nilai']);
     }
 

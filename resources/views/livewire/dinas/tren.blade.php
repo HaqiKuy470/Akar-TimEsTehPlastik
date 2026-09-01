@@ -181,21 +181,31 @@
                 type: 'line',
                 data: {
                     labels: grafik.tahun,
-                    datasets: grafik.seri.map((s) => ({
-                        label: s.nomor + ' ' + s.nama,
-                        data: s.nilai,
-                        borderColor: s.warna,
-                        backgroundColor: s.warna,
-                        spanGaps: false,
-                        tension: 0,
-                        pointRadius: 4,
-                    })),
+                    datasets: grafik.seri.map((s) => {
+                        const bergerak = s.klasifikasi !== 'stabil'
+                        return {
+                            label: s.nomor + ' ' + s.nama,
+                            data: s.nilai,
+                            borderColor: s.warna,
+                            backgroundColor: s.warna,
+                            borderWidth: bergerak ? 2.5 : 1.5,
+                            borderDash: s.klasifikasi === 'stabil' ? [4, 4] : [],
+                            spanGaps: false,
+                            tension: 0,
+                            pointRadius: bergerak ? 4 : 3,
+                            pointHoverRadius: 6,
+                        }
+                    }),
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: { duration: 200 },
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+                    interaction: { mode: 'nearest', intersect: false },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${tingkat[c.raw] ?? 'Tidak tersedia'}` } },
+                    },
                     scales: {
                         y: {
                             min: 1,
