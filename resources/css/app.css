@@ -2437,3 +2437,728 @@
         }
     }
 }
+
+
+
+/* ============================================================
+   SEKOLAH — BERANDA
+   Presentation-only scope. Tidak mengubah komponen / logic
+   Admin atau Dinas.
+   ============================================================ */
+
+@layer components {
+    .sekolah-beranda-v2 {
+        --school-page-x: clamp(1rem, 2.6vw, 2.5rem);
+        --school-section-y: clamp(3.5rem, 7vw, 7.5rem);
+        --school-line: color-mix(in srgb, var(--color-navy-900) 18%, transparent);
+        --school-muted-line: color-mix(in srgb, var(--color-teks-900) 10%, transparent);
+
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin: calc(var(--school-page-x) * -0.5) 0 0;
+        overflow: clip;
+    }
+
+    .sekolah-beranda-v2 *,
+    .sekolah-beranda-v2 *::before,
+    .sekolah-beranda-v2 *::after {
+        box-sizing: border-box;
+    }
+
+    .sekolah-beranda-v2__hero {
+        position: relative;
+        isolation: isolate;
+        padding: clamp(3.75rem, 8vw, 8rem) var(--school-page-x)
+            clamp(3.25rem, 6vw, 6rem);
+        border-top: 1px solid var(--school-line);
+        border-bottom: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__hero::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        right: 10%;
+        width: 1px;
+        height: 100%;
+        background: var(--school-muted-line);
+        pointer-events: none;
+    }
+
+    .sekolah-beranda-v2__hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.6fr);
+        gap: clamp(2.5rem, 8vw, 8rem);
+        align-items: end;
+    }
+
+    .sekolah-beranda-v2__eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: min(100%, 36rem);
+        color: var(--color-navy-900);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .sekolah-beranda-v2__eyebrow-line {
+        flex: 1;
+        height: 1px;
+        background: var(--school-line);
+    }
+
+    .sekolah-beranda-v2__display-title {
+        max-width: 10.5ch;
+        margin-top: clamp(1.5rem, 3.5vw, 3rem);
+        color: var(--color-navy-900);
+        font-size: clamp(3.3rem, 7.8vw, 8rem);
+        font-weight: 650;
+        line-height: 0.88;
+        letter-spacing: -0.068em;
+        text-wrap: balance;
+    }
+
+    .sekolah-beranda-v2__display-title span {
+        display: block;
+        color: var(--color-teks-400);
+        font-weight: 450;
+    }
+
+    .sekolah-beranda-v2__lead {
+        max-width: 43rem;
+        margin-top: clamp(1.75rem, 3vw, 2.75rem);
+        color: var(--color-teks-700);
+        font-size: clamp(1rem, 1.35vw, 1.18rem);
+        line-height: 1.72;
+    }
+
+    .sekolah-beranda-v2__hero-aside {
+        min-height: 18rem;
+        padding: 1.5rem 0 0 clamp(1.25rem, 2.8vw, 2.25rem);
+        border-left: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__kicker {
+        display: block;
+        color: var(--color-teks-500);
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+
+    .sekolah-beranda-v2__hero-aside > strong {
+        display: block;
+        max-width: 15ch;
+        margin-top: 1rem;
+        color: var(--color-teks-900);
+        font-size: clamp(1.8rem, 3.1vw, 3.2rem);
+        font-weight: 600;
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+    }
+
+    .sekolah-beranda-v2__hero-aside > p:not(.sekolah-beranda-v2__context) {
+        max-width: 25rem;
+        margin-top: 1rem;
+        color: var(--color-teks-500);
+        font-size: 0.82rem;
+        line-height: 1.7;
+    }
+
+    .sekolah-beranda-v2__context {
+        margin-top: 0.75rem;
+        color: var(--color-teks-500);
+        font-size: 0.78rem;
+        line-height: 1.6;
+    }
+
+    .sekolah-beranda-v2__uploaded {
+        display: block;
+        margin-top: 0.7rem;
+        color: var(--color-teks-400);
+        font-size: 0.66rem;
+        line-height: 1.5;
+    }
+
+    .sekolah-beranda-v2__primary-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        min-height: 3rem;
+        margin-top: 2rem;
+        padding: 0.75rem 0.95rem 0.75rem 1rem;
+        border: 1px solid var(--color-navy-900);
+        background: var(--color-navy-900);
+        color: #fffdf8;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+            background-color 180ms ease,
+            border-color 180ms ease,
+            transform 180ms ease;
+    }
+
+    .sekolah-beranda-v2__primary-link:hover {
+        background: var(--color-navy-800);
+        border-color: var(--color-navy-800);
+        transform: translateY(-2px);
+    }
+
+    .sekolah-beranda-v2__hero-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sekolah-beranda-v2__text-link {
+        margin-top: 0.9rem;
+        color: var(--color-teks-500);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 1px solid var(--color-teks-300);
+    }
+
+    .sekolah-beranda-v2__text-link:hover {
+        color: var(--color-navy-900);
+        border-color: var(--color-navy-900);
+    }
+
+    .sekolah-beranda-v2__section {
+        padding: var(--school-section-y) var(--school-page-x);
+        border-bottom: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__section--intro {
+        padding-top: clamp(2.75rem, 5vw, 5rem);
+        padding-bottom: clamp(2.75rem, 5vw, 5rem);
+    }
+
+    .sekolah-beranda-v2__section-heading {
+        display: grid;
+        grid-template-columns: 3.5rem minmax(0, 1fr) minmax(15rem, 0.55fr);
+        gap: 1rem;
+        align-items: start;
+        margin-bottom: clamp(2rem, 4vw, 4rem);
+    }
+
+    .sekolah-beranda-v2__index {
+        color: var(--color-teks-400);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+    .sekolah-beranda-v2__section-heading h2 {
+        max-width: 17ch;
+        margin-top: 0.5rem;
+        color: var(--color-navy-900);
+        font-size: clamp(1.9rem, 4vw, 4rem);
+        font-weight: 550;
+        line-height: 1.01;
+        letter-spacing: -0.055em;
+    }
+
+    .sekolah-beranda-v2__section-heading > p {
+        justify-self: end;
+        max-width: 27rem;
+        color: var(--color-teks-500);
+        font-size: 0.78rem;
+        line-height: 1.7;
+        text-align: right;
+    }
+
+    .sekolah-beranda-v2__upload-row {
+        display: grid;
+        grid-template-columns: 5rem minmax(0, 2fr) minmax(13rem, 0.7fr);
+        gap: clamp(1rem, 2.5vw, 2.5rem);
+        align-items: center;
+        padding: 1.5rem 0;
+        border-top: 2px solid var(--color-navy-900);
+        border-bottom: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__upload-mark {
+        color: var(--color-navy-900);
+        font-size: 2.8rem;
+        font-weight: 300;
+        letter-spacing: -0.06em;
+    }
+
+    .sekolah-beranda-v2__upload-copy h3 {
+        max-width: 26ch;
+        margin-top: 0.45rem;
+        color: var(--color-teks-900);
+        font-size: clamp(1.2rem, 2vw, 1.7rem);
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .sekolah-beranda-v2__upload-copy p {
+        max-width: 40rem;
+        margin-top: 0.5rem;
+        color: var(--color-teks-500);
+        font-size: 0.73rem;
+        line-height: 1.6;
+    }
+
+    .sekolah-beranda-v2__upload-action {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.7rem;
+    }
+
+    .sekolah-beranda-v2__upload-action > span {
+        color: var(--color-teks-400);
+        font-size: 0.62rem;
+        letter-spacing: 0.05em;
+    }
+
+    .sekolah-beranda-v2__upload-action a {
+        color: var(--color-navy-900);
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 1px solid var(--color-navy-900);
+    }
+
+    .sekolah-beranda-v2__upload-action a:hover {
+        color: var(--color-biru-700);
+        border-color: var(--color-biru-700);
+    }
+
+    .sekolah-beranda-v2__summary {
+        display: grid;
+        grid-template-columns: minmax(12rem, 0.55fr) minmax(0, 1.45fr);
+        border-bottom: 1px solid var(--school-line);
+        background: var(--color-kartu);
+    }
+
+    .sekolah-beranda-v2__summary-label {
+        padding: clamp(2rem, 4vw, 4rem) var(--school-page-x);
+        border-right: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__summary-label strong {
+        display: block;
+        margin-top: 1rem;
+        color: var(--color-navy-900);
+        font-size: clamp(1.3rem, 2.3vw, 2.25rem);
+        font-weight: 600;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+    }
+
+    .sekolah-beranda-v2__stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .sekolah-beranda-v2__stat {
+        position: relative;
+        min-height: clamp(11rem, 18vw, 17rem);
+        padding: 1.5rem;
+        border-right: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__stat:last-child {
+        border-right: 0;
+    }
+
+    .sekolah-beranda-v2__stat::after {
+        content: "";
+        position: absolute;
+        right: 1.25rem;
+        bottom: 1.25rem;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 999px;
+        background: currentColor;
+    }
+
+    .sekolah-beranda-v2__stat > span {
+        display: block;
+        color: currentColor;
+        font-size: 0.63rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        line-height: 1.4;
+        text-transform: uppercase;
+    }
+
+    .sekolah-beranda-v2__stat > strong {
+        display: block;
+        margin-top: clamp(2.5rem, 5vw, 5rem);
+        color: currentColor;
+        font-size: clamp(3.2rem, 6vw, 6.5rem);
+        font-weight: 550;
+        line-height: 0.82;
+        letter-spacing: -0.065em;
+    }
+
+    .sekolah-beranda-v2__stat--kurang { color: var(--color-kurang); }
+    .sekolah-beranda-v2__stat--sedang { color: var(--color-sedang); }
+    .sekolah-beranda-v2__stat--baik { color: var(--color-baik); }
+    .sekolah-beranda-v2__stat--kosong { color: var(--color-kosong); }
+
+    .sekolah-beranda-v2__notice {
+        display: grid;
+        grid-template-columns: 3.5rem minmax(0, 1fr);
+        gap: 1rem;
+        align-items: center;
+        min-height: 20rem;
+        padding: clamp(3rem, 6vw, 6rem) var(--school-page-x);
+        border-bottom: 1px solid var(--school-line);
+        background: var(--color-kartu);
+    }
+
+    .sekolah-beranda-v2__notice .sekolah-beranda-v2__index {
+        align-self: start;
+        color: var(--color-kurang);
+    }
+
+    .sekolah-beranda-v2__notice h2 {
+        max-width: 20ch;
+        margin-top: 0.55rem;
+        color: var(--color-navy-900);
+        font-size: clamp(2rem, 4.5vw, 4.5rem);
+        font-weight: 550;
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+    }
+
+    .sekolah-beranda-v2__notice p {
+        max-width: 40rem;
+        margin-top: 1rem;
+        color: var(--color-teks-500);
+        font-size: 0.82rem;
+        line-height: 1.7;
+    }
+
+    .sekolah-beranda-v2__work-list {
+        border-top: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__work-item {
+        display: grid;
+        grid-template-columns: 4.5rem minmax(0, 1fr) 2rem;
+        gap: 1rem;
+        align-items: center;
+        min-height: 9.5rem;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--school-line);
+        color: inherit;
+        text-decoration: none;
+        transition:
+            background-color 180ms ease,
+            padding 180ms ease,
+            transform 180ms ease;
+    }
+
+    .sekolah-beranda-v2__work-item:hover {
+        margin-inline: calc(var(--school-page-x) * -0.35);
+        padding-inline: calc(var(--school-page-x) * 0.35);
+        background: var(--color-kartu);
+    }
+
+    .sekolah-beranda-v2__work-number {
+        align-self: start;
+        padding-top: 0.25rem;
+        color: var(--color-teks-400);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+    }
+
+    .sekolah-beranda-v2__work-main h3 {
+        margin-top: 0.4rem;
+        color: var(--color-teks-900);
+        font-size: clamp(1.4rem, 2.5vw, 2.4rem);
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+    }
+
+    .sekolah-beranda-v2__work-main p {
+        max-width: 46rem;
+        margin-top: 0.45rem;
+        color: var(--color-teks-500);
+        font-size: 0.72rem;
+        line-height: 1.6;
+    }
+
+    .sekolah-beranda-v2__work-arrow {
+        color: var(--color-teks-400);
+        font-size: 1.15rem;
+        transform: translateX(-0.4rem);
+        opacity: 0;
+        transition:
+            opacity 180ms ease,
+            transform 180ms ease;
+    }
+
+    .sekolah-beranda-v2__work-item:hover .sekolah-beranda-v2__work-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .sekolah-beranda-v2__flow {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--school-line);
+        border-bottom: 1px solid var(--school-line);
+    }
+
+    .sekolah-beranda-v2__flow--ready {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .sekolah-beranda-v2__flow-item {
+        position: relative;
+        display: flex;
+        min-height: 14rem;
+        flex-direction: column;
+        padding: 1.5rem 1.25rem;
+        border-right: 1px solid var(--school-line);
+        color: inherit;
+        text-decoration: none;
+        transition:
+            background-color 180ms ease,
+            transform 180ms ease;
+    }
+
+    .sekolah-beranda-v2__flow-item:first-child {
+        padding-left: 0;
+    }
+
+    .sekolah-beranda-v2__flow-item:last-child {
+        border-right: 0;
+    }
+
+    .sekolah-beranda-v2__flow-item:hover {
+        background: var(--color-kartu);
+        transform: translateY(-2px);
+    }
+
+    .sekolah-beranda-v2__flow-number {
+        color: var(--color-teks-400);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+    }
+
+    .sekolah-beranda-v2__flow-item strong {
+        margin-top: auto;
+        color: var(--color-navy-900);
+        font-size: clamp(1.15rem, 1.8vw, 1.6rem);
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.025em;
+    }
+
+    .sekolah-beranda-v2__flow-item > span:last-child {
+        max-width: 17rem;
+        margin-top: 0.5rem;
+        color: var(--color-teks-500);
+        font-size: 0.68rem;
+        line-height: 1.55;
+    }
+
+    .sekolah-beranda-v2__hero,
+    .sekolah-beranda-v2__summary,
+    .sekolah-beranda-v2__notice,
+    .sekolah-beranda-v2__section {
+        animation: sekolah-beranda-v2-reveal 620ms cubic-bezier(0.22, 0.8, 0.31, 1) both;
+    }
+
+    @keyframes sekolah-beranda-v2-reveal {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .sekolah-beranda-v2__hero-grid {
+            grid-template-columns: 1fr;
+            align-items: start;
+        }
+
+        .sekolah-beranda-v2__hero::before {
+            display: none;
+        }
+
+        .sekolah-beranda-v2__hero-aside {
+            min-height: 0;
+            padding-left: 0;
+            padding-top: 1.5rem;
+            border-left: 0;
+            border-top: 1px solid var(--school-line);
+        }
+
+        .sekolah-beranda-v2__hero-aside > strong {
+            max-width: none;
+        }
+
+        .sekolah-beranda-v2__section-heading {
+            grid-template-columns: 3rem minmax(0, 1fr);
+        }
+
+        .sekolah-beranda-v2__section-heading > p {
+            grid-column: 2;
+            justify-self: start;
+            text-align: left;
+        }
+
+        .sekolah-beranda-v2__summary {
+            grid-template-columns: 1fr;
+        }
+
+        .sekolah-beranda-v2__summary-label {
+            border-right: 0;
+            border-bottom: 1px solid var(--school-line);
+        }
+
+        .sekolah-beranda-v2__upload-row {
+            grid-template-columns: 4rem minmax(0, 1fr);
+        }
+
+        .sekolah-beranda-v2__upload-action {
+            grid-column: 2;
+            align-items: flex-start;
+        }
+
+        .sekolah-beranda-v2__work-item {
+            grid-template-columns: 4rem minmax(0, 1fr) 2rem;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .sekolah-beranda-v2 {
+            --school-page-x: 1rem;
+            margin-top: 0;
+        }
+
+        .sekolah-beranda-v2__display-title {
+            max-width: 9ch;
+            font-size: clamp(3.05rem, 17vw, 5.4rem);
+        }
+
+        .sekolah-beranda-v2__hero {
+            padding-top: 3.5rem;
+        }
+
+        .sekolah-beranda-v2__section-heading {
+            grid-template-columns: 2.5rem 1fr;
+        }
+
+        .sekolah-beranda-v2__section-heading > p {
+            grid-column: 2;
+        }
+
+        .sekolah-beranda-v2__upload-row {
+            grid-template-columns: 2.75rem 1fr;
+            gap: 1rem;
+        }
+
+        .sekolah-beranda-v2__upload-mark {
+            font-size: 2.2rem;
+        }
+
+        .sekolah-beranda-v2__upload-action {
+            grid-column: 2;
+        }
+
+        .sekolah-beranda-v2__stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .sekolah-beranda-v2__stat:nth-child(2) {
+            border-right: 0;
+        }
+
+        .sekolah-beranda-v2__stat:nth-child(-n + 2) {
+            border-bottom: 1px solid var(--school-line);
+        }
+
+        .sekolah-beranda-v2__stat {
+            min-height: 10.5rem;
+            padding: 1rem;
+        }
+
+        .sekolah-beranda-v2__stat > strong {
+            margin-top: 2.25rem;
+            font-size: clamp(3rem, 17vw, 5rem);
+        }
+
+        .sekolah-beranda-v2__notice {
+            grid-template-columns: 2.5rem 1fr;
+            min-height: 22rem;
+        }
+
+        .sekolah-beranda-v2__work-item {
+            grid-template-columns: 2.5rem 1fr 1.25rem;
+            min-height: 8rem;
+            gap: 0.75rem;
+        }
+
+        .sekolah-beranda-v2__work-item:hover {
+            margin-inline: 0;
+            padding-inline: 0;
+            background: transparent;
+        }
+
+        .sekolah-beranda-v2__work-arrow {
+            opacity: 1;
+            transform: none;
+        }
+
+        .sekolah-beranda-v2__flow,
+        .sekolah-beranda-v2__flow--ready {
+            grid-template-columns: 1fr;
+        }
+
+        .sekolah-beranda-v2__flow-item,
+        .sekolah-beranda-v2__flow-item:first-child {
+            min-height: 10rem;
+            padding: 1.25rem 0;
+            border-right: 0;
+            border-bottom: 1px solid var(--school-line);
+        }
+
+        .sekolah-beranda-v2__flow-item:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .sekolah-beranda-v2__hero,
+        .sekolah-beranda-v2__summary,
+        .sekolah-beranda-v2__notice,
+        .sekolah-beranda-v2__section {
+            animation: none;
+        }
+
+        .sekolah-beranda-v2__primary-link,
+        .sekolah-beranda-v2__text-link,
+        .sekolah-beranda-v2__work-item,
+        .sekolah-beranda-v2__work-arrow,
+        .sekolah-beranda-v2__flow-item {
+            transition: none;
+        }
+    }
+}
