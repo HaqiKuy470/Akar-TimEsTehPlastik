@@ -9,3 +9,8 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Dataset Rapor Pendidikan: berkas biner, jangan coba normalkan akhir baris
+# atau tampilkan diff-nya.
+*.xlsx binary
+dataset/** -text
