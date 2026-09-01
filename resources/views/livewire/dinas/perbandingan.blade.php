@@ -1,9 +1,30 @@
-<div class="flex flex-col gap-6">
-    <x-kepala-halaman
-        judul="Perbandingan antardaerah"
-        lead="Posisi satu kabupaten/kota terhadap seluruh daerah lain di provinsinya pada satu indikator, beserta pembanding agregat provinsi dan nasional. Perbandingan ini tidak tersedia di portal resmi Rapor Pendidikan.">
-        <x-slot:aksi><x-tautan-panduan anchor="banding" /></x-slot:aksi>
-    </x-kepala-halaman>
+<div class="perbandingan-v2">
+    <section class="banding-hero_main">
+        <div class="banding-hero_grid">
+            <div class="banding-hero_main">
+                <div class="banding-eyebrow">
+                    <span>AKAR / ANALISIS DAERAH</span>
+                    
+                    <span class="banding-eyebrow_line"></span>
+                </div>
+
+                
+                <h1 class="banding-display_title">Lihat posisi daerahmu, <span>bukan sekedar nilainya.</span></h1>
+                <p class="banding-hero_lead">Bandingkan capaian satu kabupaten/kota terhadap daerah lain di provinsi yang sama, agregat provinsi, dan nasional</p>
+            </div>
+
+            <aside class="banding-hero_aside">
+                <span class="about-banding">Tentang Perbandingan</span>
+                
+                <p class="banding-hero_aside-2">Posisi daerah dihitung pada indikator, jenjang, tahun, dan status satuan pendidikan yang sama.</p>
+                
+                <div class="banding-guide">
+                    <x-tautan-panduan anchor="banding"/>
+                </div>
+            </aside>
+            
+        </div>    
+    </section>
 
     <x-kartu rapat>
         <div class="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">

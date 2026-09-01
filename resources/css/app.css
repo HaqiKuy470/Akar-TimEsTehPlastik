@@ -165,7 +165,6 @@
     }
 }
 
-
 @layer components {
     .profil-capaian-v2 {
         --akar-page-x: clamp(1rem, 2.2vw, 2rem);
@@ -618,7 +617,6 @@
         margin-top: clamp(2rem, 4vw, 3.5rem);
     }
 
-    /* Pembungkus grafik pada halaman bergaya editorial (profil capaian). */
     .akar-chart-wrap {
         margin-top: clamp(2rem, 4vw, 3rem);
         padding: 1.25rem;
@@ -1114,11 +1112,6 @@
         }
     }
 }
-/* ========================================================================
-   Prioritas Masalah — editorial ranking dashboard
-   Scope dibatasi ke .prioritas-v2 agar halaman lain tetap aman.
-   ======================================================================== */
-
 @layer components {
     .prioritas-v2 {
         --prioritas-page-x: clamp(1rem, 2.2vw, 2rem);
@@ -1719,10 +1712,9 @@
 
     .prioritas-row {
         display: grid;
-        grid-template-columns: minmax(4rem, 0.45fr) minmax(0, 2.7fr) minmax(
-                6rem,
-                0.55fr
-            ) minmax(8rem, 0.75fr);
+        grid-template-columns:
+            minmax(4rem, 0.45fr) minmax(0, 2.7fr) minmax(6rem, 0.55fr)
+            minmax(8rem, 0.75fr);
         gap: clamp(0.8rem, 2vw, 1.5rem);
         align-items: start;
         padding: 1.5rem 0;
@@ -2160,5 +2152,109 @@
         .prioritas-expand-panel__head p {
             text-align: left;
         }
+    }
+}
+
+@layer components {
+    .perbandingan-v2 {
+        --banding-page-x: clamp(1rem, 2.2vw, 2rem);
+        --banding-line:
+            color-mix{in srgb, var(--color-navy-900) 18%, transparent};
+
+        displey: flex;
+        flex-direction: column;
+
+        overflow: clip;
+    }
+
+    .perbandingan-v2 * {
+        box-sizing: border-box;
+    }
+
+    .banding-hero {
+        padding: clamp(3rem, 6vw, 6rem) var(--banding-page-x)
+            clamp(2.75rem, 5vw, 5rem);
+
+        border-top: 1px solid var(--banding-line);
+        border-bottom: 1px solid var(--banding-line);
+    }
+
+    .banding-hero_grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
+        gap: clamp(2rem, 7vw, 7rem);
+        align-items: end;
+    }
+
+    .banding-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        width: min(100%, 34rem);
+        color: var(--color-navy-900);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .banding-eyebrow__line {
+        flex: 1;
+
+        height: 1px;
+
+        background: var(--banding-line);
+    }
+
+    .banding-display_title {
+        margin-top: clamp(1.5rem, 3vw, 2.75rem);
+        max-width: 11ch;
+        color: var(--color-navy-900);
+        font-size: clamp(3.2rem, 7.2vw, 7.5rem);
+        font-weight: 650;
+        line-height: 0.9;
+        letter-spacing: -0.065em;
+    }
+
+    .banding-display_title span {
+        display: block;
+        color: var(--color-teks-400);
+        font-weight: 450;
+    }
+
+    .banding-hero_lead {
+        max-width: 43rem;
+        margin-top: clamp(1.5rem, 3vw, 2.5rem);
+        color: var(--color-teks-700);
+        font-size: clamp(1rem, 1.3vw, 1.18rem);
+        line-height: 1.7;
+    }
+
+    .banding-hero_aside {
+        min-height: 16rem;
+        padding: 1.5rem 0 0 clamp(1.25rem, 2.5vw, 2rem);
+        border-left: 1px solid var(--banding-line);
+    }
+
+    .tentang-banding {
+        color: var(--color-teks-500);
+        font-size: 0.66rem;
+        font-weight: 700;
+
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .banding-hero_aside-2 {
+        max-width: 22rem;
+        margin-top: 1rem;
+        color: var(--color-teks-700);
+        font-size: 0.84rem;
+        line-height: 1.7;
+    }
+
+    .banding-guide {
+        margin-top: 2rem;
     }
 }
