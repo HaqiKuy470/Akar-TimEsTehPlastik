@@ -107,7 +107,7 @@ config/
 
 - Jangan memakai machine learning atau memanggil API LLM untuk analisis inti. Keluaran sistem dipakai untuk perencanaan anggaran publik, jadi harus dapat dijelaskan sepenuhnya. Ini keputusan produk, bukan keterbatasan teknis, dan harus dipertahankan saat sesi tanya jawab.
 - Jangan memproses berkas XLSX di dalam siklus request HTTP.
-- Jangan memakai `pd.read_excel` atau padanannya dengan pengaturan bawaan. Header berkas ini bertingkat tiga baris dengan sel ter-merge.
+- Jangan membaca sheet XLSX dengan pengaturan bawaan PhpSpreadsheet. Header berkas ini bertingkat tiga baris dengan sel ter-merge; gunakan `HeaderResolver`.
 - Jangan menyimpan data pribadi siswa, guru, atau tenaga kependidikan. Seluruh data bersifat agregat wilayah atau satuan pendidikan.
 - Jangan menambah dependensi baru tanpa alasan kuat. Setiap paket tambahan adalah risiko di lingkungan cPanel.
 - Jangan menulis fitur yang tidak ada di PRD. Ruang lingkup sudah dikunci.
