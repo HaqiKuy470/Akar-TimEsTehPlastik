@@ -15,27 +15,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * F8 — Ekspor laporan.
- *
- * Merakit hasil analisis (profil capaian, indikator prioritas beserta rincian
- * skor dan akar masalah, serta draf rencana tindak lanjut) menjadi dua bentuk:
- *
- *  - PDF: dokumen resmi yang dibawa ke rapat perencanaan. Latar putih, warna
- *    status tetap disertai ikon dan teks agar terbaca saat dicetak hitam putih
- *    (DESIGN.md bagian 8).
- *  - Excel: data mentah hasil analisis, satu baris per indikator prioritas,
- *    untuk diolah lebih lanjut.
- *
- * Komponen Livewire hanya memanggil kelas ini lalu mengembalikan responsnya;
- * tidak ada perakitan laporan di lapisan antarmuka.
+ * F8 — Ekspor laporan: hasil analisis -> PDF (dokumen rapat, aman dicetak hitam
+ * putih, DESIGN.md 8) dan Excel (data mentah, satu baris per indikator prioritas).
  */
 class LaporanExporter
 {
     public function __construct(private readonly ProfilCapaianService $profilCapaian) {}
 
-    /**
-     * Bangun dokumen PDF laporan untuk sebuah analisis.
-     */
     public function pdf(Analisis $analisis): DokumenPdf
     {
         return Pdf::loadView('laporan.pdf', $this->data($analisis))
@@ -43,10 +29,7 @@ class LaporanExporter
             ->setOption('isRemoteEnabled', false);
     }
 
-    /**
-     * Bangun objek ekspor Excel. Komponen pemanggil membungkusnya dengan
-     * Excel::download() memakai nama berkas dari namaBerkas().
-     */
+    /** Objek ekspor Excel; pemanggil membungkusnya dengan Excel::download(). */
     public function excel(Analisis $analisis): AnalisisExport
     {
         $analisis->loadMissing('wilayah', 'prioritas.indikator', 'prioritas.akar');
@@ -54,10 +37,7 @@ class LaporanExporter
         return new AnalisisExport($analisis, $this->labelCapaian($analisis));
     }
 
-    /**
-     * Nama berkas unduhan, misalnya
-     * "AKAR Kabupaten Bangkalan SMP Umum 2025.pdf".
-     */
+    /** Nama berkas unduhan, mis. "AKAR Kabupaten Bangkalan SMP Umum 2025.pdf". */
     public function namaBerkas(Analisis $analisis, string $ekstensi): string
     {
         $bagian = trim(sprintf(
@@ -67,7 +47,7 @@ class LaporanExporter
             $analisis->tahun,
         ));
 
-        // Rapikan agar aman sebagai nama berkas lintas sistem operasi.
+        // Buang karakter yang tidak sah pada nama berkas.
         $bagian = preg_replace('/[\/\\\\:*?"<>|]+/', ' ', $bagian) ?? $bagian;
         $bagian = Str::squish((string) $bagian);
 
@@ -75,9 +55,7 @@ class LaporanExporter
     }
 
     /**
-     * Susun seluruh data yang dibutuhkan blade laporan.
-     *
-     * @return array<string, mixed>
+     * @return array<string, mixed> data untuk blade laporan
      */
     private function data(Analisis $analisis): array
     {
@@ -133,9 +111,7 @@ class LaporanExporter
     }
 
     /**
-     * Label capaian tiap indikator prioritas, satu kueri.
-     *
-     * @return array<int, string> indikator_id => label
+     * @return array<int, string> indikator_id => label capaian (satu kueri)
      */
     private function labelCapaian(Analisis $analisis): array
     {
@@ -150,9 +126,8 @@ class LaporanExporter
     }
 
     /**
-     * Samakan bentuk komponen skor. AnalisisRunner menyimpannya sebagai daftar
-     * objek {kode, nama, bobot_maks, nilai_0_1, kontribusi}; factory pengujian
-     * memakai bentuk asosiatif lama. Keluaran selalu daftar baris siap tampil.
+     * Samakan bentuk komponen skor (daftar objek dari AnalisisRunner vs bentuk
+     * asosiatif lama di factory) menjadi daftar baris siap tampil.
      *
      * @param  array<mixed>  $komponen
      * @return list<array{nama: string, kontribusi: float, bobot_maks: float}>

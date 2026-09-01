@@ -17,13 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * F7 - Generator Rencana Tindak Lanjut.
- *
- * Komponen ini memilih analisis, meminta RencanaAksiGenerator menyusun draf,
- * lalu menyediakan tabel yang dapat disunting pengguna. Tidak ada logika
- * penyusunan di sini; semuanya di service.
- */
+/** F7 — Generator Rencana Tindak Lanjut. Penyusunan draf ada di RencanaAksiGenerator. */
 class RencanaTindakLanjut extends Component
 {
     #[Url]
@@ -101,10 +95,7 @@ class RencanaTindakLanjut extends Component
         $this->muatRencana();
     }
 
-    /**
-     * Unduh laporan lengkap (profil, prioritas, akar masalah, rencana) sebagai
-     * PDF. Perakitan dokumen ada di LaporanExporter.
-     */
+    /** Perakitan dokumen ada di LaporanExporter. */
     public function unduhPdf(LaporanExporter $exporter): ?StreamedResponse
     {
         $analisis = $this->analisis;
@@ -122,9 +113,6 @@ class RencanaTindakLanjut extends Component
         );
     }
 
-    /**
-     * Unduh data mentah analisis sebagai berkas Excel.
-     */
     public function unduhExcel(LaporanExporter $exporter): ?Response
     {
         $analisis = $this->analisis;
@@ -172,8 +160,7 @@ class RencanaTindakLanjut extends Component
             $rencana->update(['judul' => $this->judul]);
         }
 
-        // Tabel item dibangun ulang dari keadaan yang disunting: lebih sederhana
-        // dan bebas dari masalah sinkronisasi id baris yang ditambah/dihapus.
+        // Bangun ulang seluruh item agar bebas dari sinkronisasi id baris yang ditambah/dihapus.
         $rencana->item()->delete();
 
         foreach (array_values($this->item) as $urutan => $baris) {

@@ -7,24 +7,18 @@ namespace App\Services\Akar\Analysis;
 use InvalidArgumentException;
 
 /**
- * Menghitung skor prioritas satu indikator bermasalah.
+ * Menghitung skor prioritas satu indikator bermasalah. Lihat ARCHITECTURE.md 6.2.
  *
- * Skor adalah gabungan empat komponen (lihat ARCHITECTURE.md bagian 6.2 dan
- * PRD bagian 7.1):
+ *   Skor = bobot.label     x nilai_label[label]
+ *        + bobot.perubahan x nilai_perubahan[perubahan]
+ *        + bobot.posisi    x bobot_posisi   (0..1 dari BenchmarkService)
+ *        + bobot.turunan   x bobot_turunan  (0..1, proporsi anak bermasalah)
  *
- *   Skor = (bobot_komponen.label     x nilai_label[label])
- *        + (bobot_komponen.perubahan x nilai_perubahan[perubahan])
- *        + (bobot_komponen.posisi    x bobot_posisi)      // 0..1 dari BenchmarkService
- *        + (bobot_komponen.turunan   x bobot_turunan)     // 0..1, proporsi anak bermasalah
+ * Kelas MURNI (tanpa DB). Angka aturan dari config/akar.php. Keluaran menyertakan
+ * rincian tiap komponen supaya skor dapat ditelusuri.
  *
- * Kelas ini MURNI: tidak menyentuh basis data. Seluruh angka aturan dibaca
- * dari config/akar.php sehingga dapat diubah tanpa menyentuh kode. Hasilnya
- * selalu menyertakan rincian tiap komponen agar skor dapat ditelusuri, bukan
- * sekadar satu angka. Juri hampir pasti menanyakan akuntabilitas ini.
- *
- * Indikator berlabel "Tidak Tersedia" tidak boleh masuk ke sini; pemanggil
- * wajib menyaringnya lebih dulu. Memberi skor nol akan menyamakan "tidak ada
- * data" dengan "sudah baik", dan itu menyesatkan.
+ * "Tidak Tersedia" harus disaring pemanggil: skor nol menyamakan "tanpa data"
+ * dengan "sudah baik".
  */
 class PrioritasCalculator
 {

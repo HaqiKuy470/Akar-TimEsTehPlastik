@@ -12,12 +12,9 @@ use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
 /**
- * Halaman superadmin: satu-satunya fungsinya membuat dan menghapus akun.
- *
- * Superadmin tidak dapat membuka halaman analisis mana pun (ditegakkan oleh
- * middleware AreaPeran), jadi tidak ada data Rapor Pendidikan yang bisa ia
- * lihat dari sini. Yang tampil hanyalah metadata akun: nama, email, peran,
- * dan waktu dibuat.
+ * Halaman superadmin: hanya membuat dan menghapus akun. Superadmin tak bisa
+ * membuka halaman analisis (ditegakkan middleware AreaPeran); di sini hanya
+ * tampil metadata akun (nama, email, peran, waktu dibuat).
  */
 #[Title('Kelola akun')]
 class KelolaAkun extends Component

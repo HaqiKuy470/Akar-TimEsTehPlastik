@@ -15,23 +15,16 @@ use RuntimeException;
 use Throwable;
 
 /**
- * Mengubah berkas Rapor Pendidikan tingkat satuan pendidikan menjadi baris
- * tabel `wilayah` (level `satuan`) dan `capaian`.
+ * Berkas Rapor Pendidikan tingkat satuan pendidikan -> tabel `wilayah`
+ * (level `satuan`) + `capaian`.
  *
- * PERINGATAN. Struktur berkas Rapor Pendidikan tingkat satuan pendidikan BELUM
- * pernah diuji tim dengan berkas asli (lihat PRD bagian 4.3). Parser ini
- * dibangun atas DUGAAN bahwa strukturnya menyerupai berkas daerah: header
- * bertingkat tiga baris dengan sel ter-merge, kolom dimensi 1-4
- * (Provinsi, Kabupaten/Kota, Jenis Satuan, Status), lalu pasangan kolom
- * label/perubahan per indikator. Bila berkas asli ternyata berbeda, parser
- * ini akan menolak berkas itu dengan pesan yang jelas, bukan mengarang data.
+ * PERINGATAN: belum pernah diuji dengan berkas asli (PRD 4.3). Dibangun atas
+ * dugaan bahwa strukturnya menyerupai berkas daerah (header 3 baris ter-merge,
+ * dimensi kolom 1-4, pasangan label/perubahan per indikator). Berkas yang tak
+ * cocok ditolak dengan pesan jelas, bukan dikarang.
  *
- * Berbeda dari berkas daerah, berkas satuan berukuran kecil sehingga satu
- * sheet dimuat penuh. Baris irisan ("Berdasarkan Kelompok Gender" dsb) tidak
- * ada di ruang lingkup ini.
- *
- * Baris capaian "Tidak Tersedia" tidak disimpan, konsisten dengan
- * CapaianDaerahParser.
+ * Berkas satuan kecil, jadi satu sheet dimuat penuh. "Tidak Tersedia" tidak
+ * disimpan (konsisten dengan CapaianDaerahParser).
  */
 class CapaianSekolahParser
 {
@@ -52,10 +45,7 @@ class CapaianSekolahParser
 
     public function __construct(private readonly HeaderResolver $headerResolver) {}
 
-    /**
-     * Impor berkas satuan pendidikan, membuat/menemukan catatan impor lewat
-     * hash isi berkas (idempoten).
-     */
+    /** Impor berkas satuan; catatan impor dikunci lewat hash isi berkas (idempoten). */
     public function impor(string $path, ?string $namaSatuan = null): ImporBerkas
     {
         if (! is_file($path)) {
@@ -69,9 +59,8 @@ class CapaianSekolahParser
     }
 
     /**
-     * Impor ke sebuah catatan impor yang sudah ada. Dipakai oleh
-     * ProsesImporSekolah agar status berkas ("antre" -> "proses" -> "selesai")
-     * terlihat di antarmuka sepanjang proses.
+     * Impor ke catatan impor yang sudah ada, agar transisi status berkas terlihat
+     * di antarmuka sepanjang proses.
      */
     public function imporKe(ImporBerkas $impor, string $path, ?string $namaSatuan = null): void
     {
@@ -130,8 +119,7 @@ class CapaianSekolahParser
             );
         }
 
-        // Header sama seperti berkas daerah: tiga baris tepat di atas dan pada
-        // baris judul kolom itu sendiri.
+        // Header = tiga baris tepat di atas baris judul kolom.
         $b6 = $awal[$barisJudulKolom - 3] ?? [];
         $b7 = $awal[$barisJudulKolom - 2] ?? [];
         $b8 = $awal[$barisJudulKolom - 1] ?? [];
@@ -234,8 +222,8 @@ class CapaianSekolahParser
     }
 
     /**
-     * Ambil nama satuan pendidikan dari baris judul. Format dugaan:
-     * "DATA HASIL RAPOR PENDIDIKAN 2025 - SD NEGERI PERCOBAAN SURABAYA (NPSN ...)".
+     * Nama satuan dari baris judul. Format dugaan:
+     * "DATA HASIL RAPOR PENDIDIKAN 2025 - SD NEGERI ... (NPSN ...)".
      *
      * @param  array<int, array<int, mixed>>  $barisJudul
      */

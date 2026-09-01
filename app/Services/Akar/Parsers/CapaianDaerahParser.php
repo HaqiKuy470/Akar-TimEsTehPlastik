@@ -16,41 +16,26 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use RuntimeException;
 
 /**
- * Mengubah sheet-sheet provinsi berkas Rapor Pendidikan Indonesia menjadi baris
- * tabel `wilayah` dan `capaian`.
+ * Sheet provinsi berkas Rapor Pendidikan Indonesia -> tabel `wilayah` + `capaian`.
  *
- * Catatan arsitektur. ARCHITECTURE.md bagian 4.3 menyarankan WithChunkReading
- * dari maatwebsite/excel. Setelah diukur pada berkas asli, pembacaan berpotong
- * membuka ulang berkas 21 MB untuk SETIAP potongan, sehingga mengimpor 38 sheet
- * menjadi tidak praktis (berjam-jam). Karena impor berkas daerah memang hanya
- * dijalankan di mesin lokal (ARCHITECTURE.md bagian 4.1), bukan di server
- * produksi, parser ini memuat satu sheet sekaligus lewat PhpSpreadsheet lalu
- * melepasnya sebelum sheet berikutnya. Puncak memori sekitar 300 MB per sheet;
- * perintah artisan menaikkan memory_limit untuk mengakomodasi ini. Server
- * produksi tidak pernah menjalankan jalur ini.
+ * Memuat satu sheet sekaligus via PhpSpreadsheet lalu melepasnya; WithChunkReading
+ * membuka ulang berkas 21 MB per potongan (terlalu lambat untuk 38 sheet). Impor
+ * daerah hanya jalan di lokal, jadi memory_limit dinaikkan di perintah artisan.
  *
- * Baris capaian berlabel "Tidak Tersedia" TIDAK disimpan secara default. Sheet
- * provinsi memuat ratusan indikator untuk setiap kombinasi wilayah/jenjang, dan
- * mayoritasnya "Tidak Tersedia". Menyimpannya berarti jutaan baris kosong yang
- * menabrak kuota basis data cPanel. Ketiadaan baris capaian untuk sebuah
- * kombinasi diperlakukan sebagai "Tidak Tersedia" oleh lapisan penyajian.
+ * Baris berlabel "Tidak Tersedia" tidak disimpan (mayoritas kombinasi wilayah x
+ * indikator kosong -> jutaan baris, menabrak kuota cPanel). Ketiadaan baris = kosong.
  */
 class CapaianDaerahParser
 {
-    /** Label capaian yang sah pada berkas sumber. */
     private const LABEL_SAH = ['Baik', 'Sedang', 'Kurang', 'Tidak Tersedia'];
 
-    /** Nilai perubahan yang sah pada berkas sumber. */
     private const PERUBAHAN_SAH = ['Naik', 'Turun', 'Tidak berubah', 'Tidak Tersedia'];
 
     private const NILAI_KOSONG = 'Tidak Tersedia';
 
-    /** Ukuran batch penyisipan massal ke tabel capaian. */
     private const UKURAN_BATCH = 1000;
 
     /**
-     * Cache indikator agar tidak dikueri berulang. Diisi sekali per impor.
-     *
      * @var array{
      *   nomorNama: array<string, int>,
      *   nomorJenis: array<string, int>,
@@ -59,20 +44,16 @@ class CapaianDaerahParser
      */
     private ?array $indeksIndikator = null;
 
-    /** Cache wilayah dalam satu impor: kunci "level|provinsi|kabkota" => id. */
+    /** Kunci "level|provinsi|kabkota" => id. */
     private array $cacheWilayah = [];
 
-    /** Nomor indikator dari header yang tidak berhasil dipetakan ke tabel indikator. */
     private array $indikatorTakDikenal = [];
 
     public function __construct(private readonly HeaderResolver $headerResolver) {}
 
     /**
-     * Impor seluruh sheet provinsi dari satu berkas .xlsx.
-     *
-     * Idempoten: berkas dengan hash sama yang sudah pernah selesai diimpor akan
-     * dilewati. Berkas yang gagal di tengah jalan diulang dengan menghapus
-     * capaian lamanya lebih dulu.
+     * Impor seluruh sheet provinsi dari satu berkas .xlsx. Idempoten lewat hash
+     * berkas; percobaan ulang menghapus capaian lama lebih dulu.
      *
      * @param  callable(string $namaSheet, int $indeks, int $total): void|null  $laporProgres
      */
@@ -142,10 +123,8 @@ class CapaianDaerahParser
     }
 
     /**
-     * Daftar nama sheet provinsi dalam berkas (tanpa Metadata dan Nasional).
-     *
-     * Dipakai jalur antrean (ProsesImporBerkas) yang memecah impor menjadi
-     * satu job per sheet.
+     * Daftar nama sheet provinsi (tanpa Metadata dan Nasional). Dipakai jalur
+     * antrean yang memecah impor menjadi satu job per sheet.
      *
      * @return list<string>
      */
@@ -155,9 +134,8 @@ class CapaianDaerahParser
     }
 
     /**
-     * Deteksi tahun edisi dari isi berkas (judul kolom "Label Capaian YYYY" di
-     * baris 8 sheet provinsi pertama). Dipakai jalur antrean untuk mengunci
-     * tahun sekali di awal, sebelum sheet dipecah menjadi job terpisah.
+     * Deteksi tahun edisi dari isi berkas. Dipakai jalur antrean untuk mengunci
+     * tahun sebelum sheet dipecah menjadi job terpisah.
      */
     public function deteksiTahunBerkas(string $path): int
     {
@@ -172,12 +150,7 @@ class CapaianDaerahParser
         return $this->deteksiTahun($path, $sheet[0]);
     }
 
-    /**
-     * Hapus seluruh capaian satu provinsi (satu sheet) untuk sebuah impor.
-     *
-     * Membuat ProsesSheetProvinsi aman diulang: bila job sebuah sheet gagal di
-     * tengah jalan lalu dicoba lagi, baris parsial dibersihkan lebih dulu.
-     */
+    /** Hapus capaian satu provinsi untuk sebuah impor, agar job sheet aman diulang. */
     public function bersihkanSheet(int $imporId, string $provinsi): void
     {
         Capaian::query()
@@ -186,17 +159,13 @@ class CapaianDaerahParser
             ->delete();
     }
 
-    /**
-     * Impor satu sheet provinsi. Mengembalikan jumlah baris data yang diproses.
-     */
+    /** Impor satu sheet provinsi; mengembalikan jumlah baris data yang diproses. */
     public function imporSheet(string $path, string $namaSheet, ImporBerkas $impor, ?int $tahun = null): int
     {
         $tahun ??= $this->deteksiTahun($path, $namaSheet);
 
         $sheet = $this->muatSheet($path, $namaSheet);
 
-        // Header dibaca sampai kolom tertinggi; kolom sisa di ujung sheet
-        // (tanpa judul di baris 8) otomatis diabaikan HeaderResolver.
         $kolomTertinggi = $sheet->getHighestColumn();
         $headerMentah = $sheet->rangeToArray("A6:{$kolomTertinggi}8", null, false, false, false);
 
@@ -314,9 +283,8 @@ class CapaianDaerahParser
     }
 
     /**
-     * Tahun edisi diambil dari isi berkas, bukan nama berkas (nama berkas
-     * Rapor Pendidikan kerap memuat dua tahun yang membingungkan). Judul kolom
-     * baris 8 berbunyi "Label Capaian 2025"; angka itulah tahun edisinya.
+     * Tahun edisi dari isi berkas, bukan nama berkas (nama berkas kerap memuat
+     * dua tahun). Judul kolom baris 8 "Label Capaian 2025" -> 2025.
      */
     private function deteksiTahun(string $path, string $namaSheet): int
     {
@@ -468,9 +436,8 @@ class CapaianDaerahParser
     }
 
     /**
-     * Cari indikator_id untuk sebuah kolom pada baris dengan jenis layanan
-     * tertentu. Prioritas: cocok persis (nomor + nama) -> cocok (nomor + jenis
-     * layanan) -> satu-satunya kandidat dengan nomor itu -> tidak ada.
+     * Prioritas pencocokan: (nomor + nama) -> (nomor + jenis layanan) ->
+     * satu-satunya kandidat dengan nomor itu -> null.
      */
     private function indikatorId(string $nomor, string $nama, string $jenisLayanan): ?int
     {
@@ -489,10 +456,6 @@ class CapaianDaerahParser
         return count($kandidat) === 1 ? $kandidat[0] : null;
     }
 
-    /**
-     * Petakan "Jenis Satuan Pendidikan" dari sheet provinsi ke salah satu dari
-     * tiga jenis layanan di berkas Metadata.
-     */
     private function jenisLayananDari(string $jenisSatuan): string
     {
         return PemetaanJenisLayanan::dari($jenisSatuan);

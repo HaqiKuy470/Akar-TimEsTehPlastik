@@ -12,12 +12,8 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
- * Profil capaian satu sekolah (mode satuan pendidikan).
- *
- * Berbeda dari versi dinas, komponen ini tidak punya pemilih wilayah:
- * wilayahnya sudah tetap, yaitu sekolah milik pengguna. Pemilih jenjang dan
- * status hanya muncul bila berkas sekolah memuat lebih dari satu kombinasi.
- * Seluruh perhitungan tetap di ProfilCapaianService.
+ * Profil capaian satu sekolah (mode satuan pendidikan): wilayahnya tetap sekolah
+ * milik pengguna, tanpa pemilih wilayah seperti versi dinas.
  */
 class ProfilCapaian extends Component
 {

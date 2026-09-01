@@ -9,7 +9,6 @@ use App\Models\AnalisisAkar;
 use App\Models\AnalisisPrioritas;
 use App\Models\Capaian;
 use App\Models\ImporBerkas;
-use App\Models\Indikator;
 use App\Models\Wilayah;
 use App\Services\Akar\Analysis\AkarMasalahAnalyzer;
 use App\Services\Akar\Analysis\AnalisisRunner;
@@ -25,12 +24,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * F3 — Deteksi & Prioritisasi Masalah, dengan penelusuran akar masalah (F4)
- * sebagai rincian di tiap kartu prioritas.
- *
- * Komponen ini hanya mengurus pilihan pengguna, memicu layanan, dan menyusun
- * tampilan. Seluruh perhitungan skor, pemeringkatan, dan penelusuran akar
- * masalah berada di app/Services/Akar/, sesuai aturan pemisahan logika di
- * CLAUDE.md.
+ * sebagai rincian tiap kartu. Komponen hanya mengurus pilihan pengguna, memicu
+ * layanan, dan menyusun tampilan; perhitungan ada di app/Services/Akar/.
  */
 class Prioritas extends Component
 {
@@ -71,10 +66,7 @@ class Prioritas extends Component
         $this->statusSatuan = '';
     }
 
-    /**
-     * Panel yang terbuka milik kombinasi lama; tutup semuanya saat pilihan
-     * berganti supaya tidak menampilkan rincian dari analisis yang salah.
-     */
+    /** Tutup semua panel saat pilihan berganti agar tak menampilkan analisis lama. */
     public function updated(string $name): void
     {
         if (in_array($name, ['tahun', 'provinsi', 'wilayahId', 'jenisSatuan', 'statusSatuan'], true)) {
@@ -82,10 +74,6 @@ class Prioritas extends Component
             $this->akarTerbuka = [];
         }
     }
-
-    // ------------------------------------------------------------------
-    // Pilihan wilayah / tahun / jenjang / status
-    // ------------------------------------------------------------------
 
     /** @return Collection<int, int> */
     #[Computed]
@@ -167,14 +155,9 @@ class Prioritas extends Component
             && $this->statusSatuan !== '';
     }
 
-    // ------------------------------------------------------------------
-    // Analisis
-    // ------------------------------------------------------------------
-
     /**
-     * Analisis terakhir untuk kombinasi yang dipilih, bila sudah pernah
-     * dijalankan. Menjalankan ulang menambah baris analisis baru dan yang
-     * terbaru inilah yang ditampilkan; riwayat lama tetap tersimpan.
+     * Analisis terakhir untuk kombinasi terpilih. Menjalankan ulang menambah
+     * baris baru; riwayat lama tetap tersimpan.
      */
     #[Computed]
     public function analisis(): ?Analisis
@@ -211,10 +194,6 @@ class Prioritas extends Component
         unset($this->analisis);
     }
 
-    /**
-     * Unduh laporan PDF untuk analisis yang sedang ditampilkan. Perakitan
-     * dokumen ada di LaporanExporter; komponen ini hanya meneruskan responsnya.
-     */
     public function unduhPdf(LaporanExporter $exporter): ?StreamedResponse
     {
         $analisis = $this->analisis;
@@ -232,9 +211,6 @@ class Prioritas extends Component
         );
     }
 
-    /**
-     * Unduh data mentah analisis sebagai berkas Excel.
-     */
     public function unduhExcel(LaporanExporter $exporter): ?Response
     {
         $analisis = $this->analisis;
@@ -257,8 +233,7 @@ class Prioritas extends Component
     {
         $this->akarTerbuka = $this->toggle($this->akarTerbuka, $prioritasId);
 
-        // Telusuri hanya saat panel dibuka; hasilnya disimpan dan dibaca ulang
-        // saat render, sehingga proses ini tidak berjalan tiap render.
+        // Telusuri hanya saat panel dibuka; hasilnya disimpan lalu dibaca saat render.
         if (in_array($prioritasId, $this->akarTerbuka, true)) {
             $prioritas = AnalisisPrioritas::with('indikator', 'analisis')->find($prioritasId);
             if ($prioritas !== null) {
@@ -277,10 +252,6 @@ class Prioritas extends Component
             ? array_values(array_diff($daftar, [$id]))
             : [...$daftar, $id];
     }
-
-    // ------------------------------------------------------------------
-    // Penyusunan tampilan
-    // ------------------------------------------------------------------
 
     public function render()
     {
@@ -302,7 +273,6 @@ class Prioritas extends Component
             return [];
         }
 
-        // Label & arah perubahan tiap indikator prioritas dalam satu kueri.
         $capaian = Capaian::query()
             ->where('wilayah_id', $analisis->wilayah_id)
             ->where('tahun', $analisis->tahun)

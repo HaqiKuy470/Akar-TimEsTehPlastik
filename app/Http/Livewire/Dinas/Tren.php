@@ -13,9 +13,8 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
- * F6 — Analisis Tren Lintas Tahun.
+ * F6 — Analisis Tren Lintas Tahun. Perhitungan ada di TrenService.
  *
- * Komponen hanya mengurus pilihan wilayah dan meneruskannya ke TrenService.
  * Tidak ada tahun yang dipilih pengguna: tren memakai seluruh edisi yang ada.
  */
 class Tren extends Component

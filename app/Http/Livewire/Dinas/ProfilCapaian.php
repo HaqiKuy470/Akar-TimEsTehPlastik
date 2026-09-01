@@ -14,13 +14,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/**
- * F2 — Profil Capaian Daerah.
- *
- * Komponen ini hanya mengurus pilihan pengguna dan menampilkan hasil. Seluruh
- * perhitungan ada di ProfilCapaianService, sesuai aturan pemisahan logika di
- * CLAUDE.md.
- */
+/** F2 — Profil Capaian Daerah. Perhitungan ada di ProfilCapaianService. */
 class ProfilCapaian extends Component
 {
     #[Url]
@@ -43,9 +37,6 @@ class ProfilCapaian extends Component
         $this->tahun ??= $this->tahunTersedia()->first();
     }
 
-    /**
-     * Saat provinsi berganti, pilihan kabupaten/kota lama tidak lagi sah.
-     */
     public function updatedProvinsi(): void
     {
         $this->wilayahId = null;
@@ -155,9 +146,8 @@ class ProfilCapaian extends Component
     }
 
     /**
-     * Sekolah di kabupaten/kota terpilih yang berkas Rapor Pendidikan
-     * satuannya sudah diunggah kepala sekolahnya. Menautkan area dinas ke
-     * area sekolah tanpa menggabungkannya.
+     * Sekolah di kabupaten/kota terpilih yang berkas Rapor Pendidikan satuannya
+     * sudah diunggah kepala sekolahnya.
      *
      * @return Collection<int, array<string, mixed>>
      */

@@ -14,11 +14,8 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 /**
- * F9 — halaman masuk.
- *
- * AKAR belum memakai Fortify atau Breeze; kebutuhan autentikasinya sederhana
- * (tiga akun peran, tanpa pendaftaran mandiri), jadi login ditangani langsung
- * di komponen ini. Tidak ada logika domain di sini.
+ * F9 — halaman masuk. Tanpa Fortify/Breeze: kebutuhannya sederhana (akun peran,
+ * tanpa pendaftaran mandiri), jadi login ditangani langsung di komponen ini.
  */
 #[Layout('layouts.tamu')]
 #[Title('Masuk')]
@@ -56,11 +53,7 @@ class Login extends Component
         $this->redirectIntended($beranda, navigate: true);
     }
 
-    /**
-     * Batasi lima percobaan gagal per menit untuk tiap pasangan email + IP,
-     * mengikuti pola bawaan Laravel. Ini mencegah penebakan kata sandi tanpa
-     * mengganggu pengguna sah yang salah ketik sesekali.
-     */
+    /** Batasi 5 percobaan gagal per menit per pasangan email + IP. */
     private function pastikanTidakDibatasi(): void
     {
         if (! RateLimiter::tooManyAttempts($this->kunciPembatas(), maxAttempts: 5)) {

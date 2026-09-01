@@ -14,13 +14,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/**
- * F5 — Perbandingan Antardaerah.
- *
- * Komponen ini hanya mengurus pilihan pengguna dan menampilkan hasil.
- * Seluruh perhitungan peringkat ada di BenchmarkService, sesuai aturan
- * pemisahan logika di CLAUDE.md.
- */
+/** F5 — Perbandingan Antardaerah. Perhitungan peringkat ada di BenchmarkService. */
 class Perbandingan extends Component
 {
     #[Url]
@@ -70,9 +64,7 @@ class Perbandingan extends Component
         $this->indikatorId = null;
     }
 
-    /**
-     * Klik header tabel: kolom sama membalik arah, kolom lain mulai menaik.
-     */
+    /** Kolom sama membalik arah, kolom lain mulai menaik. */
     public function urutkan(string $kolom): void
     {
         if ($this->urutKolom === $kolom) {
@@ -167,8 +159,7 @@ class Perbandingan extends Component
     }
 
     /**
-     * Indikator yang punya data untuk kombinasi tahun dan jenjang terpilih,
-     * diurutkan secara natural menurut nomor ("A.2" sebelum "A.10").
+     * Diurutkan natural menurut nomor ("A.2" sebelum "A.10").
      *
      * @return Collection<int, Indikator>
      */
@@ -196,10 +187,7 @@ class Perbandingan extends Component
             ->values();
     }
 
-    /**
-     * Indikator yang sedang ditampilkan: pilihan pengguna, atau indikator
-     * pertama yang tersedia bila belum memilih.
-     */
+    /** Pilihan pengguna, atau indikator pertama yang tersedia bila belum memilih. */
     #[Computed]
     public function indikatorAktif(): ?Indikator
     {

@@ -12,26 +12,17 @@ use App\Services\Akar\PemetaanJenisLayanan;
 use Illuminate\Support\Collection;
 
 /**
- * Menyusun profil capaian satu wilayah: seluruh indikator yang relevan untuk
- * kombinasi wilayah/tahun/jenjang/status, dikelompokkan menurut dimensi
- * induknya, lengkap dengan label capaian, arah perubahan, dan ambang resmi.
+ * Menyusun profil capaian satu wilayah: indikator relevan untuk kombinasi
+ * wilayah/tahun/jenjang/status, dikelompokkan menurut dimensi, lengkap dengan
+ * label, arah perubahan, dan ambang resmi.
  *
- * Catatan tentang "Tidak Tersedia". Baris capaian berlabel "Tidak Tersedia"
- * sengaja tidak disimpan saat impor (lihat CapaianDaerahParser). Karena itu
- * "indikator yang relevan untuk jenjang ini" ditentukan dari indikator mana
- * saja yang PERNAH muncul di berkas untuk jenjang tersebut (kolom di sheet),
- * bukan dari seluruh 274 indikator metadata. Sebuah indikator yang menjadi
- * kolom di sheet namun tidak punya baris untuk wilayah terpilih diperlakukan
- * sebagai "Tidak Tersedia" dan ditampilkan terpisah, bukan sebagai nilai nol.
+ * "Indikator relevan" = indikator yang pernah muncul sebagai kolom di berkas
+ * untuk jenjang itu, bukan seluruh 274 metadata. Kolom yang ada tapi tanpa baris
+ * untuk wilayah terpilih diperlakukan "Tidak Tersedia" (baris seperti itu tidak
+ * disimpan saat impor), ditampilkan terpisah, bukan nol.
  *
- * Mode satuan pendidikan. Bila wilayah berlevel 'satuan', sumber datanya adalah
- * berkas yang diunggah kepala sekolah (ImporBerkas jenis 'satuan'), bukan berkas
- * Rapor Pendidikan daerah. Bentuk keluaran identik sehingga antarmuka dinas dan
- * sekolah dapat memakai lapisan yang sama. Untuk satuan, "indikator relevan"
- * disaring dengan kolom `tersedia_satuan` dan berasal dari satu berkas sekolah
- * itu saja; karena hanya ada satu wilayah dalam berkas tersebut, daftar
- * "Tidak Tersedia" cenderung pendek (indikator yang jadi kolom tetapi bernilai
- * "Tidak Tersedia" tidak ikut tersimpan, sama seperti jalur daerah).
+ * Mode satuan: sumber data berkas kepala sekolah (ImporBerkas jenis 'satuan'),
+ * disaring kolom `tersedia_satuan`. Bentuk keluaran identik dengan jalur daerah.
  */
 class ProfilCapaianService
 {
@@ -122,8 +113,7 @@ class ProfilCapaianService
 
             $ringkasan['total']++;
 
-            // Hitungan per dimensi mencakup indikator "Tidak Tersedia" agar
-            // grafik komposisi menampilkan gambaran lengkap tiap dimensi.
+            // Hitungan per dimensi mencakup "Tidak Tersedia" untuk grafik komposisi.
             $kode = $indikator->dimensi;
             $dimensi[$kode] ??= [
                 'kode' => $kode,
@@ -144,8 +134,7 @@ class ProfilCapaianService
             $dimensi[$kode]['indikator'][] = $entri;
         }
 
-        // Dimensi yang hanya berisi indikator "Tidak Tersedia" tetap dibuang
-        // dari daftar tabel, tetapi ikut di ringkasan grafik.
+        // Dimensi yang hanya berisi "Tidak Tersedia": dibuang dari tabel, tetap di grafik.
         $dimensiGrafik = array_values(array_filter(
             $dimensi,
             static fn ($d) => array_sum($d['hitung']) > 0,
@@ -165,9 +154,7 @@ class ProfilCapaianService
         ];
     }
 
-    /**
-     * Impor berkas daerah terakhir yang berhasil untuk sebuah tahun edisi.
-     */
+    /** Impor berkas daerah terakhir yang berhasil untuk sebuah tahun edisi. */
     private function imporDaerah(int $tahun): ?ImporBerkas
     {
         return ImporBerkas::query()
@@ -178,10 +165,7 @@ class ProfilCapaianService
             ->first();
     }
 
-    /**
-     * Impor berkas satuan pendidikan terakhir yang menghasilkan capaian untuk
-     * sekolah ini pada tahun tersebut.
-     */
+    /** Impor berkas satuan terakhir yang menghasilkan capaian untuk sekolah ini. */
     private function imporSatuan(Wilayah $wilayah, int $tahun): ?ImporBerkas
     {
         $imporIds = Capaian::query()
@@ -203,11 +187,9 @@ class ProfilCapaianService
     }
 
     /**
-     * Indikator yang menjadi kolom di berkas untuk jenjang ini (pernah punya
-     * baris capaian), diurutkan menurut nomor indikator secara natural.
+     * Indikator yang jadi kolom di berkas untuk jenjang ini, terurut natural.
      *
-     * @param  string  $kolomKetersediaan  'tersedia_kabkota' untuk jalur daerah,
-     *                                     'tersedia_satuan' untuk mode sekolah
+     * @param  string  $kolomKetersediaan  'tersedia_kabkota' (daerah) / 'tersedia_satuan' (sekolah)
      * @return Collection<int, Indikator>
      */
     private function indikatorRelevan(int $imporId, string $jenisSatuan, string $jenisLayanan, string $kolomKetersediaan): Collection
@@ -232,10 +214,7 @@ class ProfilCapaianService
             ->values();
     }
 
-    /**
-     * Ubah "A.1.10" menjadi "A.001.010" agar pengurutan tidak menaruh
-     * A.1.10 sebelum A.1.2.
-     */
+    /** "A.1.10" -> "A.001.010" supaya A.1.10 tak diurutkan sebelum A.1.2. */
     private function kunciUrut(string $nomor): string
     {
         return preg_replace_callback('/\d+/', static fn ($m) => str_pad($m[0], 3, '0', STR_PAD_LEFT), $nomor) ?? $nomor;

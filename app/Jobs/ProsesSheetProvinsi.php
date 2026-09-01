@@ -14,21 +14,14 @@ use Throwable;
 /**
  * Memproses satu sheet provinsi dari berkas Data Rapor Pendidikan.
  *
- * Satu berkas daerah berisi 38 sheet provinsi. Memecahnya menjadi 38 job
- * terpisah (ARCHITECTURE.md bagian 4.3) berarti: bila satu sheet gagal, sisanya
- * tetap berhasil dan sheet yang gagal dapat diulang sendiri tanpa mengulang
- * seluruh berkas.
+ * Satu job per sheet (ARCHITECTURE.md bagian 4.3) supaya sheet yang gagal bisa
+ * diulang sendiri tanpa mengulang seluruh berkas.
  */
 class ProsesSheetProvinsi implements ShouldQueue
 {
     use Batchable;
     use Queueable;
 
-    /**
-     * Naikkan batas memori: memuat satu sheet provinsi butuh ~300 MB
-     * (lihat catatan di CapaianDaerahParser). Aman karena impor daerah hanya
-     * dijalankan di mesin lokal.
-     */
     public int $timeout = 600;
 
     public int $tries = 2;
@@ -51,14 +44,14 @@ class ProsesSheetProvinsi implements ShouldQueue
             return;
         }
 
+        // Satu sheet provinsi butuh ~300 MB; aman karena impor daerah hanya di lokal.
         @ini_set('memory_limit', '1024M');
 
-        // Bersihkan lebih dulu supaya percobaan ulang tidak menggandakan baris.
+        // Bersihkan dulu supaya percobaan ulang tidak menggandakan baris.
         $parser->bersihkanSheet($this->imporId, $this->namaSheet);
 
         $jumlah = $parser->imporSheet($this->path, $this->namaSheet, $impor, $this->tahun);
 
-        // Akumulasi jumlah baris antar-sheet secara atomik.
         $impor->increment('jumlah_baris', $jumlah);
     }
 

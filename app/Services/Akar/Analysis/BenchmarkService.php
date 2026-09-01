@@ -10,46 +10,24 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * F5 — Perbandingan Antardaerah.
+ * F5 — Perbandingan Antardaerah: peringkat satu kabupaten/kota terhadap kab/kota
+ * lain di provinsi yang sama, plus pembanding agregat provinsi dan nasional.
  *
- * Menempatkan capaian satu kabupaten/kota dalam konteks: peringkatnya terhadap
- * seluruh kabupaten/kota lain di provinsi yang sama pada indikator, tahun,
- * jenjang, dan status satuan yang sama, serta pembanding terhadap agregat
- * provinsi dan nasional. Fitur ini tidak tersedia di portal resmi dan menjadi
- * pembeda utama produk (PRD F5).
- *
- * Catatan metode.
- *
- *  1. Label capaian hanya memiliki tiga tingkat berjenjang (Baik > Sedang >
- *     Kurang), sehingga banyak daerah akan berbagi peringkat yang sama. Itu
- *     bukan cacat, melainkan konsekuensi datanya yang memang kasar. Karena itu
- *     selain `peringkat` (posisi terbaik yang mungkin dalam kelompok label yang
- *     sama) dikembalikan pula `peringkat_hingga` agar antarmuka bisa jujur
- *     menampilkan rentang, misalnya "11-25 dari 38".
- *
- *  2. Peringkat dihitung dengan kueri agregat COUNT per label, bukan dengan
- *     memuat seluruh baris capaian ke PHP (ARCHITECTURE.md bagian 6.4).
- *
- *  3. Indikator berlabel "Tidak Tersedia" dikeluarkan dari populasi
- *     pemeringkatan, bukan ditempatkan di posisi terbawah. (Baris seperti itu
- *     memang tidak disimpan saat impor, tetapi filter tetap dipasang eksplisit
- *     sebagai jaring pengaman.)
+ * Karena label hanya tiga tingkat (Baik > Sedang > Kurang), banyak daerah berbagi
+ * peringkat; selain `peringkat` dikembalikan `peringkat_hingga` agar UI bisa
+ * menampilkan rentang ("11-25 dari 38"). Peringkat dihitung lewat COUNT agregat
+ * per label (ARCHITECTURE.md 6.4). "Tidak Tersedia" dikeluarkan dari populasi.
  */
 class BenchmarkService
 {
-    /** Nilai berjenjang tiap label untuk pengurutan. Makin besar makin baik. */
     private const NILAI_LABEL = ['Baik' => 3, 'Sedang' => 2, 'Kurang' => 1];
 
     private const TIDAK_TERSEDIA = 'Tidak Tersedia';
 
     /**
      * Peringkat sebuah wilayah terhadap kabupaten/kota lain di provinsinya.
-     *
-     * Hanya berlaku untuk wilayah level 'kabkota'. Untuk 'satuan' (sekolah)
-     * peringkat antarsekolah tidak tersedia — data sekolah lain tidak
-     * dipublikasikan (PRD F10) — sehingga `berlaku` bernilai false dan
-     * pemanggil sebaiknya memakai pembanding() terhadap agregat kabupaten
-     * dan provinsi.
+     * Hanya berlaku level 'kabkota'; untuk 'satuan', `berlaku` = false (pakai
+     * pembanding() terhadap agregat kabupaten/provinsi).
      *
      * @return array{
      *   berlaku: bool,
@@ -147,8 +125,7 @@ class BenchmarkService
 
     /**
      * Tabel peringkat seluruh kabupaten/kota satu provinsi untuk satu indikator,
-     * terurut dari label terbaik. Memuat satu baris per kabupaten/kota (puluhan
-     * baris), bukan seluruh tabel capaian.
+     * terurut dari label terbaik.
      *
      * @return list<array{
      *   wilayah_id: int, nama: string, label_capaian: string,
@@ -202,15 +179,9 @@ class BenchmarkService
     }
 
     /**
-     * Capaian wilayah ini disandingkan dengan agregat kabupaten, provinsi, dan
-     * nasional.
-     *
-     * Ini pembanding utama untuk mode satuan pendidikan (PRD F5, F10): sekolah
-     * dibandingkan terhadap agregat kabupaten dan provinsinya, bukan terhadap
-     * sekolah lain (data sekolah lain tidak tersedia untuk publik). Baris
-     * `kabupaten` hanya terisi bila `$wilayah` berlevel 'satuan' dan berkasnya
-     * memuat kabupaten induk; untuk wilayah level daerah baris itu ditandai
-     * tidak berlaku.
+     * Capaian wilayah disandingkan dengan agregat kabupaten, provinsi, dan nasional.
+     * Pembanding utama mode satuan (PRD F5, F10). Baris `kabupaten` hanya terisi
+     * bila `$wilayah` level 'satuan' dan berkasnya memuat kabupaten induk.
      *
      * @return array{
      *   wilayah: array{nama: string, label: string|null, perubahan: string|null},

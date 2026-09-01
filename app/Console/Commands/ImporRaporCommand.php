@@ -11,17 +11,10 @@ use Illuminate\Console\Command;
 use Throwable;
 
 /**
- * Titik masuk impor berkas Rapor Pendidikan di mesin lokal.
+ * Impor berkas Rapor Pendidikan di mesin lokal (ARCHITECTURE.md 4.1).
  *
- * Sesuai ARCHITECTURE.md bagian 4.1, parsing berkas daerah berukuran besar
- * dilakukan di lokal lewat perintah ini, bukan di server produksi. Hasilnya
- * dikirim ke produksi sebagai dump SQL.
- *
- *   .csv   -> berkas Metadata indikator  -> tabel indikator
- *   .xlsx  -> Data Rapor Pendidikan      -> tabel wilayah + capaian
- *
- * Impor Metadata harus dijalankan lebih dulu; sheet provinsi merujuk indikator
- * lewat nomor dan namanya.
+ * .csv = Metadata indikator, .xlsx = Data Rapor Pendidikan. Impor Metadata
+ * harus lebih dulu; sheet provinsi merujuk indikator lewat nomor dan namanya.
  */
 class ImporRaporCommand extends Command
 {
@@ -75,8 +68,8 @@ class ImporRaporCommand extends Command
             return self::SUCCESS;
         }
 
-        // Memuat satu sheet provinsi sekaligus butuh memori lebih besar dari
-        // default. Ini aman karena impor hanya dijalankan di mesin lokal.
+        // Satu sheet provinsi butuh memori lebih besar dari default; aman karena
+        // impor hanya jalan di mesin lokal.
         $sebelumnya = ini_get('memory_limit');
         ini_set('memory_limit', '1024M');
 

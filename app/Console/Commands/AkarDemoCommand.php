@@ -9,11 +9,8 @@ use Illuminate\Console\Command;
 
 /**
  * Menyiapkan basis data siap-demo dalam satu perintah: peran, akun demo,
- * indikator, dan satu sheet provinsi contoh (bila berkas dataset tersedia).
- *
- * Dipakai anggota tim dan penilai untuk mencoba aplikasi tanpa menjalankan
- * seluruh alur impor. Untuk pengisian data sebenarnya, lihat `akar:impor`
- * dan ARCHITECTURE.md bagian 4.1.
+ * indikator, dan satu sheet provinsi contoh. Untuk data sebenarnya pakai
+ * `akar:impor` (ARCHITECTURE.md 4.1).
  */
 class AkarDemoCommand extends Command
 {

@@ -7,32 +7,22 @@ namespace App\Services\Akar\Parsers;
 use RuntimeException;
 
 /**
- * Merekonstruksi header bertingkat sheet provinsi menjadi peta kolom.
+ * Merekonstruksi header bertingkat sheet provinsi (baris 6-8, sel ter-merge)
+ * menjadi peta kolom. Komponen paling kritis dari alur impor. Lihat ARCHITECTURE.md
+ * 3.2 dan 6.1.
  *
- * Ini komponen paling kritis dari alur impor. Sheet provinsi memakai tiga baris
- * header (baris 6, 7, 8) dengan sel ter-merge, sehingga hanya kolom pertama tiap
- * kelompok yang berisi nilai dan sisanya kosong. Susunan indikator BERBEDA
- * antaredisi, jadi resolusi wajib berdasarkan pola nama indikator di baris 7,
- * bukan posisi kolom yang diasumsikan tetap.
+ *   Baris 6  kode indikator induk : "A.1", "A.2"
+ *   Baris 7  nama lengkap          : "A.1 Kemampuan literasi", "A.1.1 ..."
+ *   Baris 8  nama kolom            : "Provinsi", ..., "Label Capaian 2025", "Perubahan ..."
  *
- * Struktur header (lihat ARCHITECTURE.md bagian 3.2 dan 6.1):
- *   Baris 6  kode indikator induk        : "A.1", "A.2", ...
- *   Baris 7  nama indikator lengkap       : "A.1 Kemampuan literasi", "A.1.1 ..."
- *   Baris 8  nama kolom                   : "Provinsi", ..., "Label Capaian 2025",
- *                                           "Perubahan Nilai Capaian dari Tahun Lalu"
- *
- * Kolom 1-4 adalah dimensi. Kolom 5 dan seterusnya berpasangan dua kolom per
- * indikator: satu kolom label, satu kolom perubahan. Nomor indikator yang sama
- * bisa muncul lebih dari sekali dengan nama berbeda (mis. "D.2" untuk PAUD dan
- * "D.2" untuk pendidikan dasar-menengah), sehingga nama ikut dikembalikan
- * sebagai kunci disambiguasi bagi CapaianDaerahParser.
+ * Susunan indikator berbeda antaredisi, jadi resolusi berdasarkan pola nama di
+ * baris 7, bukan posisi kolom. Kolom 1-4 dimensi; 5+ berpasangan label/perubahan.
+ * Nomor indikator sama bisa muncul >1x dengan nama berbeda (PAUD vs dasar-menengah),
+ * jadi nama ikut dikembalikan sebagai kunci disambiguasi.
  */
 class HeaderResolver
 {
-    /**
-     * Pola nomor indikator: satu huruf dimensi A-E, diikuti satu atau lebih
-     * segmen angka. Contoh cocok: A.1, A.1.1, D.17, E.5.3.
-     */
+    /** Nomor indikator: huruf A-E + segmen angka. Cocok: A.1, A.1.1, D.17. */
     private const POLA_NOMOR = '/^([A-E]\.\d+(?:\.\d+)*)(?:\s+(.*))?$/us';
 
     /**
@@ -81,9 +71,8 @@ class HeaderResolver
     }
 
     /**
-     * Kolom 1-4 selalu dimensi. Perannya dikenali dari teks baris 8 lebih dulu
-     * (lebih tahan terhadap perbedaan antaredisi) dan jatuh ke posisi bila teks
-     * tidak dikenali.
+     * Kolom 1-4 dimensi. Peran dikenali dari teks baris 8 dulu (tahan perbedaan
+     * antaredisi), jatuh ke posisi bila teks tak dikenali.
      *
      * @return array<string, string>
      */
@@ -112,11 +101,9 @@ class HeaderResolver
         $adaNama = $nama !== null && $nama !== '';
         $adaJudul = $judulKolom !== null && $judulKolom !== '';
 
-        // Kolom data indikator selalu memiliki judul "Label Capaian" atau
-        // "Perubahan Nilai Capaian" di baris 8. Tanpa judul, kolom ini hanyalah
-        // sisa lebar sheet di sebelah kanan data dan diabaikan. Pemeriksaan
-        // judul lebih dulu penting karena forward-fill baris 7 dapat membawa
-        // nama indikator terakhir merembet ke kolom-kolom sisa itu.
+        // Kolom data indikator selalu berjudul "Label Capaian"/"Perubahan ..." di
+        // baris 8. Tanpa judul = sisa lebar sheet, diabaikan. Cek judul dulu karena
+        // forward-fill baris 7 bisa merembetkan nama indikator terakhir ke sana.
         if (! $adaJudul) {
             return null;
         }
@@ -180,9 +167,7 @@ class HeaderResolver
     }
 
     /**
-     * Ubah seluruh sel menjadi string ter-trim; sel kosong menjadi null.
-     * Karakter newline di dalam judul kolom ("Jenis Satuan Pendidikan\n") ikut
-     * dirapikan agar pencocokan teks tidak meleset.
+     * Sel -> string ter-trim (whitespace runtuh jadi satu spasi); kosong -> null.
      *
      * @param  list<int|float|string|null>  $baris
      * @return list<string|null>
@@ -200,8 +185,7 @@ class HeaderResolver
     }
 
     /**
-     * Isi sel kosong bekas merge dengan nilai terakhir yang tidak kosong di
-     * sebelah kirinya (forward-fill). Hanya diterapkan pada baris 6 dan 7.
+     * Forward-fill: isi sel kosong bekas merge dengan nilai tak kosong di kirinya.
      *
      * @param  list<string|null>  $baris
      * @return list<string|null>

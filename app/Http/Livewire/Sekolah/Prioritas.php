@@ -15,13 +15,9 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 /**
- * Prioritas masalah dan akar masalah untuk satu sekolah.
- *
- * Memakai layanan yang sama dengan versi dinas (AnalisisRunner,
- * AkarMasalahAnalyzer). Perbedaannya hanya wilayah: tetap sekolah milik
- * pengguna, tanpa pemilih. Komponen "posisi relatif" pada skor prioritas
- * membandingкан sekolah dengan agregat kabupatennya, bukan dengan sekolah
- * lain (data sekolah lain tidak dipublikasikan).
+ * Prioritas masalah dan akar masalah untuk satu sekolah. Layanan sama dengan
+ * versi dinas; wilayah tetap sekolah milik pengguna. "Posisi relatif" pada skor
+ * dibandingkan dengan agregat kabupaten, bukan sekolah lain (tak dipublikasikan).
  */
 class Prioritas extends Component
 {

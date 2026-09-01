@@ -8,14 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * Halaman panduan penggunaan AKAR.
- *
- * Seluruh penjelasan cara memakai aplikasi, arti label capaian, cara skor
- * prioritas dihitung, dan batasan produk dikumpulkan di satu tempat. Halaman
- * alat (Profil, Prioritas, dan seterusnya) cukup memuat tautan ke bagian yang
- * relevan di sini, sehingga tetap ringkas untuk pengguna yang sudah paham.
- *
- * Tidak ada logika analisis di sini; bobot skor dibaca dari config/akar.php
+ * Halaman panduan penggunaan AKAR. Bobot skor dibaca dari config/akar.php
  * hanya untuk ditampilkan apa adanya.
  */
 #[Title('Panduan')]

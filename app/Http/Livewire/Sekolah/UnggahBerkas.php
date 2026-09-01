@@ -14,16 +14,12 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 
 /**
- * F10 — Mode Satuan Pendidikan: unggah berkas Rapor Pendidikan sekolah.
+ * F10 — Mode Satuan Pendidikan: unggah berkas Rapor Pendidikan sekolah. Parsing
+ * dikerjakan ProsesImporSekolah di antrean (CLAUDE.md: jangan proses XLSX dalam
+ * siklus request).
  *
- * Komponen hanya mengurus unggahan, deteksi jenis berkas (murah, sekadar
- * membaca nama sheet + 15 baris pertama), dan pemantauan status. Parsing yang
- * sesungguhnya dikerjakan ProsesImporSekolah di antrean, sesuai aturan
- * "jangan memproses XLSX di dalam siklus request" pada CLAUDE.md.
- *
- * CATATAN JUJUR. Struktur berkas Rapor Pendidikan tingkat satuan pendidikan
- * belum diuji tim dengan berkas asli. Alur ini akan menolak berkas yang
- * strukturnya tidak dikenali dengan pesan spesifik, bukan memaksakannya.
+ * CATATAN: struktur berkas satuan pendidikan belum diuji dengan berkas asli;
+ * berkas yang tak dikenali ditolak dengan pesan spesifik, bukan dipaksakan.
  */
 class UnggahBerkas extends Component
 {
@@ -104,19 +100,12 @@ class UnggahBerkas extends Component
         $this->galat = null;
     }
 
-    /**
-     * Setelah berkas selesai diproses, arahкан ke beranda sekolah tempat
-     * seluruh analisis (profil, prioritas, RKT) dapat dibuka.
-     */
     public function keBeranda()
     {
         return redirect()->route('sekolah.beranda');
     }
 
-    /**
-     * Dipanggil oleh wire:poll selama impor berjalan. Begitu status berubah
-     * menjadi "selesai", pengguna langsung dibawa ke beranda.
-     */
+    /** Dipanggil wire:poll selama impor berjalan; alihkan ke beranda saat selesai. */
     public function periksaSelesai()
     {
         if ($this->impor?->status === 'selesai') {

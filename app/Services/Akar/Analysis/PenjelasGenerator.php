@@ -5,15 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Akar\Analysis;
 
 /**
- * Menyusun kalimat penjelas untuk satu indikator prioritas.
- *
- * Kalimatnya harus bisa dibaca kepala bidang di Dinas Pendidikan tanpa latar
- * belakang teknis, dan dibawa langsung ke forum perencanaan. Karena itu kelas
- * ini merangkai kalimat Indonesia biasa dari fakta-fakta analisis, bukan
- * membeberkan angka skor mentah.
- *
- * Kalimat penjelas tidak boleh kosong. Bila konteks minim, minimal kondisi
- * label dan arah perubahan selalu dijelaskan.
+ * Merangkai kalimat penjelas Indonesia biasa untuk satu indikator prioritas,
+ * dari fakta analisis (bukan angka skor mentah). Tidak pernah kosong: minimal
+ * kondisi label dan arah perubahan selalu dijelaskan.
  */
 class PenjelasGenerator
 {
@@ -43,8 +37,7 @@ class PenjelasGenerator
             $kalimat[] = $peringkat;
         }
 
-        // Mode satuan pendidikan tidak punya peringkat antarsekolah; pembandingnya
-        // adalah agregat kabupaten induk.
+        // Mode satuan: pembandingnya agregat kabupaten induk, bukan peringkat.
         $kabupaten = $this->kalimatKabupaten($konteks['pembanding_kabupaten'] ?? null, $konteks['label'] ?? null);
         if ($kabupaten !== null) {
             $kalimat[] = $kabupaten;

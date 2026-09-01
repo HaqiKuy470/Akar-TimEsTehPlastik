@@ -9,26 +9,16 @@ use App\Models\Indikator;
 use App\Models\Wilayah;
 
 /**
- * F6 — Analisis Tren Lintas Tahun.
+ * F6 — Analisis Tren Lintas Tahun: indikator mana yang memburuk dua tahun
+ * berturut-turut dan mana yang membaik konsisten.
  *
- * Portal Rapor Pendidikan resmi menampilkan capaian satu tahun. Nilai tambah
- * AKAR di sini adalah menampilkan lintasannya: indikator mana yang memburuk dua
- * tahun berturut-turut (perlu perhatian serius) dan mana yang membaik konsisten
- * (praktik yang layak dipertahankan).
- *
- * Seluruh perbandingan antar tahun memakai jenjang mutu label dari
- * config/akar.php (Baik > Sedang > Kurang). Tahun tanpa baris capaian untuk
- * sebuah indikator berarti "Tidak Tersedia" pada tahun itu (baris "Tidak
- * Tersedia" memang tidak disimpan saat impor), dan memutus rangkaian penilaian
- * tren, bukan dianggap penurunan.
+ * Perbandingan antar tahun memakai jenjang mutu label config/akar.php
+ * (Baik > Sedang > Kurang). Tahun tanpa baris capaian = "Tidak Tersedia" pada
+ * tahun itu; memutus rangkaian penilaian, bukan dianggap penurunan.
  */
 class TrenService
 {
-    /**
-     * Warna garis grafik menurut klasifikasi. Memakai isian grafik AKAR
-     * (hue status yang dinaikkan agar terpisah untuk mata buta warna);
-     * lihat token --color-grafik-* di app.css.
-     */
+    /** Warna garis grafik per klasifikasi; lihat token --color-grafik-* di app.css. */
     private const WARNA_KLASIFIKASI = [
         'memburuk_berturut' => '#b4231a',
         'membaik_konsisten' => '#2f7d3f',
@@ -196,12 +186,8 @@ class TrenService
     }
 
     /**
-     * Satu garis per indikator (DESIGN.md 5). Grafik hanya menampilkan
-     * indikator yang BERGERAK — memburuk berturut atau membaik konsisten —
-     * karena garis datar dari indikator stabil hanya menambah keramaian dan
-     * tidak menceritakan apa pun. Bila hampir tidak ada yang bergerak,
-     * ditambahkan beberapa indikator stabil sebagai konteks. Dibatasi tujuh
-     * garis agar tetap terbaca.
+     * Grafik hanya menampilkan indikator yang bergerak; bila hampir tak ada,
+     * beberapa indikator stabil ditambahkan sebagai konteks. Maks 7 garis.
      *
      * @param  list<array<string, mixed>>  $baris
      * @return list<array<string, mixed>>

@@ -9,22 +9,13 @@ use App\Models\Wilayah;
 use Illuminate\Support\Collection;
 
 /**
- * Menjembatani dua area aplikasi tanpa menggabungkannya.
- *
- * Analis dinas bekerja dengan data agregat kabupaten/kota. Bila ada kepala
- * sekolah di kabupaten itu yang sudah mengunggah Rapor Pendidikan sekolahnya,
- * analis dapat melihat capaian sekolah tersebut sebagai konteks tambahan.
- * Kelas ini menjawab "sekolah mana di kabupaten X yang sudah punya data?".
- *
- * Data sekolah tetap terpisah: yang muncul hanya sekolah yang berkasnya
- * benar-benar sudah diunggah dan diproses, bukan seluruh sekolah di daerah.
+ * Menjawab "sekolah mana di kabupaten X yang sudah punya data?", agar analis
+ * dinas bisa memakai capaian sekolah sebagai konteks. Hanya sekolah yang
+ * berkasnya sudah diunggah dan diproses yang muncul, bukan seluruh sekolah.
  */
 class SekolahWilayah
 {
     /**
-     * Daftar sekolah di sebuah kabupaten/kota yang berkas satuannya sudah
-     * berhasil diproses, beserta ringkasan capaian singkat tiap sekolah.
-     *
      * @return Collection<int, array{
      *   wilayah_id: int,
      *   nama: string,

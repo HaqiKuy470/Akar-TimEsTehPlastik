@@ -15,15 +15,9 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
- * Jembatan area dinas → area sekolah.
- *
- * Analis dinas dapat melihat capaian satu sekolah yang berkasnya sudah
- * diunggah kepala sekolahnya, sebagai konteks tambahan atas data agregat
- * kabupaten. Tampilan bersifat baca-saja; tidak ada aksi menyunting di sini,
- * dan hanya sekolah yang benar-benar sudah punya berkas yang bisa dibuka.
- *
- * Halaman ini TIDAK menggantikan area sekolah: kepala sekolah tetap bekerja
- * di ruang kerjanya sendiri. Ini hanya jendela baca dari sisi dinas.
+ * Jembatan area dinas → area sekolah: jendela baca-saja bagi analis dinas untuk
+ * melihat capaian satu sekolah yang berkasnya sudah diunggah kepala sekolahnya.
+ * Tidak menggantikan area sekolah.
  */
 #[Title('Sekolah di wilayah')]
 class SekolahDaerah extends Component

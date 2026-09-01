@@ -13,30 +13,20 @@ use App\Models\RencanaAksi;
 use Illuminate\Support\Facades\DB;
 
 /**
- * F7 - Generator Rencana Tindak Lanjut.
+ * F7 - Generator Rencana Tindak Lanjut: hasil analisis -> draf dokumen kerja,
+ * satu baris per kegiatan usulan (penanggung jawab, indikator keberhasilan, waktu).
  *
- * Mengubah hasil analisis (indikator prioritas + akar masalah) menjadi draf
- * dokumen kerja: satu baris per kegiatan usulan, lengkap dengan penanggung
- * jawab, indikator keberhasilan, dan perkiraan waktu.
- *
- * Prinsip yang dipegang:
- *  - Aturan bisnis ada di config, bukan di sini. Kegiatan yang diusulkan untuk
- *    sebuah akar masalah dibaca dari config/intervensi.php; rincian tiap
- *    kegiatan dari config/kegiatan.php.
- *  - Tidak mengarang. Indikator prioritas tanpa akar masalah yang cukup
- *    didukung bukti, atau akar yang kegiatannya tidak ada di katalog,
- *    dilewati begitu saja. Pengguna menambah sendiri bila perlu.
- *  - Hasilnya draf. Seluruh nilai dapat disunting pengguna sebelum diekspor.
+ * Kegiatan per akar masalah dari config/intervensi.php; rincian dari
+ * config/kegiatan.php. Prioritas tanpa akar berbukti cukup, atau akar yang
+ * kegiatannya tak ada di katalog, dilewati (tidak mengarang). Hasilnya draf yang
+ * dapat disunting pengguna.
  */
 class RencanaAksiGenerator
 {
     /**
-     * Susun (atau susun ulang) draf rencana tindak lanjut untuk sebuah analisis.
-     *
-     * Idempoten: satu analisis hanya punya satu rencana aksi. Bila sudah ada
-     * dan $paksaUlang bernilai false, rencana yang ada dikembalikan tanpa
-     * perubahan sehingga suntingan pengguna tidak hilang. Bila $paksaUlang
-     * bernilai true, seluruh item lama diganti hasil generasi baru.
+     * Susun (atau susun ulang) draf rencana tindak lanjut. Idempoten: bila sudah
+     * ada dan $paksaUlang false, rencana lama dikembalikan agar suntingan pengguna
+     * tidak hilang.
      */
     public function hasilkan(Analisis $analisis, ?int $dibuatOleh = null, bool $paksaUlang = false): RencanaAksi
     {
@@ -111,10 +101,7 @@ class RencanaAksiGenerator
         });
     }
 
-    /**
-     * Akar masalah terkuat sebuah indikator prioritas: keyakinan tertinggi dan
-     * bukan "tidak cukup bukti". Mengembalikan null bila tidak ada.
-     */
+    /** Akar keyakinan tertinggi yang bukan "tidak cukup bukti"; null bila tidak ada. */
     private function akarTerkuat(AnalisisPrioritas $prioritas): ?AnalisisAkar
     {
         return $prioritas->akar
@@ -134,8 +121,7 @@ class RencanaAksiGenerator
     }
 
     /**
-     * Kandidat akar di config/intervensi.php yang kodenya cocok dengan hasil
-     * analisis.
+     * Kandidat akar di config/intervensi.php yang kodenya cocok.
      *
      * @param  array<string, mixed>  $entriIndikator
      * @return array<string, mixed>|null
@@ -152,7 +138,7 @@ class RencanaAksiGenerator
     }
 
     /**
-     * Label capaian tiap indikator prioritas dalam analisis ini, sekali kueri.
+     * Label capaian tiap indikator prioritas, sekali kueri.
      *
      * @return array<int, string> indikator_id => label capaian
      */

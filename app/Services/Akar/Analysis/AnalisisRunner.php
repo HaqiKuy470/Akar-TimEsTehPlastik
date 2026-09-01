@@ -13,26 +13,13 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Menjalankan satu analisis prioritas untuk kombinasi wilayah + tahun +
- * jenjang + status, lalu menyimpan hasilnya (F3).
+ * jenjang + status, lalu menyimpan hasilnya (F3). Lihat ARCHITECTURE.md 7.2.
  *
- * Alur (ARCHITECTURE.md bagian 7.2):
- *   1. buat baris `analisis` beserta salinan config/akar.php
- *   2. ambil seluruh indikator berlabel Kurang/Sedang untuk kombinasi itu
- *   3. untuk tiap indikator hitung dua komponen yang butuh data:
- *        - posisi relatif terhadap kabupaten/kota lain di provinsi sama
- *        - proporsi indikator turunan yang juga bermasalah
- *   4. panggil PrioritasCalculator, simpan `analisis_prioritas` lengkap
- *      dengan rincian komponen skor dan kalimat penjelas
+ * Pemeringkatan dilakukan lewat kueri agregat, bukan memuat semua baris ke PHP.
  *
- * Analisis satu wilayah menyentuh ratusan baris, bukan jutaan, dan seluruh
- * pemeringkatan dilakukan lewat kueri agregat, bukan dengan memuat semua baris
- * capaian ke PHP.
- *
- * Mode satuan pendidikan. Bila wilayah berlevel 'satuan', tidak ada sekolah
- * lain sebagai pembanding (data sekolah lain tidak dipublikasikan, PRD F10),
- * sehingga komponen "posisi relatif" diganti: label sekolah dibandingkan
- * terhadap agregat kabupaten induknya. Bobotnya tetap sama dan skor tetap pada
- * skala 0-100 sehingga hasil dinas dan sekolah tetap sebanding.
+ * Mode satuan: tidak ada sekolah lain sebagai pembanding (PRD F10), jadi komponen
+ * "posisi relatif" diganti perbandingan label sekolah vs agregat kabupaten induk.
+ * Bobot dan skala skor tetap sama supaya hasil dinas dan sekolah sebanding.
  */
 class AnalisisRunner
 {
@@ -59,8 +46,7 @@ class AnalisisRunner
                 'tahun' => $tahun,
                 'jenis_satuan' => $jenisSatuan,
                 'status_satuan' => $statusSatuan,
-                // Salinan penuh, sehingga hasil ini tetap dapat direproduksi
-                // walau bobot di config/akar.php diubah kemudian.
+                // Salinan penuh supaya hasil tetap reproducible bila config diubah.
                 'bobot_dipakai' => (array) config('akar'),
                 'dibuat_oleh' => $dibuatOleh,
             ]);
@@ -111,8 +97,7 @@ class AnalisisRunner
                 $kalimat = $this->penjelas->untuk($hasil['komponen'], [
                     'label' => $capaian->label_capaian,
                     'perubahan' => $capaian->perubahan_nilai,
-                    // Untuk satuan, peringkat/dari null → PenjelasGenerator tidak
-                    // membuat kalimat "peringkat X dari Y kabupaten/kota".
+                    // Satuan: peringkat/dari null -> tanpa kalimat "peringkat X dari Y".
                     'peringkat' => $posisi['peringkat'] ?? null,
                     'dari' => $posisi['dari'] ?? null,
                     'anak_bermasalah' => $turunan['bermasalah'] ?? null,
@@ -158,15 +143,11 @@ class AnalisisRunner
     }
 
     /**
-     * Persentil terbalik tiap indikator: proporsi kabupaten/kota lain di
-     * provinsi yang sama yang berlabel LEBIH BAIK daripada wilayah ini. Nilai
-     * 1.0 berarti wilayah ini yang terburuk, 0.0 berarti terbaik.
+     * Proporsi kabupaten/kota lain di provinsi sama yang berlabel lebih baik dari
+     * wilayah ini. 1.0 = terburuk, 0.0 = terbaik. Label "Tidak Tersedia" dikeluarkan
+     * dari populasi, bukan ditaruh di posisi terbawah.
      *
-     * Wilayah dengan label "Tidak Tersedia" dikeluarkan dari populasi, bukan
-     * ditempatkan di posisi terbawah.
-     *
-     * TODO: pindahkan ke BenchmarkService (F5) agar logika pemeringkatan hanya
-     * ada di satu tempat.
+     * TODO: pindahkan ke BenchmarkService (F5).
      *
      * @param  list<int>  $indikatorIds
      * @param  array<string, int>  $peringkatLabel
@@ -185,8 +166,7 @@ class AnalisisRunner
             ->where('provinsi', $wilayah->provinsi)
             ->pluck('id');
 
-        // Distribusi label per indikator untuk seluruh kabupaten/kota di
-        // provinsi ini, dalam satu kueri agregat.
+        // Distribusi label per indikator untuk semua kab/kota provinsi, satu kueri.
         $distribusi = Capaian::query()
             ->selectRaw('indikator_id, label_capaian, COUNT(*) as jumlah')
             ->whereIn('wilayah_id', $kabkotaProvinsi)
@@ -199,7 +179,6 @@ class AnalisisRunner
             ->get()
             ->groupBy('indikator_id');
 
-        // Label wilayah ini sendiri per indikator.
         $labelWilayah = Capaian::query()
             ->where('wilayah_id', $wilayah->id)
             ->where('tahun', $tahun)
@@ -233,11 +212,9 @@ class AnalisisRunner
                 }
             }
 
-            // nilai = proporsi daerah yang lebih baik dari wilayah ini.
             $nilai = $total > 1 ? $lebihBaik / ($total - 1) : 0.0;
 
-            // Peringkat 1 = terbaik. Wilayah ini berada di bawah semua daerah
-            // yang lebih baik, sehingga peringkatnya = jumlah daerah lebih baik + 1.
+            // Peringkat 1 = terbaik; wilayah ini = (jumlah daerah lebih baik) + 1.
             $hasil[$id] = [
                 'nilai' => round($nilai, 4),
                 'peringkat' => $lebihBaik + 1,
@@ -249,14 +226,8 @@ class AnalisisRunner
     }
 
     /**
-     * Komponen "posisi" untuk mode satuan pendidikan: bukan peringkat
-     * antarsekolah (data itu tidak publik), melainkan perbandingan label
-     * sekolah terhadap agregat kabupaten induknya pada indikator yang sama.
-     *
-     *   sekolah lebih buruk daripada kabupaten -> nilai 1.0
-     *   sama                                    -> nilai 0.5
-     *   sekolah lebih baik                      -> nilai 0.0
-     *   kabupaten tidak punya data              -> nilai 0.0 (pembanding kosong)
+     * Komponen "posisi" mode satuan: label sekolah vs agregat kabupaten induk.
+     * Lebih buruk -> 1.0, sama -> 0.5, lebih baik / kabupaten tanpa data -> 0.0.
      *
      * @param  list<int>  $indikatorIds
      * @param  array<string, int>  $peringkatLabel
@@ -281,9 +252,8 @@ class AnalisisRunner
             ->whereIn('indikator_id', $indikatorIds)
             ->pluck('label_capaian', 'indikator_id');
 
-        // Berkas daerah kadang memakai istilah jenjang yang sedikit berbeda dari
-        // berkas sekolah (mis. "SD Umum" vs "SD Negeri"); kalau tidak ada baris
-        // untuk jenjang yang sama persis, pembanding dianggap tidak tersedia.
+        // Jenjang berkas daerah vs sekolah bisa beda ("SD Umum" vs "SD Negeri");
+        // tanpa baris untuk jenjang yang sama persis, pembanding dianggap kosong.
         $labelKabupaten = $kabupaten
             ? Capaian::query()
                 ->where('wilayah_id', $kabupaten->id)
@@ -321,9 +291,8 @@ class AnalisisRunner
     }
 
     /**
-     * Ganti label komponen "posisi" pada rincian skor agar sesuai konteks
-     * sekolah, dan lampirkan pembanding kabupaten. Jumlah komponen tetap empat
-     * dan kontribusinya tidak diubah, sehingga skor tetap dapat ditelusuri.
+     * Ganti label komponen "posisi" agar sesuai konteks sekolah dan lampirkan
+     * pembanding kabupaten. Kontribusi skor tidak diubah.
      *
      * @param  list<array<string, mixed>>  $komponen
      * @param  array<string, mixed>|null  $posisi
@@ -348,9 +317,8 @@ class AnalisisRunner
     }
 
     /**
-     * Proporsi indikator turunan (anak) yang berlabel Kurang/Sedang untuk
-     * wilayah dan kombinasi yang sama. Hanya anak yang punya data yang dihitung
-     * sebagai penyebut.
+     * Proporsi indikator turunan berlabel Kurang/Sedang. Penyebut hanya anak
+     * yang punya data.
      *
      * @param  list<int>  $indikatorIds
      * @param  list<string>  $labelBermasalah

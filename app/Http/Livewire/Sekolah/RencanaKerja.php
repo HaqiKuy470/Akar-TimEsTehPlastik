@@ -17,12 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Rencana Kerja Tahunan (RKT) satu sekolah.
- *
- * Sama seperti generator rencana tindak lanjut tingkat dinas, tetapi diberi
- * istilah RKT karena itulah dokumen yang wajib disusun kepala sekolah setiap
- * tahun (PRD bagian 3.2). Analisisnya diambil otomatis dari analisis terakhir
- * sekolah pengguna; penyusunan draf tetap di RencanaAksiGenerator.
+ * Rencana Kerja Tahunan (RKT) satu sekolah — sama dengan rencana tindak lanjut
+ * dinas, istilah RKT dipakai sesuai dokumen wajib kepala sekolah (PRD bagian 3.2).
  */
 class RencanaKerja extends Component
 {

@@ -14,10 +14,6 @@ use Throwable;
 /**
  * Memproses berkas Rapor Pendidikan satuan pendidikan yang diunggah pengguna,
  * di luar siklus request HTTP (CLAUDE.md).
- *
- * Di lingkungan produksi cPanel, antrean dijalankan lewat cron
- * (`queue:work --stop-when-empty`), jadi jeda maksimal satu menit sebelum job
- * dieksekusi. Antarmuka menampilkan status "Menunggu diproses" sampai selesai.
  */
 class ProsesImporSekolah implements ShouldQueue
 {
@@ -39,7 +35,6 @@ class ProsesImporSekolah implements ShouldQueue
         try {
             $parser->imporKe($impor, $path);
         } finally {
-            // Berkas mentah tidak perlu disimpan setelah diproses.
             Storage::disk('local')->delete($this->lokasiRelatif);
         }
     }

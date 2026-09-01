@@ -15,41 +15,26 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 /**
- * F4 - Analisis Akar Masalah.
+ * F4 - Analisis Akar Masalah: menelusuri dari gejala (indikator prioritas merah)
+ * ke penyebab lewat pohon keputusan di config/intervensi.php (bukan di kode).
  *
- * Menelusuri dari gejala (indikator prioritas berlabel merah) ke penyebab.
- * Pohon keputusannya tidak tertanam di kode, melainkan dibaca dari
- * config/intervensi.php. Untuk setiap indikator prioritas:
+ * Per indikator prioritas: ambil kandidat akar dari konfigurasi (kosong = belum
+ * dipetakan, pemanggil menyatakan "rekomendasi belum tersedia", tidak mengarang),
+ * periksa label indikator pendukung, terapkan gerbang 'ambang'. Bila ada kandidat
+ * lolos, hanya itu yang jadi hipotesis; bila tidak, semua dicatat dengan keyakinan
+ * "tidak_cukup_bukti" (PRD F4). Keyakinan mengikuti ARCHITECTURE.md 6.3.
  *
- *   1. Ambil daftar kandidat akar masalah dari konfigurasi. Bila indikator
- *      belum dipetakan, kembalikan koleksi kosong; pemanggil menyatakan
- *      "rekomendasi belum tersedia" dan TIDAK mengarang.
- *   2. Untuk tiap kandidat, periksa label capaian indikator pendukungnya pada
- *      kombinasi wilayah/tahun/jenjang/status yang sama dengan analisis induk.
- *   3. Terapkan gerbang 'ambang'. Bila ada kandidat yang lolos gerbang, hanya
- *      kandidat itulah yang menjadi hipotesis akar masalah. Bila tidak ada
- *      satu pun yang lolos, seluruh kandidat tetap dicatat dengan keyakinan
- *      "tidak_cukup_bukti" - sistem menyatakan keterbatasannya secara jujur
- *      alih-alih memaksakan kesimpulan (PRD F4).
- *   4. Tingkat keyakinan mengikuti tabel di ARCHITECTURE.md bagian 6.3,
- *      dihitung dari jumlah indikator pendukung berlabel Kurang atau Sedang.
- *
- * Indikator pendukung berlabel "Tidak Tersedia" (termasuk yang tidak punya
- * baris capaian sama sekali) tidak dihitung sebagai bukti maupun sebagai
- * populasi gerbang 'mayoritas_bermasalah'.
+ * Label "Tidak Tersedia" tidak dihitung sebagai bukti maupun populasi gerbang.
  */
 class AkarMasalahAnalyzer
 {
-    /** Label yang dihitung sebagai bukti pendukung sebuah akar masalah. */
     private const LABEL_BUKTI = ['Kurang', 'Sedang'];
 
     private const TIDAK_TERSEDIA = 'Tidak Tersedia';
 
     /**
      * Telusuri akar masalah untuk satu indikator prioritas dan simpan hasilnya.
-     *
-     * Idempoten: baris analisis_akar lama milik prioritas ini dihapus lebih
-     * dulu, sehingga menjalankan ulang menghasilkan keadaan yang sama.
+     * Idempoten: baris analisis_akar lama dihapus lebih dulu.
      *
      * @return Collection<int, AnalisisAkar> diurutkan dari keyakinan terkuat
      */
@@ -68,7 +53,6 @@ class AkarMasalahAnalyzer
 
         $kandidatList = $peta[$nomorIndikator]['kandidat_akar'] ?? [];
 
-        // Nilai tiap kandidat lebih dulu, tanpa menyentuh basis data.
         $dinilai = array_map(function (array $kandidat) use ($analisis): array {
             $pendukung = $this->labelPendukung($analisis, $kandidat['periksa'] ?? []);
 
@@ -86,8 +70,7 @@ class AkarMasalahAnalyzer
 
         $baris = collect();
         foreach ($dinilai as $d) {
-            // Bila ada kandidat yang lolos gerbang, kandidat yang tidak lolos
-            // diabaikan: hipotesis yang lebih didukung data yang menang.
+            // Bila ada kandidat lolos gerbang, yang tidak lolos diabaikan.
             if ($adaYangLolos && ! $d['lolos']) {
                 continue;
             }
@@ -108,8 +91,7 @@ class AkarMasalahAnalyzer
     }
 
     /**
-     * Telusuri akar masalah untuk seluruh indikator prioritas dalam sebuah
-     * analisis.
+     * Telusuri akar masalah untuk seluruh indikator prioritas dalam satu analisis.
      *
      * @return Collection<int, AnalisisAkar>
      */
@@ -130,9 +112,8 @@ class AkarMasalahAnalyzer
     }
 
     /**
-     * Label capaian tiap indikator pendukung untuk kombinasi analisis ini.
-     * Indikator yang tidak ada di tabel indikator, atau ada tetapi tidak punya
-     * baris capaian, dilaporkan sebagai "Tidak Tersedia".
+     * Label capaian tiap indikator pendukung. Indikator tak dikenal atau tanpa
+     * baris capaian dilaporkan "Tidak Tersedia".
      *
      * @param  list<string>  $nomorPeriksa
      * @return list<array{nomor: string, nama: string|null, label: string}>
@@ -199,7 +180,7 @@ class AkarMasalahAnalyzer
     }
 
     /**
-     * Tabel keyakinan ARCHITECTURE.md bagian 6.3.
+     * Tabel keyakinan ARCHITECTURE.md 6.3.
      *
      * @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung
      */
@@ -226,9 +207,7 @@ class AkarMasalahAnalyzer
     }
 
     /**
-     * Hanya indikator pendukung berlabel Kurang atau Sedang yang dicatat
-     * sebagai bukti; indikator Baik atau Tidak Tersedia tidak memperkuat
-     * hipotesis akar masalah.
+     * Hanya pendukung berlabel Kurang/Sedang yang dicatat sebagai bukti.
      *
      * @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung
      * @return list<array{nomor: string, nama: string|null, label: string}>

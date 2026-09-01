@@ -10,15 +10,8 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 /**
- * Beranda mode satuan pendidikan.
- *
- * Halaman pertama yang dilihat kepala sekolah dan wakil kepala kurikulum
- * setelah masuk. Bila mereka belum pernah mengunggah berkas, halaman ini
- * mengajak mengunggah. Bila sudah, ia menampilkan ringkasan capaian sekolah
- * dan pintasan ke profil, prioritas, dan rencana kerja.
- *
- * Tidak ada logika analisis di sini; ringkasan diambil dari
- * ProfilCapaianService.
+ * Beranda mode satuan pendidikan: mengajak mengunggah berkas bila belum ada,
+ * atau menampilkan ringkasan capaian sekolah bila sudah.
  */
 class Beranda extends Component
 {
@@ -35,9 +28,6 @@ class Beranda extends Component
     }
 
     /**
-     * Kombinasi jenjang/status pertama pada berkas sekolah. Berkas satuan
-     * pendidikan umumnya hanya memuat satu.
-     *
      * @return array{tahun: int, jenis_satuan: string, status_satuan: string}|null
      */
     #[Computed]

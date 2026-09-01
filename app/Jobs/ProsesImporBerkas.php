@@ -14,15 +14,11 @@ use Illuminate\Support\Facades\Bus;
 use Throwable;
 
 /**
- * Titik masuk impor berkas Data Rapor Pendidikan lewat antrean.
+ * Titik masuk impor berkas Data Rapor Pendidikan lewat antrean: mencatat berkas
+ * dan memecah pekerjaan menjadi satu ProsesSheetProvinsi per sheet provinsi
+ * (ARCHITECTURE.md bagian 4.3).
  *
- * Job ini tidak melakukan parsing sendiri: ia mendeteksi tahun edisi, mencatat
- * berkas, lalu memecah pekerjaan menjadi satu ProsesSheetProvinsi per sheet
- * provinsi (ARCHITECTURE.md bagian 4.3). Setelah seluruh sheet selesai, callback
- * batch menetapkan status akhir ImporBerkas.
- *
- * Di lingkungan cPanel tidak ada worker daemon; antrean dijalankan cron dengan
- * `queue:work --stop-when-empty` (lihat routes/console.php). Karena itu setiap
+ * Antrean cPanel dijalankan cron (`queue:work --stop-when-empty`), jadi setiap
  * job wajib idempoten dan aman diulang.
  */
 class ProsesImporBerkas implements ShouldQueue
@@ -90,11 +86,8 @@ class ProsesImporBerkas implements ShouldQueue
     }
 
     /**
-     * Tetapkan status akhir ImporBerkas setelah seluruh sheet diproses.
-     *
-     * Kebijakan gagal-sebagian: selama ada minimal satu sheet yang berhasil,
-     * impor dianggap `selesai` dengan catatan berapa sheet yang gagal. Hanya
-     * bila SEMUA sheet gagal statusnya `gagal`.
+     * Kebijakan gagal-sebagian: selama ada satu sheet berhasil, impor `selesai`
+     * dengan catatan jumlah sheet gagal; `gagal` hanya bila semua sheet gagal.
      */
     public static function selesaikan(int $imporId, int $gagal, int $total): void
     {
@@ -111,7 +104,6 @@ class ProsesImporBerkas implements ShouldQueue
             $catatan = $catatan ? $ringkas."\n".$catatan : $ringkas;
         }
 
-        // jumlah_baris sudah diakumulasi tiap ProsesSheetProvinsi (increment).
         $impor->update([
             'status' => $semuaGagal ? 'gagal' : 'selesai',
             'diproses_pada' => now(),

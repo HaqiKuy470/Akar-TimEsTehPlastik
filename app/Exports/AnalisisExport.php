@@ -12,9 +12,8 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
 /**
- * Data mentah hasil analisis: satu baris per indikator prioritas, untuk diolah
- * lebih lanjut di luar aplikasi. Kolom komponen skor dipisah agar skor tetap
- * dapat ditelusuri di lembar kerja.
+ * Data mentah hasil analisis: satu baris per indikator prioritas. Komponen skor
+ * dipisah per kolom agar skor tetap dapat ditelusuri di lembar kerja.
  */
 class AnalisisExport implements FromArray, ShouldAutoSize, WithHeadings, WithTitle
 {
@@ -86,10 +85,8 @@ class AnalisisExport implements FromArray, ShouldAutoSize, WithHeadings, WithTit
     }
 
     /**
-     * Kontribusi tiap komponen skor menurut kodenya.
-     *
      * @param  array<mixed>  $komponenSkor
-     * @return array<string, float>
+     * @return array<string, float> kode komponen => kontribusi
      */
     private function komponen(array $komponenSkor): array
     {

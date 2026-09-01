@@ -9,25 +9,15 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /**
- * Membaca berkas Metadata indikator Rapor Pendidikan (sheet "Metadata" yang
- * sudah diekstrak ke CSV oleh Kemendikdasmen) menjadi baris tabel `indikator`.
+ * Membaca CSV Metadata indikator Rapor Pendidikan menjadi baris tabel `indikator`.
+ * Diproses lebih dulu dari sheet provinsi: memuat ambang merah/kuning/hijau resmi,
+ * dan sheet provinsi merujuk indikator lewat nomor.
  *
- * Dua alasan berkas ini diproses lebih dulu dari sheet provinsi:
- *  1. Ia memuat ambang merah/kuning/hijau resmi yang menjadi dasar seluruh
- *     analisis. Sistem tidak mengarang kriteria sendiri.
- *  2. Sheet provinsi merujuk indikator lewat nomor; tabel `indikator` harus
- *     sudah terisi agar `capaian` bisa dipetakan.
- *
- * Parser ini sengaja dipisah menjadi dua tahap yang keduanya dapat diuji:
- *  - parse(): murni, mengubah CSV menjadi array atribut ternormalisasi.
- *  - impor(): menyimpan hasil parse ke basis data secara idempoten.
+ * Dua tahap yang keduanya dapat diuji: parse() murni (CSV -> array), impor()
+ * menyimpan idempoten.
  */
 class MetadataIndikatorParser
 {
-    /**
-     * Kolom yang diharapkan ada di baris header CSV. Bila salah satu hilang,
-     * berkas kemungkinan bukan Metadata Rapor Pendidikan atau formatnya berubah.
-     */
     private const KOLOM_WAJIB = [
         'Jenis Layanan/Jenjang Pendidikan',
         'Nomor Indikator',
@@ -90,8 +80,8 @@ class MetadataIndikatorParser
     }
 
     /**
-     * Simpan hasil parse ke tabel `indikator`. Aman dijalankan berkali-kali:
-     * baris yang sudah ada diperbarui berdasarkan (nomor, jenis_layanan, nama).
+     * Simpan hasil parse ke tabel `indikator`, idempoten lewat kunci
+     * (nomor, jenis_layanan, nama).
      *
      * @return int jumlah indikator yang tersimpan
      */
@@ -156,10 +146,8 @@ class MetadataIndikatorParser
     }
 
     /**
-     * Isi kolom induk_id dengan mencari indikator induk berdasarkan nomor.
-     * Induk dari 'A.1.1' adalah 'A.1'; induk dari 'A.1.skor' adalah 'A.1'.
-     * Pencarian dibatasi pada jenis layanan yang sama. Bila induk ambigu
-     * (nomor sama muncul lebih dari sekali), kolom dibiarkan kosong.
+     * Isi induk_id: induk dari 'A.1.1' dan 'A.1.skor' adalah 'A.1'. Dibatasi jenis
+     * layanan yang sama; induk ambigu -> dibiarkan kosong.
      */
     private function petakanInduk(): void
     {

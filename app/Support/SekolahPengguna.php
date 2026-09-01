@@ -10,19 +10,13 @@ use App\Models\User;
 use App\Models\Wilayah;
 
 /**
- * Menjawab pertanyaan "sekolah mana milik pengguna ini?".
- *
- * Mode satuan pendidikan tidak menautkan pengguna ke sekolah lewat kolom
- * khusus di tabel users; kaitannya diambil dari berkas yang pernah diunggah
- * pengguna sendiri (impor_berkas.diunggah_oleh). Dengan begitu satu kepala
- * sekolah yang mengunggah berkas SMP-nya akan selalu melihat data SMP itu,
- * dan tidak ada data sekolah lain yang bisa ia buka.
+ * Menjawab "sekolah mana milik pengguna ini?". Kaitan pengguna-sekolah tidak
+ * disimpan di tabel users, melainkan diturunkan dari berkas yang pernah ia
+ * unggah sendiri (impor_berkas.diunggah_oleh), sehingga data sekolah lain tetap
+ * tak terjangkau.
  */
 class SekolahPengguna
 {
-    /**
-     * Catatan impor berkas satuan terakhir yang berhasil milik pengguna.
-     */
     public function imporTerakhir(?User $pengguna): ?ImporBerkas
     {
         if ($pengguna === null) {
@@ -37,10 +31,7 @@ class SekolahPengguna
             ->first();
     }
 
-    /**
-     * Wilayah level 'satuan' milik pengguna, atau null bila ia belum pernah
-     * mengunggah berkas yang berhasil diproses.
-     */
+    /** Wilayah level 'satuan' milik pengguna, atau null bila belum ada berkas berhasil. */
     public function untuk(?User $pengguna): ?Wilayah
     {
         $impor = $this->imporTerakhir($pengguna);
@@ -56,7 +47,7 @@ class SekolahPengguna
     }
 
     /**
-     * Kombinasi jenjang dan status yang ada pada berkas sekolah (biasanya satu).
+     * Kombinasi jenjang dan status pada berkas sekolah (biasanya satu).
      *
      * @return list<array{tahun: int, jenis_satuan: string, status_satuan: string}>
      */
