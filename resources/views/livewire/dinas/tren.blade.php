@@ -1,10 +1,48 @@
-<div class="flex flex-col gap-6">
-    <x-kepala-halaman
-        judul="Tren lintas tahun"
-        lead="Pergerakan label capaian dari edisi ke edisi. Portal resmi menampilkan capaian satu tahun; di sini terlihat lintasannya, termasuk indikator yang memburuk dua tahun berturut-turut.">
-        <x-slot:aksi><x-tautan-panduan anchor="tren" /></x-slot:aksi>
-    </x-kepala-halaman>
+<div class="trend-v2">
+    <section class="tren-hero-v2">
+        <div class="tren-hero-v2__grid">
 
+            <div class="tren-hero-v2__main">
+                <div class="tren-hero-v2__eyebrow">
+                    <span>AKAR / ANALISIS DAERAH</span>
+                    <span class="tren-hero-v2__line"></span>
+                </div>
+
+                <h1 class="tren-hero-v2__title">
+                    Lihat perubahan,
+                    <span>bukan hanya keadaan.</span>
+                </h1>
+
+                <p class="tren-hero-v2__lead">
+                    Telusuri perubahan capaian indikator dari tahun ke tahun
+                    untuk melihat apakah kondisi pendidikan membaik, menurun,
+                    atau relatif tidak berubah.
+                </p>
+            </div>
+
+            <aside class="tren-hero-v2__aside">
+                <span class="tren-hero-v2__kicker">
+                    Tren lintas tahun
+                </span>
+
+                <p>
+                    Bandingkan indikator yang sama pada wilayah, jenjang,
+                    dan status satuan pendidikan yang konsisten.
+                </p>
+
+                <div class="tren-hero-v2__axis" aria-hidden="true">
+                    <span>2022</span>
+                    <span class="tren-hero-v2__axis-line"></span>
+                    <span>2023</span>
+                    <span class="tren-hero-v2__axis-line"></span>
+                    <span>2024</span>
+                    <span class="tren-hero-v2__axis-line"></span>
+                    <span>2025</span>
+                </div>
+            </aside>
+
+        </div>
+    </section>
     <x-kartu rapat>
         <div class="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <x-pilih label="Provinsi" wire:model.live="provinsi">

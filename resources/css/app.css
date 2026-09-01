@@ -2258,3 +2258,182 @@
         margin-top: 2rem;
     }
 }
+
+@layer components {
+    .tren-hero-v2 {
+        --tren-line: color-mix(in srgb, var(--color-navy-900) 18%, transparent);
+
+        padding: clamp(2.75rem, 5vw, 4.75rem) clamp(1rem, 2.2vw, 2rem)
+            clamp(2.5rem, 4vw, 4rem);
+
+        border-top: 1px solid var(--tren-line);
+        border-bottom: 1px solid var(--tren-line);
+
+        overflow: hidden;
+    }
+
+    .tren-hero-v2__grid {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1.45fr)
+            minmax(17rem, 0.55fr);
+
+        gap: clamp(2rem, 6vw, 6rem);
+
+        align-items: end;
+    }
+
+    .tren-hero-v2__eyebrow {
+        display: flex;
+        align-items: center;
+
+        gap: 0.75rem;
+
+        width: min(100%, 34rem);
+
+        color: var(--color-navy-900);
+
+        font-size: 0.68rem;
+        font-weight: 700;
+
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .tren-hero-v2__line {
+        flex: 1;
+
+        height: 1px;
+
+        background: var(--tren-line);
+    }
+
+    .tren-hero-v2__title {
+        max-width: 11ch;
+
+        margin-top: clamp(1.4rem, 2.5vw, 2.2rem);
+
+        color: var(--color-navy-900);
+
+        font-size: clamp(3rem, 6.7vw, 7rem);
+        font-weight: 650;
+
+        line-height: 0.91;
+
+        letter-spacing: -0.062em;
+    }
+
+    .tren-hero-v2__title span {
+        display: block;
+
+        color: var(--color-teks-400);
+
+        font-weight: 450;
+    }
+
+    .tren-hero-v2__lead {
+        max-width: 43rem;
+
+        margin-top: clamp(1.4rem, 2.5vw, 2.2rem);
+
+        color: var(--color-teks-700);
+
+        font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+
+        line-height: 1.7;
+    }
+
+    .tren-hero-v2__aside {
+        padding: 1.35rem 0 0 clamp(1.25rem, 2.5vw, 2rem);
+
+        border-left: 1px solid var(--tren-line);
+    }
+
+    .tren-hero-v2__kicker {
+        display: block;
+
+        color: var(--color-teks-500);
+
+        font-size: 0.66rem;
+        font-weight: 700;
+
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .tren-hero-v2__aside > p {
+        max-width: 22rem;
+
+        margin-top: 0.9rem;
+
+        color: var(--color-teks-700);
+
+        font-size: 0.82rem;
+
+        line-height: 1.7;
+    }
+
+    .tren-hero-v2__axis {
+        display: flex;
+        align-items: center;
+
+        margin-top: clamp(2rem, 4vw, 3.5rem);
+
+        color: var(--color-teks-500);
+
+        font-size: 0.62rem;
+        font-weight: 700;
+
+        letter-spacing: 0.05em;
+    }
+
+    .tren-hero-v2__axis-line {
+        flex: 1;
+
+        height: 1px;
+
+        margin-inline: 0.45rem;
+
+        background: var(--tren-line);
+    }
+
+    @media (max-width: 1000px) {
+        .tren-hero-v2__grid {
+            grid-template-columns: 1fr;
+        }
+
+        .tren-hero-v2__aside {
+            padding: 1.5rem 0 0;
+
+            border-top: 1px solid var(--tren-line);
+            border-left: 0;
+        }
+
+        .tren-hero-v2__aside > p {
+            max-width: 35rem;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .tren-hero-v2 {
+            padding: 2.5rem 1rem 2.25rem;
+        }
+
+        .tren-hero-v2__title {
+            max-width: 12ch;
+
+            font-size: clamp(3rem, 16vw, 5rem);
+        }
+
+        .tren-hero-v2__axis {
+            font-size: 0.56rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .tren-hero-v2 * {
+            transition: none !important;
+        }
+    }
+}

@@ -4,7 +4,6 @@
             <div class="banding-hero_main">
                 <div class="banding-eyebrow">
                     <span>AKAR / ANALISIS DAERAH</span>
-                    
                     <span class="banding-eyebrow_line"></span>
                 </div>
 
@@ -22,7 +21,7 @@
                     <x-tautan-panduan anchor="banding"/>
                 </div>
             </aside>
-            
+
         </div>    
     </section>
 
