@@ -7,6 +7,7 @@ use App\Http\Livewire\Dinas\Prioritas;
 use App\Http\Livewire\Dinas\ProfilCapaian;
 use App\Http\Livewire\Dinas\RencanaTindakLanjut;
 use App\Http\Livewire\Dinas\Tren;
+use App\Http\Livewire\Panduan;
 use App\Http\Livewire\Sekolah\Beranda as SekolahBeranda;
 use App\Http\Livewire\Sekolah\Prioritas as SekolahPrioritas;
 use App\Http\Livewire\Sekolah\ProfilCapaian as SekolahProfilCapaian;
@@ -38,6 +39,10 @@ Route::post('logout', function (Request $request) {
 
     return redirect()->route('login');
 })->middleware('auth')->name('logout');
+
+// Panduan penggunaan — dapat diakses semua peran yang sudah masuk, di luar
+// pembatasan area, karena penjelasannya berlaku untuk kedua mode.
+Route::get('panduan', Panduan::class)->middleware('auth')->name('panduan');
 
 /*
 | Analisis level daerah — untuk admin dan analis dinas. Kepala sekolah yang

@@ -27,6 +27,10 @@
                     AKAR mengurutkan indikator bermasalah berdasarkan skor prioritas,
                     lalu membantu menelusuri faktor yang paling mungkin menjadi akar masalahnya.
                 </p>
+
+                <div class="mt-4">
+                    <x-tautan-panduan anchor="prioritas" />
+                </div>
             </div>
 
             <aside class="prioritas-hero__context">

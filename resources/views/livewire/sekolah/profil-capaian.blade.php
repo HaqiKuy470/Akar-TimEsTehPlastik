@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6">
     <x-kepala-halaman
         judul="Profil capaian sekolah"
-        lead="Kondisi seluruh indikator mutu pendidikan sekolah Anda, dikelompokkan menurut dimensinya." />
+        lead="Kondisi seluruh indikator mutu pendidikan sekolah Anda, dikelompokkan menurut dimensinya.">
+        <x-slot:aksi><x-tautan-panduan anchor="profil" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     @if ($this->sekolah === null)
         <x-kartu rapat>

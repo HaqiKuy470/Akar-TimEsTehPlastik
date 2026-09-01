@@ -8,7 +8,9 @@
     @if ($sekolah === null)
         <x-kepala-halaman
             judul="Beranda sekolah"
-            lead="Ruang kerja kepala sekolah dan tim kurikulum untuk menerjemahkan Rapor Pendidikan sekolah menjadi Rencana Kerja Tahunan berbasis data." />
+            lead="Ruang kerja kepala sekolah dan tim kurikulum untuk menerjemahkan Rapor Pendidikan sekolah menjadi Rencana Kerja Tahunan berbasis data.">
+            <x-slot:aksi><x-tautan-panduan anchor="alur" /></x-slot:aksi>
+        </x-kepala-halaman>
 
         <x-kartu rapat>
             <x-kosong
@@ -29,7 +31,10 @@
                 @if ($this->impor?->diproses_pada) · diunggah {{ $this->impor->diproses_pada->translatedFormat('d F Y') }}@endif
             </x-slot:konteks>
             <x-slot:aksi>
-                <x-tombol jenis="sekunder" ukuran="kecil" :href="route('sekolah.unggah')">Unggah berkas baru</x-tombol>
+                <div class="flex items-center gap-2">
+                    <x-tautan-panduan anchor="alur" />
+                    <x-tombol jenis="sekunder" ukuran="kecil" :href="route('sekolah.unggah')">Unggah berkas baru</x-tombol>
+                </div>
             </x-slot:aksi>
         </x-kepala-halaman>
 

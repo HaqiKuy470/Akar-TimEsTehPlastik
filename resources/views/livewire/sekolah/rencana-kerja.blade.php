@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6">
     <x-kepala-halaman
         judul="Rencana Kerja Tahunan (RKT)"
-        lead="Draf RKT berbasis data, disusun dari hasil analisis akar masalah sekolah. Setiap butir dapat Anda sunting, tambah, atau hapus sebelum diunduh dan dibawa ke rapat penyusunan program." />
+        lead="Draf RKT berbasis data, disusun dari hasil analisis akar masalah sekolah. Setiap butir dapat Anda sunting, tambah, atau hapus sebelum diunduh dan dibawa ke rapat penyusunan program.">
+        <x-slot:aksi><x-tautan-panduan anchor="rencana" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     @if ($this->sekolah === null)
         <x-kartu rapat>

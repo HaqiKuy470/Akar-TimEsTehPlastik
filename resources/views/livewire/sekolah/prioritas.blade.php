@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6">
     <x-kepala-halaman
         judul="Prioritas & akar masalah"
-        lead="Indikator sekolah berlabel merah dan kuning, diurutkan menurut skor prioritas. Setiap skor dapat ditelusuri ke komponen pembentuknya, dan tiap indikator dapat ditelusuri akar masalahnya." />
+        lead="Indikator sekolah berlabel merah dan kuning, diurutkan menurut skor prioritas. Setiap skor dapat ditelusuri ke komponen pembentuknya, dan tiap indikator dapat ditelusuri akar masalahnya.">
+        <x-slot:aksi><x-tautan-panduan anchor="prioritas" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     @if ($this->sekolah === null)
         <x-kartu rapat>

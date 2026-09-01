@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6">
     <x-kepala-halaman
         judul="Unggah Rapor Pendidikan sekolah"
-        lead="Kepala sekolah dan tim kurikulum dapat mengunggah berkas Rapor Pendidikan satuan pendidikan untuk memperoleh analisis prioritas, akar masalah, dan draf rencana kerja dengan logika yang sama seperti tingkat daerah." />
+        lead="Kepala sekolah dan tim kurikulum dapat mengunggah berkas Rapor Pendidikan satuan pendidikan untuk memperoleh analisis prioritas, akar masalah, dan draf rencana kerja dengan logika yang sama seperti tingkat daerah.">
+        <x-slot:aksi><x-tautan-panduan anchor="impor" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     <x-kartu judul="Cara memperoleh berkas">
         <ol class="flex flex-col gap-2 text-[13px] text-teks-700">

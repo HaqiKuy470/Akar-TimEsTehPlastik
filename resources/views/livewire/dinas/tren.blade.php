@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6">
     <x-kepala-halaman
         judul="Tren lintas tahun"
-        lead="Pergerakan label capaian dari edisi ke edisi. Portal resmi menampilkan capaian satu tahun; di sini terlihat lintasannya, termasuk indikator yang memburuk dua tahun berturut-turut." />
+        lead="Pergerakan label capaian dari edisi ke edisi. Portal resmi menampilkan capaian satu tahun; di sini terlihat lintasannya, termasuk indikator yang memburuk dua tahun berturut-turut.">
+        <x-slot:aksi><x-tautan-panduan anchor="tren" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     <x-kartu rapat>
         <div class="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">

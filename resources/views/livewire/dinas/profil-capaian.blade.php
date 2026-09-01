@@ -43,6 +43,10 @@
                 <p class="akar-hero__lead">
                     Baca kondisi mutu pendidikan satu wilayah secara utuh—dari gambaran besar sampai indikator yang perlu ditindaklanjuti.
                 </p>
+
+                <div class="mt-4">
+                    <x-tautan-panduan anchor="profil" />
+                </div>
             </div>
 
             <div class="akar-hero__context" aria-live="polite">

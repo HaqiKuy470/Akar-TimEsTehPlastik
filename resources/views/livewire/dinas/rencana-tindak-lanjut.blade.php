@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6">
     <x-kepala-halaman
         judul="Rencana tindak lanjut"
-        lead="Draf rencana pembenahan yang disusun dari hasil analisis akar masalah. Setiap butir dapat Anda sunting, tambah, atau hapus sebelum diunduh." />
+        lead="Draf rencana pembenahan yang disusun dari hasil analisis akar masalah. Setiap butir dapat Anda sunting, tambah, atau hapus sebelum diunduh.">
+        <x-slot:aksi><x-tautan-panduan anchor="rencana" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     <x-kartu rapat>
         <div class="p-4">

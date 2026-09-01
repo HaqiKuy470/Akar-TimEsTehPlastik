@@ -1,7 +1,9 @@
 <div class="flex flex-col gap-6" @if ($this->adaYangDiproses) wire:poll.5s @endif>
     <x-kepala-halaman
         judul="Impor berkas"
-        lead="Riwayat dan status setiap berkas Rapor Pendidikan yang dimuat ke basis data." />
+        lead="Riwayat dan status setiap berkas Rapor Pendidikan yang dimuat ke basis data.">
+        <x-slot:aksi><x-tautan-panduan anchor="impor" /></x-slot:aksi>
+    </x-kepala-halaman>
 
     <x-kartu judul="Berkas Rapor Pendidikan Indonesia (level daerah)">
         <p class="text-[13px] text-teks-700">

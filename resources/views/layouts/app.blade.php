@@ -24,6 +24,7 @@
         'impor' => '<path d="M12 15V4m0 11l-3-3m3 3l3-3M5 20h14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
         'beranda' => '<path d="M4 11l8-6 8 6v9H4v-9z" stroke-width="1.5" stroke-linejoin="round"/>',
         'unggah' => '<path d="M12 4v11m0-11L9 7m3-3l3 3M5 20h14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+        'panduan' => '<circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M9.6 9.2a2.5 2.5 0 014.5 1.5c-.5.9-1.9 1.3-2.2 2-.15.35-.15.7-.15 1.1" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>',
     ];
 
     $menu = $kepalaSekolah ? [
@@ -32,6 +33,7 @@
         ['sekolah.prioritas', 'Prioritas & akar masalah', 'prioritas'],
         ['sekolah.rkt', 'Rencana Kerja Tahunan', 'rencana'],
         ['sekolah.unggah', 'Unggah berkas', 'unggah'],
+        ['panduan', 'Panduan penggunaan', 'panduan'],
     ] : [
         ['dinas.profil', 'Profil capaian', 'profil'],
         ['dinas.prioritas', 'Prioritas & akar masalah', 'prioritas'],
@@ -40,6 +42,7 @@
         ['dinas.rencana', 'Rencana tindak lanjut', 'rencana'],
         ['dinas.impor', 'Impor berkas', 'impor'],
         ['sekolah.unggah', 'Mode satuan pendidikan', 'unggah'],
+        ['panduan', 'Panduan penggunaan', 'panduan'],
     ];
 
     $labelPeran = ['admin' => 'Administrator', 'analis_dinas' => 'Analis Dinas', 'kepala_sekolah' => 'Kepala Sekolah'];
