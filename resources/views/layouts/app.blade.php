@@ -52,10 +52,9 @@
 
     <div class="flex h-screen overflow-hidden">
         <aside class="hidden w-[248px] shrink-0 flex-col overflow-y-auto bg-navy-900 text-white lg:flex">
-            <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-white/10 px-5">
-                <img src="{{ asset('logo.svg') }}" alt="" class="size-7 shrink-0 rounded bg-white/95 p-0.5">
-                <span class="text-[15px] font-bold tracking-[0.08em]">AKAR</span>
-                <span class="text-[11px] text-biru-300">Rapor Pendidikan</span>
+            <div class="flex h-14 shrink-0 items-center gap-3 border-b border-white/10 px-5">
+                <img src="{{ asset('logo.svg') }}" alt="" class="size-9 shrink-0">
+                <span class="text-[17px] font-bold tracking-[0.1em]">AKAR</span>
             </div>
 
             <nav class="flex flex-1 flex-col gap-0.5 px-3 py-4">
@@ -92,7 +91,7 @@
         <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
             <header class="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-krem-300 bg-navy-900 px-6 text-white">
                 <div class="flex items-center gap-2 text-[13px] font-semibold">
-                    <img src="{{ asset('logo.svg') }}" alt="AKAR" class="size-6 rounded bg-white/95 p-0.5 lg:hidden">
+                    <img src="{{ asset('logo.svg') }}" alt="AKAR" class="size-7 lg:hidden">
                     <span class="hidden lg:inline">{{ $header ?? 'Beranda' }}</span>
                 </div>
                 @auth

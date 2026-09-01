@@ -15,7 +15,7 @@
     {{-- Kolom kiri: pernyataan produk, hanya di layar lebar. --}}
     <aside class="relative hidden flex-col justify-between bg-navy-900 p-12 text-white lg:flex">
         <div class="flex items-center gap-3">
-            <img src="{{ asset('logo.svg') }}" alt="" class="size-9 shrink-0 rounded-md bg-white/95 p-1">
+            <img src="{{ asset('logo.svg') }}" alt="" class="size-11 shrink-0">
             <span class="text-[17px] font-bold tracking-[0.08em]">AKAR</span>
             <span class="text-[12px] text-biru-300">Analisis Kausal dan Rekomendasi</span>
         </div>
@@ -44,7 +44,7 @@
     <main class="flex items-center justify-center bg-krem-100 p-6">
         <div class="w-full max-w-sm">
             <div class="mb-7 flex items-center gap-2.5 lg:hidden">
-                <img src="{{ asset('logo.svg') }}" alt="" class="size-9 rounded-md border border-krem-300 p-1">
+                <img src="{{ asset('logo.svg') }}" alt="" class="size-10">
                 <div>
                     <div class="text-[18px] font-bold tracking-[0.06em] text-navy-900">AKAR</div>
                     <p class="text-[11px] text-teks-500">Analisis Kausal dan Rekomendasi</p>
