@@ -4,47 +4,33 @@
 @source '../../storage/framework/views/*.php';
 @source '../views';
 
-/*
-| Sistem visual AKAR — turunan DESIGN.md.
-| Skema krem hangat dengan biru tua, kesan dokumen resmi. Modern pada
-| kerapian tipografi, ritme jarak, dan keadaan interaksi — bukan pada
-| gradien, bayangan tebal, atau hiasan. Jangan menambah warna di luar daftar.
-*/
 @theme {
     --font-sans:
         "Inter", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-    /* Font merek: hanya untuk wordmark "AKAR". Fraunces punya karakter
-       hangat dan sedikit "wonky" yang cocok untuk lambang akar/pohon,
-       tanpa terasa dekoratif berlebihan seperti Playfair. */
     --font-merek: "Fraunces", Georgia, "Times New Roman", serif;
 
-    /* Krem hangat untuk wordmark di atas latar navy — bukan putih. */
     --color-krem-merek: #efe7d3;
 
-    /* Latar dan permukaan */
-    --color-krem-100: #f5f1e6; /* latar halaman */
-    --color-krem-150: #f0ebdd; /* hover baris ringan, isian nonaktif */
-    --color-krem-200: #ebe5d6; /* header tabel, baris terpilih */
-    --color-krem-300: #ddd5c2; /* garis, border kartu */
-    --color-kartu: #fffdf8; /* latar kartu, putih hangat */
+    --color-krem-100: #f5f1e6;
+    --color-krem-150: #f0ebdd;
+    --color-krem-200: #ebe5d6;
+    --color-krem-300: #ddd5c2;
+    --color-kartu: #fffdf8;
 
-    /* Biru kelembagaan */
-    --color-navy-900: #0b2545; /* header utama, sidebar */
-    --color-navy-800: #133154; /* hover di dalam sidebar */
-    --color-biru-100: #dee7f3; /* sorotan baris, latar informasi */
-    --color-biru-300: #9db8dd; /* aksen di atas navy */
-    --color-biru-600: #1a56b0; /* hover tombol primer */
-    --color-biru-700: #14448c; /* warna merek, tombol, tautan */
+    --color-navy-900: #0b2545;
+    --color-navy-800: #133154;
+    --color-biru-100: #dee7f3;
+    --color-biru-300: #9db8dd;
+    --color-biru-600: #1a56b0;
+    --color-biru-700: #14448c;
 
-    /* Netral hangat */
     --color-teks-900: #231f1a;
     --color-teks-700: #4a443b;
     --color-teks-500: #6f675b;
     --color-teks-400: #8b8375;
     --color-teks-300: #ddd5c2;
 
-    /* Status capaian */
     --color-baik: #1b5e36;
     --color-baik-bg: #e2ecdd;
     --color-sedang: #7a4e00;
@@ -54,20 +40,14 @@
     --color-kosong: #615a4e;
     --color-kosong-bg: #e8e2d5;
 
-    /* Isian grafik: hue status DESIGN.md dinaikkan sedikit agar terpisah
-       secara warna maupun untuk mata buta warna (deutan/protan). Dipakai
-       HANYA untuk isian Chart.js; teks & badge tetap memakai token status
-       di atas. Selalu berpasangan dengan label langsung pada segmen. */
     --color-grafik-kurang: #b4231a;
     --color-grafik-sedang: #c8791a;
     --color-grafik-baik: #2f7d3f;
     --color-grafik-kosong: #a89f8e;
     --color-grafik-kisi: #ddd5c2;
 
-    --color-emas-700: #8a6d14; /* penanda prioritas pertama, sangat hemat */
+    --color-emas-700: #8a6d14;
 
-    /* Elevasi — kartu tetap datar (border). Bayangan hanya untuk elemen
-       melayang: panel dropdown, popover. Bernuansa navy, bukan hitam. */
     --shadow-panel:
         0 8px 24px -8px rgb(11 37 69 / 0.16), 0 2px 6px -2px rgb(11 37 69 / 0.1);
 
@@ -88,7 +68,6 @@
         text-rendering: optimizeLegibility;
     }
 
-    /* Judul terasa disengaja: tracking rapat, tak menggantung satu kata. */
     h1,
     h2,
     h3 {
@@ -99,8 +78,6 @@
     p {
         text-wrap: pretty;
     }
-
-    /* Angka pada tabel, skor, dan ringkasan sejajar. */
     table,
     .tabular {
         font-variant-numeric: tabular-nums;
@@ -116,7 +93,6 @@
         border-radius: 2px;
     }
 
-    /* Transisi halus pada seluruh elemen interaktif. */
     a,
     button,
     select,
@@ -144,12 +120,6 @@
     }
 }
 
-/* Livewire hanya menerbitkan CSS penyembunyi untuk kombinasi modifier
-   tertentu; `wire:loading.delay.flex` (dan sejenisnya) tidak termasuk, jadi
-   kerangka-muat sempat tampil sebelum ada permintaan. Selektor atribut ganda
-   meniru trik spesifisitas Livewire sendiri agar menang atas kelas tata letak
-   pada elemen yang sama (mis. `.akar-loading` yang ber-`display: flex`).
-   Diletakkan di luar @layer supaya selalu sesudah utilitas Tailwind. */
 [wire\:loading\.delay\.flex][wire\:loading\.delay\.flex],
 [wire\:loading\.delay\.inline-flex][wire\:loading\.delay\.inline-flex],
 [wire\:loading\.delay\.grid][wire\:loading\.delay\.grid],
@@ -160,7 +130,6 @@
 }
 
 @layer components {
-    /* Wordmark "AKAR". Font serif berkarakter, spasi huruf sedikit lega. */
     .merek {
         font-family: var(--font-merek);
         font-optical-sizing: auto;
@@ -170,7 +139,6 @@
         line-height: 1;
     }
 
-    /* Tagline di samping wordmark: serif miring, lebih halus. */
     .merek-tagline {
         font-family: var(--font-merek);
         font-optical-sizing: auto;
@@ -180,7 +148,6 @@
         line-height: 1;
     }
 
-    /* Kerangka berdenyut untuk keadaan memuat (DESIGN.md 6). */
     .rangka-muat {
         background-color: var(--color-krem-200);
         border-radius: 0.375rem;
@@ -198,10 +165,6 @@
     }
 }
 
-/* ========================================================================
-   Profil Capaian Daerah — editorial data dashboard
-   Scope sengaja dibatasi ke .profil-capaian-v2 agar halaman lain tetap aman.
-   ======================================================================== */
 
 @layer components {
     .profil-capaian-v2 {
