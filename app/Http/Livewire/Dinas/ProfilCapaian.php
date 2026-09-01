@@ -8,6 +8,7 @@ use App\Models\Capaian;
 use App\Models\ImporBerkas;
 use App\Models\Wilayah;
 use App\Services\Akar\Analysis\ProfilCapaianService;
+use App\Support\SekolahWilayah;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
@@ -151,6 +152,28 @@ class ProfilCapaian extends Component
 
         return app(ProfilCapaianService::class)
             ->untukWilayah($wilayah, $this->tahun, $this->jenisSatuan, $this->statusSatuan);
+    }
+
+    /**
+     * Sekolah di kabupaten/kota terpilih yang berkas Rapor Pendidikan
+     * satuannya sudah diunggah kepala sekolahnya. Menautkan area dinas ke
+     * area sekolah tanpa menggabungkannya.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    #[Computed]
+    public function sekolahDiWilayah(): Collection
+    {
+        if ($this->wilayahId === null) {
+            return collect();
+        }
+
+        $wilayah = Wilayah::find($this->wilayahId);
+        if ($wilayah === null || $wilayah->level !== 'kabkota') {
+            return collect();
+        }
+
+        return app(SekolahWilayah::class)->diKabupaten($this->wilayahId);
     }
 
     public function render()

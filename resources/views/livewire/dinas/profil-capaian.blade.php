@@ -352,6 +352,42 @@
                     </details>
                 </section>
             @endif
+
+            {{-- Jembatan ke area sekolah: sekolah di kabupaten ini yang sudah
+                 mengunggah berkasnya sendiri. Dua area tetap terpisah; ini
+                 hanya tautan konteks. --}}
+            @if ($this->sekolahDiWilayah->isNotEmpty())
+                <div class="akar-chart-wrap">
+                    <div class="mb-3 flex items-center gap-3">
+                        <h3 class="text-[13px] font-semibold uppercase tracking-[0.05em] text-teks-700">
+                            Sekolah di wilayah ini yang sudah mengunggah berkas
+                        </h3>
+                        <span class="h-px flex-1 bg-krem-300"></span>
+                    </div>
+                    <p class="mb-3 text-[12px] leading-relaxed text-teks-500">
+                        {{ $this->sekolahDiWilayah->count() }} sekolah telah mengunggah Rapor Pendidikan
+                        satuan pendidikannya. Capaian tiap sekolah dapat dibuka baca-saja sebagai konteks.
+                    </p>
+                    <div class="flex flex-col gap-2">
+                        @foreach ($this->sekolahDiWilayah as $s)
+                            <a href="{{ route('dinas.sekolah', ['kabkota' => $wilayahId, 'wilayah' => $s['wilayah_id']]) }}"
+                               wire:navigate
+                               class="flex items-center justify-between gap-4 rounded-md border border-krem-300 bg-kartu px-3.5 py-2.5 hover:border-biru-700">
+                                <span>
+                                    <span class="text-[13px] font-semibold text-teks-900">{{ $s['nama'] }}</span>
+                                    <span class="text-[11px] text-teks-500"> · {{ $s['jenis_satuan'] }} · {{ $s['tahun'] }}</span>
+                                </span>
+                                <span class="flex shrink-0 items-center gap-3 text-[11px] tabular">
+                                    <span class="text-kurang">{{ $s['merah'] }}</span>
+                                    <span class="text-sedang">{{ $s['kuning'] }}</span>
+                                    <span class="text-baik">{{ $s['hijau'] }}</span>
+                                    <span class="text-teks-400" aria-hidden="true">→</span>
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 

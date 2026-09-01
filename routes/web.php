@@ -6,6 +6,7 @@ use App\Http\Livewire\Dinas\Perbandingan;
 use App\Http\Livewire\Dinas\Prioritas;
 use App\Http\Livewire\Dinas\ProfilCapaian;
 use App\Http\Livewire\Dinas\RencanaTindakLanjut;
+use App\Http\Livewire\Dinas\SekolahDaerah;
 use App\Http\Livewire\Dinas\Tren;
 use App\Http\Livewire\Panduan;
 use App\Http\Livewire\Sekolah\Beranda as SekolahBeranda;
@@ -55,6 +56,10 @@ Route::prefix('dinas')->name('dinas.')->middleware(['auth', AreaPeran::class.':d
     Route::get('tren', Tren::class)->name('tren');
     Route::get('rencana', RencanaTindakLanjut::class)->name('rencana');
     Route::get('impor', ImporBerkas::class)->name('impor');
+
+    // Jendela baca ke area sekolah: capaian satu sekolah yang berkasnya
+    // sudah diunggah, sebagai konteks atas data agregat kabupaten.
+    Route::get('sekolah', SekolahDaerah::class)->name('sekolah');
 });
 
 /*

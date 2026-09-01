@@ -34,7 +34,7 @@
                 Sumber data: Kementerian Pendidikan Dasar dan Menengah,
                 Portal Satu Data Kemendikdasmen.
             </p>
-            <p>Dibuat oleh Tim EsTehPlastik untuk HoloDev HOLOGY 9.0.</p>
+            <p>Dibuat oleh Tim EsTehPlastik.</p>
         </div>
     </aside>
 
