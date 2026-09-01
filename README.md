@@ -53,11 +53,12 @@ php artisan akar:impor path/data-rapor-pendidikan-indonesia.xlsx
 Dibuat otomatis oleh `php artisan migrate:fresh --seed`. Kata sandi ketiganya
 `password`.
 
-| Peran          | Email              | Bisa melakukan                                      |
-|----------------|--------------------|----------------------------------------------------|
-| Administrator  | `admin@akar.test`  | Impor berkas daerah, seluruh analisis dan rencana  |
-| Analis Dinas   | `analis@akar.test` | Menjalankan analisis, menyusun rencana tindak lanjut |
-| Kepala Sekolah | `kepala@akar.test` | Mengunggah berkas satuan pendidikan, analisis, rencana |
+| Peran          | Email                   | Bisa melakukan                                      |
+|----------------|-------------------------|----------------------------------------------------|
+| Super Admin    | `superadmin@akar.test`  | HANYA membuat/menghapus akun; tidak melihat data apa pun |
+| Administrator  | `admin@akar.test`       | Impor berkas daerah, seluruh analisis dan rencana  |
+| Analis Dinas   | `analis@akar.test`      | Menjalankan analisis, menyusun rencana tindak lanjut |
+| Kepala Sekolah | `kepala@akar.test`      | Mengunggah berkas satuan pendidikan, analisis, rencana |
 
 ---
 

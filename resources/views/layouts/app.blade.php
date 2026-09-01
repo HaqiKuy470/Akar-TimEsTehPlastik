@@ -14,6 +14,7 @@
 <body class="h-full">
 @php
     $kepalaSekolah = auth()->check() && auth()->user()->hasRole('kepala_sekolah');
+    $superadmin = auth()->check() && auth()->user()->hasRole('superadmin');
 
     // [route, label, ikon]. Ikon = garis tunggal 1.5px, bukan set generik.
     $ikon = [
@@ -26,9 +27,12 @@
         'beranda' => '<path d="M4 11l8-6 8 6v9H4v-9z" stroke-width="1.5" stroke-linejoin="round"/>',
         'unggah' => '<path d="M12 4v11m0-11L9 7m3-3l3 3M5 20h14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
         'panduan' => '<circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M9.6 9.2a2.5 2.5 0 014.5 1.5c-.5.9-1.9 1.3-2.2 2-.15.35-.15.7-.15 1.1" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>',
+        'akun' => '<circle cx="12" cy="8" r="3.5" stroke-width="1.5"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5" stroke-width="1.5" stroke-linecap="round"/>',
     ];
 
-    $menu = $kepalaSekolah ? [
+    $menu = $superadmin ? [
+        ['akun', 'Kelola akun', 'akun'],
+    ] : ($kepalaSekolah ? [
         ['sekolah.beranda', 'Beranda', 'beranda'],
         ['sekolah.profil', 'Profil capaian', 'profil'],
         ['sekolah.prioritas', 'Prioritas & akar masalah', 'prioritas'],
@@ -44,9 +48,9 @@
         ['dinas.impor', 'Impor berkas', 'impor'],
         ['sekolah.unggah', 'Mode satuan pendidikan', 'unggah'],
         ['panduan', 'Panduan penggunaan', 'panduan'],
-    ];
+    ]);
 
-    $labelPeran = ['admin' => 'Administrator', 'analis_dinas' => 'Analis Dinas', 'kepala_sekolah' => 'Kepala Sekolah'];
+    $labelPeran = ['superadmin' => 'Super Admin', 'admin' => 'Administrator', 'analis_dinas' => 'Analis Dinas', 'kepala_sekolah' => 'Kepala Sekolah'];
     $peran = auth()->check() ? auth()->user()->getRoleNames()->first() : null;
 @endphp
 
@@ -59,7 +63,7 @@
 
             <nav class="flex flex-1 flex-col gap-0.5 px-3 py-4">
                 <p class="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
-                    {{ $kepalaSekolah ? 'Satuan pendidikan' : 'Analisis daerah' }}
+                    @if ($superadmin) Administrasi @elseif ($kepalaSekolah) Satuan pendidikan @else Analisis daerah @endif
                 </p>
                 @foreach ($menu as [$nama, $label, $kunciIkon])
                     @continue(! \Illuminate\Support\Facades\Route::has($nama))

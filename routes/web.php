@@ -14,6 +14,7 @@ use App\Http\Livewire\Sekolah\Prioritas as SekolahPrioritas;
 use App\Http\Livewire\Sekolah\ProfilCapaian as SekolahProfilCapaian;
 use App\Http\Livewire\Sekolah\RencanaKerja;
 use App\Http\Livewire\Sekolah\UnggahBerkas;
+use App\Http\Livewire\Superadmin\KelolaAkun;
 use App\Http\Middleware\AreaPeran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +25,13 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
 
-    return redirect()->route(
-        Auth::user()->hasRole('kepala_sekolah') ? 'sekolah.beranda' : 'dinas.profil'
-    );
+    $pengguna = Auth::user();
+
+    return redirect()->route(match (true) {
+        $pengguna->hasRole('superadmin') => 'akun',
+        $pengguna->hasRole('kepala_sekolah') => 'sekolah.beranda',
+        default => 'dinas.profil',
+    });
 });
 
 Route::middleware('guest')->group(function () {
@@ -41,9 +46,12 @@ Route::post('logout', function (Request $request) {
     return redirect()->route('login');
 })->middleware('auth')->name('logout');
 
-// Panduan penggunaan — dapat diakses semua peran yang sudah masuk, di luar
-// pembatasan area, karena penjelasannya berlaku untuk kedua mode.
-Route::get('panduan', Panduan::class)->middleware('auth')->name('panduan');
+// Panduan penggunaan — untuk semua peran yang bekerja dengan data (dinas &
+// sekolah). Superadmin diarahkan kembali ke halaman kelola akun.
+Route::get('panduan', Panduan::class)->middleware(['auth', AreaPeran::class.':umum'])->name('panduan');
+
+// Area superadmin — HANYA mengelola akun, tanpa akses ke data analisis.
+Route::get('akun', KelolaAkun::class)->middleware(['auth', AreaPeran::class.':akun'])->name('akun');
 
 /*
 | Analisis level daerah — untuk admin dan analis dinas. Kepala sekolah yang
@@ -67,7 +75,7 @@ Route::prefix('dinas')->name('dinas.')->middleware(['auth', AreaPeran::class.':d
 | Pendidikan sekolah diunggah sendiri; logika analisisnya identik dengan
 | level daerah, hanya pembandingnya agregat kabupaten dan provinsi.
 */
-Route::prefix('sekolah')->name('sekolah.')->middleware('auth')->group(function () {
+Route::prefix('sekolah')->name('sekolah.')->middleware(['auth', AreaPeran::class.':sekolah'])->group(function () {
     Route::get('beranda', SekolahBeranda::class)->name('beranda');
     Route::get('unggah', UnggahBerkas::class)->name('unggah');
     Route::get('profil', SekolahProfilCapaian::class)->name('profil');

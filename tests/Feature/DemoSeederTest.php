@@ -18,11 +18,11 @@ class DemoSeederTest extends TestCase
         $this->seed(DemoSeeder::class);
 
         $this->assertSame(
-            ['admin', 'analis_dinas', 'kepala_sekolah'],
+            ['admin', 'analis_dinas', 'kepala_sekolah', 'superadmin'],
             Role::query()->orderBy('name')->pluck('name')->all(),
         );
 
-        foreach (['admin@akar.test', 'analis@akar.test', 'kepala@akar.test'] as $email) {
+        foreach (['superadmin@akar.test', 'admin@akar.test', 'analis@akar.test', 'kepala@akar.test'] as $email) {
             $this->assertDatabaseHas('users', ['email' => $email]);
         }
 

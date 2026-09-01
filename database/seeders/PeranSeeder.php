@@ -13,9 +13,14 @@ use Spatie\Permission\PermissionRegistrar;
  *
  * | Peran          | Pengguna                    | Izin                                        |
  * |----------------|-----------------------------|---------------------------------------------|
- * | admin          | Pengelola sistem            | seluruh izin (termasuk impor berkas daerah) |
+ * | superadmin     | Pengelola akun              | HANYA mengelola akun; tak melihat data      |
+ * | admin          | Pengelola sistem            | seluruh izin analisis (termasuk impor daerah) |
  * | analis_dinas   | Analis Perencanaan Dinas    | jalankan analisis, kelola rencana aksi      |
  * | kepala_sekolah | Kepala satuan pendidikan    | unggah berkas satuan, analisis, rencana     |
+ *
+ * Pemisahan tugas: superadmin membuat akun tetapi tidak boleh membuka
+ * halaman analisis mana pun; admin menjalankan analisis tetapi tidak
+ * mengelola akun.
  *
  * Aman dijalankan berkali-kali: peran dan izin dibuat dengan firstOrCreate.
  */
@@ -25,6 +30,7 @@ class PeranSeeder extends Seeder
      * Seluruh izin yang dikenal sistem beserta keterangannya.
      */
     public const IZIN = [
+        'akun.kelola' => 'Membuat dan menghapus akun pengguna',
         'impor.daerah' => 'Mengimpor berkas Rapor Pendidikan level daerah',
         'analisis.jalankan' => 'Menjalankan analisis prioritas dan akar masalah',
         'rencana.kelola' => 'Menyusun dan menyunting rencana tindak lanjut',
@@ -32,9 +38,11 @@ class PeranSeeder extends Seeder
     ];
 
     /**
-     * Pemetaan peran ke daftar izinnya.
+     * Pemetaan peran ke daftar izinnya. superadmin sengaja HANYA memegang
+     * 'akun.kelola' — tanpa izin analisis apa pun.
      */
     public const PETA_PERAN = [
+        'superadmin' => ['akun.kelola'],
         'admin' => ['impor.daerah', 'analisis.jalankan', 'rencana.kelola', 'berkas.satuan.unggah'],
         'analis_dinas' => ['analisis.jalankan', 'rencana.kelola'],
         'kepala_sekolah' => ['berkas.satuan.unggah', 'analisis.jalankan', 'rencana.kelola'],

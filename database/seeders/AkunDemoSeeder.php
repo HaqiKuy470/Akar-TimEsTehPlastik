@@ -19,6 +19,7 @@ class AkunDemoSeeder extends Seeder
      * Daftar akun demo: email => [nama, peran].
      */
     public const AKUN = [
+        'superadmin@akar.test' => ['Super Admin', 'superadmin'],
         'admin@akar.test' => ['Admin AKAR', 'admin'],
         'analis@akar.test' => ['Analis Dinas Pendidikan', 'analis_dinas'],
         'kepala@akar.test' => ['Kepala SMP Negeri', 'kepala_sekolah'],

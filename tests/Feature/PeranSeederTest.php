@@ -14,12 +14,12 @@ class PeranSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_membuat_tiga_peran(): void
+    public function test_membuat_empat_peran(): void
     {
         $this->seed(PeranSeeder::class);
 
         $this->assertEqualsCanonicalizing(
-            ['admin', 'analis_dinas', 'kepala_sekolah'],
+            ['superadmin', 'admin', 'analis_dinas', 'kepala_sekolah'],
             Role::pluck('name')->all(),
         );
     }
@@ -52,6 +52,12 @@ class PeranSeederTest extends TestCase
         $this->assertTrue($kepala->hasPermissionTo('berkas.satuan.unggah'));
         $this->assertTrue($kepala->hasPermissionTo('analisis.jalankan'));
         $this->assertFalse($analis->hasPermissionTo('berkas.satuan.unggah'));
+
+        // superadmin HANYA mengelola akun; tak boleh menjalankan analisis.
+        $super = Role::findByName('superadmin');
+        $this->assertTrue($super->hasPermissionTo('akun.kelola'));
+        $this->assertFalse($super->hasPermissionTo('analisis.jalankan'));
+        $this->assertFalse($analis->hasPermissionTo('akun.kelola'));
     }
 
     public function test_seeder_idempoten(): void
@@ -59,7 +65,7 @@ class PeranSeederTest extends TestCase
         $this->seed(PeranSeeder::class);
         $this->seed(PeranSeeder::class);
 
-        $this->assertSame(3, Role::count());
+        $this->assertSame(4, Role::count());
         $this->assertSame(count(PeranSeeder::IZIN), Permission::count());
     }
 
@@ -68,7 +74,7 @@ class PeranSeederTest extends TestCase
         $this->seed(PeranSeeder::class);
         $this->seed(AkunDemoSeeder::class);
 
-        $this->assertSame(3, User::count());
+        $this->assertSame(4, User::count());
 
         $admin = User::where('email', 'admin@akar.test')->first();
         $this->assertTrue($admin->hasRole('admin'));
@@ -85,6 +91,6 @@ class PeranSeederTest extends TestCase
         $this->seed(AkunDemoSeeder::class);
         $this->seed(AkunDemoSeeder::class);
 
-        $this->assertSame(3, User::count());
+        $this->assertSame(4, User::count());
     }
 }

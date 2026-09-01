@@ -9,19 +9,20 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Memisahкан dua area aplikasi menurut peran pengguna.
+ * Memisahkan area aplikasi menurut peran pengguna, dan menegakkan
+ * pemisahan tugas.
  *
- *  - Area "dinas": analisis level daerah, untuk admin dan analis dinas.
- *  - Area "sekolah": analisis satuan pendidikan, ruang kerja kepala sekolah.
+ *  - Area "akun"    : hanya superadmin. Membuat/menghapus akun, tanpa akses
+ *                     ke data analisis apa pun.
+ *  - Area "dinas"   : analisis level daerah, untuk admin dan analis dinas.
+ *  - Area "sekolah" : analisis satuan pendidikan, ruang kerja kepala sekolah.
  *
- * Kepala sekolah yang membuka area dinas diarahкан ke berandanya sendiri,
- * bukan ditolak dengan galat. Area sekolah tidak dibatasi peran: datanya
- * sudah terisolasi per pengunggah (SekolahPengguna menyaring berdasarkan
- * impor_berkas.diunggah_oleh), jadi pengguna dinas yang membukanya hanya
- * melihat ajakan mengunggah, bukan data sekolah orang lain.
+ * Pengguna yang membuka area di luar wewenangnya diarahkan ke berandanya
+ * sendiri, bukan ditolak dengan galat. Data sekolah tetap terisolasi per
+ * pengunggah (SekolahPengguna), jadi area sekolah tidak dibatasi peran.
  *
  * Dipakai lewat nama kelas langsung di routes/web.php
- * (`AreaPeran::class.':dinas'`), tanpa perlu alias di bootstrap/app.php.
+ * (`AreaPeran::class.':dinas'`), tanpa alias di bootstrap/app.php.
  */
 class AreaPeran
 {
@@ -29,7 +30,27 @@ class AreaPeran
     {
         $pengguna = $request->user();
 
-        if ($area === 'dinas' && $pengguna !== null && $pengguna->hasRole('kepala_sekolah')) {
+        if ($pengguna === null) {
+            return $next($request);
+        }
+
+        $superadmin = $pengguna->hasRole('superadmin');
+        $kepalaSekolah = $pengguna->hasRole('kepala_sekolah');
+
+        // Superadmin hanya boleh di area akun.
+        if ($superadmin && $area !== 'akun') {
+            return redirect()->route('akun');
+        }
+
+        // Selain superadmin tidak boleh masuk area akun.
+        if (! $superadmin && $area === 'akun') {
+            return redirect()->route(
+                $kepalaSekolah ? 'sekolah.beranda' : 'dinas.profil'
+            );
+        }
+
+        // Kepala sekolah yang membuka area dinas diarahkan ke berandanya.
+        if ($area === 'dinas' && $kepalaSekolah) {
             return redirect()->route('sekolah.beranda');
         }
 
