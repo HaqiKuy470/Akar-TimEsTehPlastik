@@ -43,7 +43,8 @@ class ProfilCapaianService
      *   status_satuan: string,
      *   tersedia: bool,
      *   ringkasan: array{merah: int, kuning: int, hijau: int, tidak_tersedia: int, total: int},
-     *   dimensi: array<string, array{kode: string, nama: string, indikator: list<array<string, mixed>>}>,
+     *   dimensi: array<string, array{kode: string, nama: string, indikator: list<array<string, mixed>>, hitung: array<string, int>}>,
+     *   dimensi_grafik: list<array{kode: string, nama: string, hitung: array<string, int>}>,
      *   tidak_tersedia: list<array<string, mixed>>
      * }
      */
@@ -57,6 +58,7 @@ class ProfilCapaianService
             'tersedia' => false,
             'ringkasan' => ['merah' => 0, 'kuning' => 0, 'hijau' => 0, 'tidak_tersedia' => 0, 'total' => 0],
             'dimensi' => [],
+            'dimensi_grafik' => [],
             'tidak_tersedia' => [],
         ];
 
@@ -120,6 +122,17 @@ class ProfilCapaianService
 
             $ringkasan['total']++;
 
+            // Hitungan per dimensi mencakup indikator "Tidak Tersedia" agar
+            // grafik komposisi menampilkan gambaran lengkap tiap dimensi.
+            $kode = $indikator->dimensi;
+            $dimensi[$kode] ??= [
+                'kode' => $kode,
+                'nama' => $namaDimensi[$kode] ?? $kode,
+                'indikator' => [],
+                'hitung' => ['merah' => 0, 'kuning' => 0, 'hijau' => 0, 'kosong' => 0],
+            ];
+            $dimensi[$kode]['hitung'][$status]++;
+
             if ($status === 'kosong') {
                 $ringkasan['tidak_tersedia']++;
                 $tidakTersedia[] = $entri;
@@ -128,16 +141,18 @@ class ProfilCapaianService
             }
 
             $ringkasan[$status]++;
-
-            $kode = $indikator->dimensi;
-            $dimensi[$kode] ??= [
-                'kode' => $kode,
-                'nama' => $namaDimensi[$kode] ?? $kode,
-                'indikator' => [],
-            ];
             $dimensi[$kode]['indikator'][] = $entri;
         }
 
+        // Dimensi yang hanya berisi indikator "Tidak Tersedia" tetap dibuang
+        // dari daftar tabel, tetapi ikut di ringkasan grafik.
+        $dimensiGrafik = array_values(array_filter(
+            $dimensi,
+            static fn ($d) => array_sum($d['hitung']) > 0,
+        ));
+        usort($dimensiGrafik, static fn ($a, $b) => strcmp($a['kode'], $b['kode']));
+
+        $dimensi = array_filter($dimensi, static fn ($d) => $d['indikator'] !== []);
         ksort($dimensi);
 
         return [
@@ -145,6 +160,7 @@ class ProfilCapaianService
             'tersedia' => true,
             'ringkasan' => $ringkasan,
             'dimensi' => $dimensi,
+            'dimensi_grafik' => $dimensiGrafik,
             'tidak_tersedia' => $tidakTersedia,
         ];
     }

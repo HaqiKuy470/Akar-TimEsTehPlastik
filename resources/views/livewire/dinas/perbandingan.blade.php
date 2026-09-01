@@ -118,6 +118,34 @@
         <div class="flex flex-col gap-3">
             <x-judul-bagian :judul="'Peringkat kabupaten/kota di '.$provinsi" :jumlah="count($hasil['tabel'] ?? []).' daerah'" />
 
+            @if (! empty($hasil['tabel']))
+                @php
+                    $grafikBaris = collect($hasil['tabel'])
+                        ->sortBy('peringkat')
+                        ->map(fn ($b) => [
+                            'nama' => $b['nama'],
+                            'label' => $b['label_capaian'],
+                            'perubahan' => $b['perubahan_nilai'],
+                            'peringkat' => $b['peringkat'],
+                            'terpilih' => $b['wilayah_id'] === $wilayahId,
+                        ])->values()->all();
+                @endphp
+                <x-kartu wire:key="grafik-{{ $hasil['indikator']['nomor'] }}-{{ $wilayahId }}">
+                    <div wire:ignore x-data="grafikPeringkat(@js(['baris' => $grafikBaris]))" x-init="gambar()">
+                        <div class="mb-3 flex items-center gap-3">
+                            <h3 class="text-[13px] font-semibold uppercase tracking-[0.05em] text-teks-700">Semua daerah pada indikator ini</h3>
+                            <span class="h-px flex-1 bg-krem-300"></span>
+                        </div>
+                        <div class="w-full overflow-x-auto">
+                            <div style="height: {{ max(count($grafikBaris) * 22 + 40, 160) }}px; min-width: 460px;">
+                                <canvas x-ref="kanvas"></canvas>
+                            </div>
+                        </div>
+                        <p class="mt-2 text-[11px] text-teks-400">Garis tebal menandai daerah yang dipilih. Arahkan kursor untuk detail peringkat.</p>
+                    </div>
+                </x-kartu>
+            @endif
+
             <x-kartu rapat>
                 @if (empty($hasil['tabel']))
                     <p class="px-5 py-4 text-[13px] text-teks-500">Tidak ada kabupaten/kota dengan data pada indikator ini.</p>
@@ -167,4 +195,6 @@
             </x-kartu>
         </div>
     @endif
+
+    <x-grafik-skrip />
 </div>

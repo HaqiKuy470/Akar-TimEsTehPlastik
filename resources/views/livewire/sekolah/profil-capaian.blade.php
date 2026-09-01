@@ -61,6 +61,13 @@
                     {{ $profil['ringkasan']['total'] }} indikator diukur
                 </p>
 
+                @if (! empty($profil['dimensi_grafik']))
+                    <x-kartu>
+                        <x-grafik-komposisi :dimensi="$profil['dimensi_grafik']"
+                            judul="Sebaran per dimensi" />
+                    </x-kartu>
+                @endif
+
                 @foreach ($profil['dimensi'] as $kode => $dim)
                     <div class="flex flex-col gap-3">
                         <x-judul-bagian :judul="$kode.'. '.$dim['nama']" :jumlah="count($dim['indikator']).' indikator'" />
@@ -108,4 +115,6 @@
             @endif
         </div>
     @endif
+
+    <x-grafik-skrip />
 </div>

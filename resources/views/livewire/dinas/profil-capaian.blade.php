@@ -238,6 +238,13 @@
                         <span>{{ $persenBaik }}% dari data tersedia berlabel baik</span>
                     </div>
                 </div>
+
+                @if (! empty($profil['dimensi_grafik']))
+                    <div class="akar-chart-wrap">
+                        <x-grafik-komposisi :dimensi="$profil['dimensi_grafik']"
+                            judul="Sebaran per dimensi" />
+                    </div>
+                @endif
             </section>
 
             <section class="akar-section akar-section--indicators" aria-labelledby="judul-indikator-capaian">
@@ -343,4 +350,6 @@
             @endif
         @endif
     </div>
+
+    <x-grafik-skrip />
 </div>

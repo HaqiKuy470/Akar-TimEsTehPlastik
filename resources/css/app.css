@@ -46,6 +46,16 @@
     --color-kosong: #615a4e;
     --color-kosong-bg: #e8e2d5;
 
+    /* Isian grafik: hue status DESIGN.md dinaikkan sedikit agar terpisah
+       secara warna maupun untuk mata buta warna (deutan/protan). Dipakai
+       HANYA untuk isian Chart.js; teks & badge tetap memakai token status
+       di atas. Selalu berpasangan dengan label langsung pada segmen. */
+    --color-grafik-kurang: #b4231a;
+    --color-grafik-sedang: #c8791a;
+    --color-grafik-baik: #2f7d3f;
+    --color-grafik-kosong: #a89f8e;
+    --color-grafik-kisi: #ddd5c2;
+
     --color-emas-700: #8a6d14; /* penanda prioritas pertama, sangat hemat */
 
     /* Elevasi — kartu tetap datar (border). Bayangan hanya untuk elemen
@@ -615,6 +625,15 @@
 
     .akar-distribution {
         margin-top: clamp(2rem, 4vw, 3.5rem);
+    }
+
+    /* Pembungkus grafik pada halaman bergaya editorial (profil capaian). */
+    .akar-chart-wrap {
+        margin-top: clamp(2rem, 4vw, 3rem);
+        padding: 1.25rem;
+        border: 1px solid var(--color-krem-300);
+        border-radius: var(--radius-kartu);
+        background: var(--color-kartu);
     }
 
     .akar-distribution__track {
