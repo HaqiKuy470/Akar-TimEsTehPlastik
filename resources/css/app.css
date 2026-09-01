@@ -126,16 +126,19 @@
     }
 }
 
-@layer base {
-    /* Livewire hanya menerbitkan CSS penyembunyi untuk kombinasi modifier
-       tertentu; `wire:loading.delay.flex` (dan sejenisnya) tidak termasuk,
-       sehingga kerangka-muat tampil sebelum ada permintaan. Tutup di sini. */
-    [wire\:loading\.delay\.flex],
-    [wire\:loading\.delay\.inline-flex],
-    [wire\:loading\.delay\.grid],
-    [wire\:loading\.delay\.block] {
-        display: none;
-    }
+/* Livewire hanya menerbitkan CSS penyembunyi untuk kombinasi modifier
+   tertentu; `wire:loading.delay.flex` (dan sejenisnya) tidak termasuk, jadi
+   kerangka-muat sempat tampil sebelum ada permintaan. Selektor atribut ganda
+   meniru trik spesifisitas Livewire sendiri agar menang atas kelas tata letak
+   pada elemen yang sama (mis. `.akar-loading` yang ber-`display: flex`).
+   Diletakkan di luar @layer supaya selalu sesudah utilitas Tailwind. */
+[wire\:loading\.delay\.flex][wire\:loading\.delay\.flex],
+[wire\:loading\.delay\.inline-flex][wire\:loading\.delay\.inline-flex],
+[wire\:loading\.delay\.grid][wire\:loading\.delay\.grid],
+[wire\:loading\.delay\.block][wire\:loading\.delay\.block],
+[wire\:loading\.flex][wire\:loading\.flex],
+[wire\:loading\.grid][wire\:loading\.grid] {
+    display: none;
 }
 
 @layer components {
