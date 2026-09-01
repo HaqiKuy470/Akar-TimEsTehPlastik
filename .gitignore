@@ -27,6 +27,11 @@
 _ide_helper.php
 /public/fonts-manifest.dev.json
 
+# Catatan kerja lokal (tidak untuk repo)
+*.local.md
+/akar-deploy/
+/akar-deploy*.zip
+
 # Sistem operasi dan editor
 .DS_Store
 Thumbs.db
