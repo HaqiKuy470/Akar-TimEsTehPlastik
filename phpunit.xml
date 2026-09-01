@@ -32,5 +32,8 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="SUPERADMIN_NAMA" value="Super Admin Uji"/>
+        <env name="SUPERADMIN_EMAIL" value="superadmin@akar.test"/>
+        <env name="SUPERADMIN_PASSWORD" value="password"/>
     </php>
 </phpunit>

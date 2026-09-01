@@ -86,4 +86,13 @@ return [
         'E' => 'Pengelolaan sekolah yang partisipatif, transparan, dan akuntabel',
     ],
 
+    // Akun super admin awal (pembuat akun). Diambil dari .env supaya
+    // kredensialnya tidak tersimpan di repositori. Bila email atau kata
+    // sandi kosong, seeder melewati pembuatan akun super admin.
+    'superadmin' => [
+        'nama' => env('SUPERADMIN_NAMA', 'Super Admin'),
+        'email' => env('SUPERADMIN_EMAIL'),
+        'kata_sandi' => env('SUPERADMIN_PASSWORD'),
+    ],
+
 ];

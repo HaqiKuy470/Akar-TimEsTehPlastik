@@ -55,10 +55,21 @@ Dibuat otomatis oleh `php artisan migrate:fresh --seed`. Kata sandi ketiganya
 
 | Peran          | Email                   | Bisa melakukan                                      |
 |----------------|-------------------------|----------------------------------------------------|
-| Super Admin    | `superadmin@akar.test`  | HANYA membuat/menghapus akun; tidak melihat data apa pun |
 | Administrator  | `admin@akar.test`       | Impor berkas daerah, seluruh analisis dan rencana  |
 | Analis Dinas   | `analis@akar.test`      | Menjalankan analisis, menyusun rencana tindak lanjut |
 | Kepala Sekolah | `kepala@akar.test`      | Mengunggah berkas satuan pendidikan, analisis, rencana |
+
+Akun **Super Admin** (hanya membuat/menghapus akun, tidak melihat data)
+tidak ikut sebagai akun demo. Kredensialnya diatur lewat `.env`:
+
+```
+SUPERADMIN_NAMA="Nama Pengelola"
+SUPERADMIN_EMAIL=pengelola@instansi.go.id
+SUPERADMIN_PASSWORD=kata-sandi-kuat
+```
+
+Akun ini dibuat oleh `php artisan migrate:fresh --seed` bila kedua nilai
+di atas terisi.
 
 ---
 
