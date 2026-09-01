@@ -14,6 +14,14 @@
     --font-sans:
         "Inter", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
 
+    /* Font merek: hanya untuk wordmark "AKAR". Fraunces punya karakter
+       hangat dan sedikit "wonky" yang cocok untuk lambang akar/pohon,
+       tanpa terasa dekoratif berlebihan seperti Playfair. */
+    --font-merek: "Fraunces", Georgia, "Times New Roman", serif;
+
+    /* Krem hangat untuk wordmark di atas latar navy — bukan putih. */
+    --color-krem-merek: #efe7d3;
+
     /* Latar dan permukaan */
     --color-krem-100: #f5f1e6; /* latar halaman */
     --color-krem-150: #f0ebdd; /* hover baris ringan, isian nonaktif */
@@ -152,6 +160,16 @@
 }
 
 @layer components {
+    /* Wordmark "AKAR". Font serif berkarakter, spasi huruf sedikit lega. */
+    .merek {
+        font-family: var(--font-merek);
+        font-optical-sizing: auto;
+        font-weight: 600;
+        font-style: normal;
+        letter-spacing: 0.02em;
+        line-height: 1;
+    }
+
     /* Kerangka berdenyut untuk keadaan memuat (DESIGN.md 6). */
     .rangka-muat {
         background-color: var(--color-krem-200);

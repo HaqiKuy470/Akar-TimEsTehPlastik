@@ -7,7 +7,7 @@
     <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -54,7 +54,7 @@
         <aside class="hidden w-[248px] shrink-0 flex-col overflow-y-auto bg-navy-900 text-white lg:flex">
             <div class="flex h-14 shrink-0 items-center gap-3 border-b border-white/10 px-5">
                 <img src="{{ asset('logo.svg') }}" alt="" class="size-9 shrink-0">
-                <span class="text-[17px] font-bold tracking-[0.1em]">AKAR</span>
+                <span class="merek text-[22px]" style="color: var(--color-krem-merek)">AKAR</span>
             </div>
 
             <nav class="flex flex-1 flex-col gap-0.5 px-3 py-4">
