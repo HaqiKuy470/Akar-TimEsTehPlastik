@@ -9,12 +9,6 @@ use App\Models\ImporBerkas;
 use App\Models\User;
 use App\Models\Wilayah;
 
-/**
- * Menjawab "sekolah mana milik pengguna ini?". Kaitan pengguna-sekolah tidak
- * disimpan di tabel users, melainkan diturunkan dari berkas yang pernah ia
- * unggah sendiri (impor_berkas.diunggah_oleh), sehingga data sekolah lain tetap
- * tak terjangkau.
- */
 class SekolahPengguna
 {
     public function imporTerakhir(?User $pengguna): ?ImporBerkas
@@ -31,7 +25,6 @@ class SekolahPengguna
             ->first();
     }
 
-    /** Wilayah level 'satuan' milik pengguna, atau null bila belum ada berkas berhasil. */
     public function untuk(?User $pengguna): ?Wilayah
     {
         $impor = $this->imporTerakhir($pengguna);
@@ -46,11 +39,7 @@ class SekolahPengguna
         return $wilayahId !== null ? Wilayah::find($wilayahId) : null;
     }
 
-    /**
-     * Kombinasi jenjang dan status pada berkas sekolah (biasanya satu).
-     *
-     * @return list<array{tahun: int, jenis_satuan: string, status_satuan: string}>
-     */
+    /** @return list<array{tahun: int, jenis_satuan: string, status_satuan: string}> */
     public function kombinasi(Wilayah $sekolah): array
     {
         return Capaian::query()

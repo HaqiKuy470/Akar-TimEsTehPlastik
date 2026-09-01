@@ -11,12 +11,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
 
-/**
- * Memproses satu sheet provinsi dari berkas Data Rapor Pendidikan.
- *
- * Satu job per sheet (ARCHITECTURE.md bagian 4.3) supaya sheet yang gagal bisa
- * diulang sendiri tanpa mengulang seluruh berkas.
- */
 class ProsesSheetProvinsi implements ShouldQueue
 {
     use Batchable;
@@ -44,10 +38,8 @@ class ProsesSheetProvinsi implements ShouldQueue
             return;
         }
 
-        // Satu sheet provinsi butuh ~300 MB; aman karena impor daerah hanya di lokal.
         @ini_set('memory_limit', '1024M');
 
-        // Bersihkan dulu supaya percobaan ulang tidak menggandakan baris.
         $parser->bersihkanSheet($this->imporId, $this->namaSheet);
 
         $jumlah = $parser->imporSheet($this->path, $this->namaSheet, $impor, $this->tahun);

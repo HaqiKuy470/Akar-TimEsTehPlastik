@@ -7,11 +7,6 @@ namespace App\Console\Commands;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Console\Command;
 
-/**
- * Menyiapkan basis data siap-demo dalam satu perintah: peran, akun demo,
- * indikator, dan satu sheet provinsi contoh. Untuk data sebenarnya pakai
- * `akar:impor` (ARCHITECTURE.md 4.1).
- */
 class AkarDemoCommand extends Command
 {
     protected $signature = 'akar:demo {--fresh : Jalankan migrate:fresh lebih dulu (menghapus seluruh data)}';

@@ -12,7 +12,6 @@
     @livewireStyles
 </head>
 <body class="grid min-h-full lg:grid-cols-[1fr_460px]">
-    {{-- Kolom kiri: pernyataan produk, hanya di layar lebar. --}}
     <aside class="relative hidden flex-col justify-between bg-navy-900 p-12 text-white lg:flex">
         <div class="flex items-center gap-3.5">
             <img src="{{ asset('logo.svg') }}" alt="" class="size-11 shrink-0">
@@ -40,8 +39,6 @@
             <p>Dibuat oleh Tim EsTehPlastik.</p>
         </div>
     </aside>
-
-    {{-- Kolom kanan: formulir. --}}
     <main class="flex items-center justify-center bg-krem-100 p-6">
         <div class="w-full max-w-sm">
             <div class="mb-7 flex items-center gap-2.5 lg:hidden">

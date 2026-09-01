@@ -12,22 +12,8 @@ use App\Models\Capaian;
 use App\Models\RencanaAksi;
 use Illuminate\Support\Facades\DB;
 
-/**
- * F7 - Generator Rencana Tindak Lanjut: hasil analisis -> draf dokumen kerja,
- * satu baris per kegiatan usulan (penanggung jawab, indikator keberhasilan, waktu).
- *
- * Kegiatan per akar masalah dari config/intervensi.php; rincian dari
- * config/kegiatan.php. Prioritas tanpa akar berbukti cukup, atau akar yang
- * kegiatannya tak ada di katalog, dilewati (tidak mengarang). Hasilnya draf yang
- * dapat disunting pengguna.
- */
 class RencanaAksiGenerator
 {
-    /**
-     * Susun (atau susun ulang) draf rencana tindak lanjut. Idempoten: bila sudah
-     * ada dan $paksaUlang false, rencana lama dikembalikan agar suntingan pengguna
-     * tidak hilang.
-     */
     public function hasilkan(Analisis $analisis, ?int $dibuatOleh = null, bool $paksaUlang = false): RencanaAksi
     {
         $analisis->loadMissing('wilayah', 'prioritas.indikator', 'prioritas.akar');
@@ -75,7 +61,7 @@ class RencanaAksiGenerator
                 foreach ($kandidat['kegiatan'] ?? [] as $kodeKegiatan) {
                     $k = $katalog[$kodeKegiatan] ?? null;
                     if ($k === null) {
-                        continue; // kegiatan belum ada di katalog, jangan mengarang
+                        continue;
                     }
 
                     $baris[] = [
@@ -101,7 +87,6 @@ class RencanaAksiGenerator
         });
     }
 
-    /** Akar keyakinan tertinggi yang bukan "tidak cukup bukti"; null bila tidak ada. */
     private function akarTerkuat(AnalisisPrioritas $prioritas): ?AnalisisAkar
     {
         return $prioritas->akar
@@ -121,8 +106,6 @@ class RencanaAksiGenerator
     }
 
     /**
-     * Kandidat akar di config/intervensi.php yang kodenya cocok.
-     *
      * @param  array<string, mixed>  $entriIndikator
      * @return array<string, mixed>|null
      */
@@ -137,11 +120,7 @@ class RencanaAksiGenerator
         return null;
     }
 
-    /**
-     * Label capaian tiap indikator prioritas, sekali kueri.
-     *
-     * @return array<int, string> indikator_id => label capaian
-     */
+    /** @return array<int, string> indikator_id => label capaian */
     private function labelIndikator(Analisis $analisis): array
     {
         return Capaian::query()

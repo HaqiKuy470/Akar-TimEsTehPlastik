@@ -1,17 +1,5 @@
 @props(['nomor' => '', 'nama' => '', 'akar' => null])
 
-{{--
-    Pohon akar masalah — daftar bertingkat dengan garis penghubung, bukan
-    diagram interaktif (DESIGN.md 5). Baris yang menjadi bukti diberi latar
-    biru-100 dan penanda "← bukti".
-
-    Dipanggil dari halaman Prioritas (dinas & sekolah):
-        <x-pohon-akar :nomor="$item['nomor']" :nama="$item['nama']" :akar="$item['akar']" />
-
-    Bentuk $akar: ['dipetakan' => bool, 'induk_label' => string,
-                   'kandidat' => [ ['label','keyakinan','keyakinan_kode','bukti'=>[['nomor','nama','label']]] ]]
---}}
-
 @php
     $chip = [
         'kuat' => 'border-biru-700 bg-biru-100 text-navy-900',

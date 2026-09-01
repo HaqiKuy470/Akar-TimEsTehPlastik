@@ -14,19 +14,12 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/**
- * Jembatan area dinas → area sekolah: jendela baca-saja bagi analis dinas untuk
- * melihat capaian satu sekolah yang berkasnya sudah diunggah kepala sekolahnya.
- * Tidak menggantikan area sekolah.
- */
 #[Title('Sekolah di wilayah')]
 class SekolahDaerah extends Component
 {
-    /** Kabupaten/kota yang sedang ditinjau (untuk daftar sekolah). */
     #[Url]
     public ?int $kabkota = null;
 
-    /** Sekolah yang dipilih untuk dilihat capaiannya. */
     #[Url]
     public ?int $wilayah = null;
 
@@ -38,9 +31,7 @@ class SekolahDaerah extends Component
             : null;
     }
 
-    /**
-     * @return Collection<int, array<string, mixed>>
-     */
+    /** @return Collection<int, array<string, mixed>> */
     #[Computed]
     public function daftar(): Collection
     {
@@ -60,7 +51,6 @@ class SekolahDaerah extends Component
 
         $sekolah = Wilayah::where('level', 'satuan')->find($this->wilayah);
 
-        // Batasi ke sekolah di kabupaten yang ditinjau bila kabupaten diketahui.
         if ($sekolah !== null && $this->kabkota !== null && $sekolah->induk_id !== $this->kabkota) {
             return null;
         }

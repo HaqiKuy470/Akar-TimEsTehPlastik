@@ -11,15 +11,9 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
-/**
- * Halaman superadmin: hanya membuat dan menghapus akun. Superadmin tak bisa
- * membuka halaman analisis (ditegakkan middleware AreaPeran); di sini hanya
- * tampil metadata akun (nama, email, peran, waktu dibuat).
- */
 #[Title('Kelola akun')]
 class KelolaAkun extends Component
 {
-    /** Peran yang boleh dibuat superadmin (superadmin lain tidak dibuat di sini). */
     public const PERAN_DIIZINKAN = [
         'admin' => 'Administrator (kementerian)',
         'analis_dinas' => 'Analis Dinas Pendidikan',
@@ -34,7 +28,6 @@ class KelolaAkun extends Component
 
     public string $kataSandi = '';
 
-    /** Konfirmasi sebelum menghapus: id user yang akan dihapus. */
     public ?int $hapusId = null;
 
     public function buatAkun(): void
@@ -81,7 +74,6 @@ class KelolaAkun extends Component
 
         $user = User::find($this->hapusId);
 
-        // Jangan hapus diri sendiri atau superadmin lain.
         if ($user !== null
             && $user->id !== auth()->id()
             && ! $user->hasRole('superadmin')) {

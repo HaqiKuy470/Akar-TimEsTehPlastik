@@ -6,35 +6,15 @@ namespace App\Services\Akar\Parsers;
 
 use RuntimeException;
 
-/**
- * Merekonstruksi header bertingkat sheet provinsi (baris 6-8, sel ter-merge)
- * menjadi peta kolom. Komponen paling kritis dari alur impor. Lihat ARCHITECTURE.md
- * 3.2 dan 6.1.
- *
- *   Baris 6  kode indikator induk : "A.1", "A.2"
- *   Baris 7  nama lengkap          : "A.1 Kemampuan literasi", "A.1.1 ..."
- *   Baris 8  nama kolom            : "Provinsi", ..., "Label Capaian 2025", "Perubahan ..."
- *
- * Susunan indikator berbeda antaredisi, jadi resolusi berdasarkan pola nama di
- * baris 7, bukan posisi kolom. Kolom 1-4 dimensi; 5+ berpasangan label/perubahan.
- * Nomor indikator sama bisa muncul >1x dengan nama berbeda (PAUD vs dasar-menengah),
- * jadi nama ikut dikembalikan sebagai kunci disambiguasi.
- */
 class HeaderResolver
 {
-    /** Nomor indikator: huruf A-E + segmen angka. Cocok: A.1, A.1.1, D.17. */
     private const POLA_NOMOR = '/^([A-E]\.\d+(?:\.\d+)*)(?:\s+(.*))?$/us';
 
     /**
      * @param  list<int|float|string|null>  $baris6  isi mentah baris 6, indeks 0 = kolom A
      * @param  list<int|float|string|null>  $baris7  isi mentah baris 7
      * @param  list<int|float|string|null>  $baris8  isi mentah baris 8
-     * @return array<int, array<string, string|null>> peta dari nomor kolom (1-based) ke atribut kolom
-     *
-     * Bentuk nilai:
-     *   Dimensi   : ['jenis' => 'dimensi', 'dimensi' => 'provinsi'|'kabupaten_kota'|'jenis_satuan'|'status_satuan']
-     *   Indikator : ['jenis' => 'indikator', 'nomor' => 'D.2', 'nama' => 'Refleksi ...',
-     *                'induk' => 'D.2'|null, 'peran' => 'label'|'perubahan']
+     * @return array<int, array<string, string|null>> peta nomor kolom (1-based) => atribut kolom
      */
     public function resolve(array $baris6, array $baris7, array $baris8): array
     {
@@ -70,12 +50,7 @@ class HeaderResolver
         return $peta;
     }
 
-    /**
-     * Kolom 1-4 dimensi. Peran dikenali dari teks baris 8 dulu (tahan perbedaan
-     * antaredisi), jatuh ke posisi bila teks tak dikenali.
-     *
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     private function kolomDimensi(int $nomorKolom, ?string $judul): array
     {
         $teks = mb_strtolower((string) $judul);
@@ -91,19 +66,12 @@ class HeaderResolver
         return ['jenis' => 'dimensi', 'dimensi' => $dimensi];
     }
 
-    /**
-     * Kolom 5+ berisi pasangan label/perubahan per indikator.
-     *
-     * @return array<string, string|null>|null null bila kolom benar-benar kosong (kolom sisa di ujung sheet)
-     */
+    /** @return array<string, string|null>|null null bila kolom benar-benar kosong (kolom sisa di ujung sheet) */
     private function kolomIndikator(int $nomorKolom, ?string $induk, ?string $nama, ?string $judulKolom): ?array
     {
         $adaNama = $nama !== null && $nama !== '';
         $adaJudul = $judulKolom !== null && $judulKolom !== '';
 
-        // Kolom data indikator selalu berjudul "Label Capaian"/"Perubahan ..." di
-        // baris 8. Tanpa judul = sisa lebar sheet, diabaikan. Cek judul dulu karena
-        // forward-fill baris 7 bisa merembetkan nama indikator terakhir ke sana.
         if (! $adaJudul) {
             return null;
         }
@@ -150,9 +118,7 @@ class HeaderResolver
         };
     }
 
-    /**
-     * @param  array<int, array<string, string|null>>  $peta
-     */
+    /** @param  array<int, array<string, string|null>>  $peta */
     private function pastikanAdaIndikator(array $peta): void
     {
         foreach ($peta as $entri) {
@@ -167,8 +133,6 @@ class HeaderResolver
     }
 
     /**
-     * Sel -> string ter-trim (whitespace runtuh jadi satu spasi); kosong -> null.
-     *
      * @param  list<int|float|string|null>  $baris
      * @return list<string|null>
      */
@@ -185,8 +149,6 @@ class HeaderResolver
     }
 
     /**
-     * Forward-fill: isi sel kosong bekas merge dengan nilai tak kosong di kirinya.
-     *
      * @param  list<string|null>  $baris
      * @return list<string|null>
      */

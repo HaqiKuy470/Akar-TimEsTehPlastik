@@ -16,13 +16,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Rencana Kerja Tahunan (RKT) satu sekolah — sama dengan rencana tindak lanjut
- * dinas, istilah RKT dipakai sesuai dokumen wajib kepala sekolah (PRD bagian 3.2).
- */
 class RencanaKerja extends Component
 {
-    /** @var list<array<string, mixed>> */
     public array $item = [];
 
     public ?int $rencanaId = null;
@@ -190,9 +185,7 @@ class RencanaKerja extends Component
             ->all();
     }
 
-    /**
-     * @param  array<string, mixed>  $baris
-     */
+    /** @param  array<string, mixed>  $baris */
     private function barisKosong(array $baris): bool
     {
         foreach ($baris as $nilai) {

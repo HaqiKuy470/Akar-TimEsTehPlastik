@@ -17,17 +17,12 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/** F7 — Generator Rencana Tindak Lanjut. Penyusunan draf ada di RencanaAksiGenerator. */
 class RencanaTindakLanjut extends Component
 {
     #[Url]
     public ?int $analisisId = null;
 
-    /**
-     * Baris rencana yang sedang disunting.
-     *
-     * @var list<array<string, mixed>>
-     */
+    /** @var list<array<string, mixed>> */
     public array $item = [];
 
     public ?int $rencanaId = null;
@@ -54,9 +49,7 @@ class RencanaTindakLanjut extends Component
         $this->muatRencana();
     }
 
-    /**
-     * @return Collection<int, array{id: int, label: string}>
-     */
+    /** @return Collection<int, array{id: int, label: string}> */
     #[Computed]
     public function analisisTersedia(): Collection
     {
@@ -95,7 +88,6 @@ class RencanaTindakLanjut extends Component
         $this->muatRencana();
     }
 
-    /** Perakitan dokumen ada di LaporanExporter. */
     public function unduhPdf(LaporanExporter $exporter): ?StreamedResponse
     {
         $analisis = $this->analisis;
@@ -160,7 +152,6 @@ class RencanaTindakLanjut extends Component
             $rencana->update(['judul' => $this->judul]);
         }
 
-        // Bangun ulang seluruh item agar bebas dari sinkronisasi id baris yang ditambah/dihapus.
         $rencana->item()->delete();
 
         foreach (array_values($this->item) as $urutan => $baris) {
@@ -212,9 +203,7 @@ class RencanaTindakLanjut extends Component
             ->all();
     }
 
-    /**
-     * @param  array<string, mixed>  $baris
-     */
+    /** @param  array<string, mixed>  $baris */
     private function barisKosong(array $baris): bool
     {
         foreach ($baris as $nilai) {

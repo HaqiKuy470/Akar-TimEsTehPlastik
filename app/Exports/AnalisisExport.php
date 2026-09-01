@@ -11,15 +11,9 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-/**
- * Data mentah hasil analisis: satu baris per indikator prioritas. Komponen skor
- * dipisah per kolom agar skor tetap dapat ditelusuri di lembar kerja.
- */
 class AnalisisExport implements FromArray, ShouldAutoSize, WithHeadings, WithTitle
 {
-    /**
-     * @param  array<int, string>  $labelCapaian  indikator_id => label capaian
-     */
+    /** @param  array<int, string>  $labelCapaian  indikator_id => label capaian */
     public function __construct(
         private readonly Analisis $analisis,
         private readonly array $labelCapaian,
@@ -30,9 +24,7 @@ class AnalisisExport implements FromArray, ShouldAutoSize, WithHeadings, WithTit
         return 'Prioritas';
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     public function headings(): array
     {
         return [
@@ -51,9 +43,7 @@ class AnalisisExport implements FromArray, ShouldAutoSize, WithHeadings, WithTit
         ];
     }
 
-    /**
-     * @return list<list<string|int|float|null>>
-     */
+    /** @return list<list<string|int|float|null>> */
     public function array(): array
     {
         return $this->analisis->prioritas

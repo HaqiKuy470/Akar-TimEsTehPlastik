@@ -66,8 +66,6 @@
             Data tahun {{ $tahun }} &middot; Dicetak {{ $tanggal_cetak }}
         </div>
     </div>
-
-    {{-- Bagian 1: profil capaian ringkas --}}
     <h2>1. Profil capaian</h2>
     @if (! ($profil['tersedia'] ?? false))
         <p class="muted">Data profil capaian tidak tersedia untuk kombinasi ini.</p>
@@ -108,8 +106,6 @@
             </p>
         @endif
     @endif
-
-    {{-- Bagian 2: indikator prioritas + rincian skor + akar masalah --}}
     <h2>2. Indikator prioritas dan akar masalah</h2>
     @forelse ($prioritas as $p)
         <div class="kartu">
@@ -158,8 +154,6 @@
     @empty
         <p class="muted">Tidak ada indikator berlabel Kurang atau Sedang untuk kombinasi ini.</p>
     @endforelse
-
-    {{-- Bagian 3: rencana tindak lanjut --}}
     <h2>3. Rencana tindak lanjut</h2>
     @if ($rencana === null || $rencana->item->isEmpty())
         <p class="muted">Draf rencana tindak lanjut belum disusun untuk analisis ini.</p>

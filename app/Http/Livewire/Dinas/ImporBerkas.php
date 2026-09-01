@@ -9,19 +9,9 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-/**
- * F1 — Riwayat & pemantauan impor berkas.
- *
- * Berkas daerah berukuran 16-21 MB tidak diunggah lewat halaman ini: parsing
- * dilakukan di mesin lokal dengan `php artisan akar:impor <berkas> --async`
- * (ARCHITECTURE.md bagian 4.1). Halaman ini menampilkan riwayat dan status
- * setiap impor, termasuk yang masih dalam antrean.
- */
 class ImporBerkas extends Component
 {
-    /**
-     * @return Collection<int, ImporBerkasModel>
-     */
+    /** @return Collection<int, ImporBerkasModel> */
     #[Computed]
     public function riwayat(): Collection
     {

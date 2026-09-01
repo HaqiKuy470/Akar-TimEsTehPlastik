@@ -9,15 +9,6 @@ use App\Models\Wilayah;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-/**
- * F5 — Perbandingan Antardaerah: peringkat satu kabupaten/kota terhadap kab/kota
- * lain di provinsi yang sama, plus pembanding agregat provinsi dan nasional.
- *
- * Karena label hanya tiga tingkat (Baik > Sedang > Kurang), banyak daerah berbagi
- * peringkat; selain `peringkat` dikembalikan `peringkat_hingga` agar UI bisa
- * menampilkan rentang ("11-25 dari 38"). Peringkat dihitung lewat COUNT agregat
- * per label (ARCHITECTURE.md 6.4). "Tidak Tersedia" dikeluarkan dari populasi.
- */
 class BenchmarkService
 {
     private const NILAI_LABEL = ['Baik' => 3, 'Sedang' => 2, 'Kurang' => 1];
@@ -25,10 +16,6 @@ class BenchmarkService
     private const TIDAK_TERSEDIA = 'Tidak Tersedia';
 
     /**
-     * Peringkat sebuah wilayah terhadap kabupaten/kota lain di provinsinya.
-     * Hanya berlaku level 'kabkota'; untuk 'satuan', `berlaku` = false (pakai
-     * pembanding() terhadap agregat kabupaten/provinsi).
-     *
      * @return array{
      *   berlaku: bool,
      *   label_wilayah: string|null,
@@ -99,13 +86,11 @@ class BenchmarkService
                 $lebihBaik += (int) $jumlah;
             }
         }
-        $sama = (int) ($jumlahPerLabel[$baris->label_capaian] ?? 0); // termasuk wilayah ini sendiri
+        $sama = (int) ($jumlahPerLabel[$baris->label_capaian] ?? 0);
 
         $peringkat = $lebihBaik + 1;
         $peringkatHingga = $lebihBaik + $sama;
 
-        // Peringkat tengah kelompok label yang sama, dipakai untuk persentil
-        // agar daerah di tengah kelompok besar tidak dianggap berada di puncak.
         $peringkatTengah = $lebihBaik + ($sama + 1) / 2;
         $persentil = $total > 1
             ? round(($total - $peringkatTengah) / ($total - 1), 4)
@@ -124,9 +109,6 @@ class BenchmarkService
     }
 
     /**
-     * Tabel peringkat seluruh kabupaten/kota satu provinsi untuk satu indikator,
-     * terurut dari label terbaik.
-     *
      * @return list<array{
      *   wilayah_id: int, nama: string, label_capaian: string,
      *   perubahan_nilai: string, peringkat: int
@@ -179,10 +161,6 @@ class BenchmarkService
     }
 
     /**
-     * Capaian wilayah disandingkan dengan agregat kabupaten, provinsi, dan nasional.
-     * Pembanding utama mode satuan (PRD F5, F10). Baris `kabupaten` hanya terisi
-     * bila `$wilayah` level 'satuan' dan berkasnya memuat kabupaten induk.
-     *
      * @return array{
      *   wilayah: array{nama: string, label: string|null, perubahan: string|null},
      *   kabupaten: array{nama: string|null, label: string|null, perubahan: string|null, tersedia: bool},
@@ -213,7 +191,6 @@ class BenchmarkService
                 ->first(['label_capaian', 'perubahan_nilai']);
         };
 
-        // Untuk sekolah, kabupaten pembanding adalah induk langsungnya.
         $kabupatenWilayah = $wilayah->level === 'satuan' && $wilayah->induk?->level === 'kabkota'
             ? $wilayah->induk
             : null;
@@ -254,11 +231,7 @@ class BenchmarkService
         ];
     }
 
-    /**
-     * Jumlah kabupaten/kota per label di satu provinsi, tanpa "Tidak Tersedia".
-     *
-     * @return Collection<string, int>
-     */
+    /** @return Collection<string, int> */
     private function populasi(
         string $provinsi,
         int $indikatorId,

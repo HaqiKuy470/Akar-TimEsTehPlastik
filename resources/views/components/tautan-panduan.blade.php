@@ -6,9 +6,6 @@
 @php
     $tujuan = route('panduan').($anchor ? '#'.$anchor : '');
 @endphp
-
-{{-- Tanpa wire:navigate: pemuatan penuh menghormati anchor (#bagian),
-     sedangkan navigasi SPA Livewire tidak menggulir ke fragmen. --}}
 <a href="{{ $tujuan }}"
    {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 rounded-md border border-krem-300 bg-kartu px-2.5 py-1 text-[12px] font-medium text-teks-700 hover:border-biru-700 hover:text-biru-700']) }}>
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true" class="size-3.5">

@@ -14,7 +14,6 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/** F2 — Profil Capaian Daerah. Perhitungan ada di ProfilCapaianService. */
 class ProfilCapaian extends Component
 {
     #[Url]
@@ -48,9 +47,7 @@ class ProfilCapaian extends Component
         $this->statusSatuan = '';
     }
 
-    /**
-     * @return Collection<int, int>
-     */
+    /** @return Collection<int, int> */
     #[Computed]
     public function tahunTersedia(): Collection
     {
@@ -63,9 +60,7 @@ class ProfilCapaian extends Component
             ->pluck('tahun_edisi');
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function provinsiTersedia(): Collection
     {
@@ -77,9 +72,7 @@ class ProfilCapaian extends Component
             ->pluck('provinsi');
     }
 
-    /**
-     * @return Collection<int, Wilayah>
-     */
+    /** @return Collection<int, Wilayah> */
     #[Computed]
     public function kabkotaTersedia(): Collection
     {
@@ -94,9 +87,7 @@ class ProfilCapaian extends Component
             ->get(['id', 'kabupaten_kota']);
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function jenisSatuanTersedia(): Collection
     {
@@ -111,9 +102,7 @@ class ProfilCapaian extends Component
             ->pluck('jenis_satuan');
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function statusSatuanTersedia(): Collection
     {
@@ -145,12 +134,7 @@ class ProfilCapaian extends Component
             ->untukWilayah($wilayah, $this->tahun, $this->jenisSatuan, $this->statusSatuan);
     }
 
-    /**
-     * Sekolah di kabupaten/kota terpilih yang berkas Rapor Pendidikan satuannya
-     * sudah diunggah kepala sekolahnya.
-     *
-     * @return Collection<int, array<string, mixed>>
-     */
+    /** @return Collection<int, array<string, mixed>> */
     #[Computed]
     public function sekolahDiWilayah(): Collection
     {

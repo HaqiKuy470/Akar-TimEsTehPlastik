@@ -14,17 +14,10 @@ use App\Support\SekolahPengguna;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-/**
- * Prioritas masalah dan akar masalah untuk satu sekolah. Layanan sama dengan
- * versi dinas; wilayah tetap sekolah milik pengguna. "Posisi relatif" pada skor
- * dibandingkan dengan agregat kabupaten, bukan sekolah lain (tak dipublikasikan).
- */
 class Prioritas extends Component
 {
-    /** @var list<int> */
     public array $rincianTerbuka = [];
 
-    /** @var list<int> */
     public array $akarTerbuka = [];
 
     #[Computed]
@@ -33,9 +26,7 @@ class Prioritas extends Component
         return app(SekolahPengguna::class)->untuk(auth()->user());
     }
 
-    /**
-     * @return array{tahun: int, jenis_satuan: string, status_satuan: string}|null
-     */
+    /** @return array{tahun: int, jenis_satuan: string, status_satuan: string}|null */
     #[Computed]
     public function kombinasi(): ?array
     {
@@ -125,9 +116,7 @@ class Prioritas extends Component
         ])->layout('layouts::app', ['header' => 'Prioritas']);
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
+    /** @return list<array<string, mixed>> */
     private function susunDaftar(Analisis $analisis): array
     {
         $prioritas = $analisis->prioritas;
@@ -170,9 +159,7 @@ class Prioritas extends Component
         })->all();
     }
 
-    /**
-     * @return array{dipetakan: bool, induk_label: string, kandidat: list<array<string, mixed>>}
-     */
+    /** @return array{dipetakan: bool, induk_label: string, kandidat: list<array<string, mixed>>} */
     private function susunAkar(int $prioritasId, string $indukLabel): array
     {
         $akar = AnalisisAkar::query()->where('analisis_prioritas_id', $prioritasId)->get();

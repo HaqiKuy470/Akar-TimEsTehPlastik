@@ -1,8 +1,4 @@
-{{--
-    Muat Chart.js sekali dan daftarkan komponen Alpine bersama.
-    Sertakan komponen ini SATU KALI per halaman yang memakai grafik AKAR.
-    Chart.js dari cdnjs (satu-satunya CDN skrip yang diizinkan CSP artefak).
---}}
+
 @assets
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 @endassets

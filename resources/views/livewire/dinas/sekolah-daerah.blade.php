@@ -28,7 +28,6 @@
         </x-kartu>
     @else
         <div class="grid gap-6 lg:grid-cols-[300px_1fr]">
-            {{-- Daftar sekolah --}}
             <div class="flex flex-col gap-3">
                 <x-judul-bagian :judul="'Sekolah di '.optional($this->kabupaten)->kabupaten_kota" :jumlah="$this->daftar->count().' sekolah'" />
                 <div class="flex flex-col gap-2">
@@ -51,8 +50,6 @@
                     @endforeach
                 </div>
             </div>
-
-            {{-- Profil sekolah terpilih --}}
             <div class="flex flex-col gap-5">
                 @php $profil = $this->profil; @endphp
 

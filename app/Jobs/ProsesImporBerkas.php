@@ -13,14 +13,6 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Bus;
 use Throwable;
 
-/**
- * Titik masuk impor berkas Data Rapor Pendidikan lewat antrean: mencatat berkas
- * dan memecah pekerjaan menjadi satu ProsesSheetProvinsi per sheet provinsi
- * (ARCHITECTURE.md bagian 4.3).
- *
- * Antrean cPanel dijalankan cron (`queue:work --stop-when-empty`), jadi setiap
- * job wajib idempoten dan aman diulang.
- */
 class ProsesImporBerkas implements ShouldQueue
 {
     use Queueable;
@@ -38,7 +30,6 @@ class ProsesImporBerkas implements ShouldQueue
         $hash = hash_file('sha256', $this->path);
         $impor = ImporBerkas::firstOrNew(['hash_berkas' => $hash]);
 
-        // Idempoten: berkas yang sama dan sudah selesai tidak diproses ulang.
         if ($impor->exists && $impor->status === 'selesai') {
             return;
         }
@@ -67,7 +58,6 @@ class ProsesImporBerkas implements ShouldQueue
             'diproses_pada' => null,
         ])->save();
 
-        // Mulai dari bersih bila ini percobaan kedua atas berkas yang sama.
         Capaian::where('impor_id', $impor->id)->delete();
 
         $imporId = $impor->id;
@@ -80,15 +70,11 @@ class ProsesImporBerkas implements ShouldQueue
 
         Bus::batch($jobs)
             ->name("Impor Rapor Pendidikan: {$impor->nama_berkas}")
-            ->allowFailures() // satu sheet gagal tidak membatalkan sisanya
+            ->allowFailures()
             ->finally(fn (Batch $batch) => self::selesaikan($imporId, $batch->failedJobs, $batch->totalJobs))
             ->dispatch();
     }
 
-    /**
-     * Kebijakan gagal-sebagian: selama ada satu sheet berhasil, impor `selesai`
-     * dengan catatan jumlah sheet gagal; `gagal` hanya bila semua sheet gagal.
-     */
     public static function selesaikan(int $imporId, int $gagal, int $total): void
     {
         $impor = ImporBerkas::find($imporId);

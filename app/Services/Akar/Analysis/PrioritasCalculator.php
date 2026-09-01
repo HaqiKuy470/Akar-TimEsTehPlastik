@@ -6,34 +6,15 @@ namespace App\Services\Akar\Analysis;
 
 use InvalidArgumentException;
 
-/**
- * Menghitung skor prioritas satu indikator bermasalah. Lihat ARCHITECTURE.md 6.2.
- *
- *   Skor = bobot.label     x nilai_label[label]
- *        + bobot.perubahan x nilai_perubahan[perubahan]
- *        + bobot.posisi    x bobot_posisi   (0..1 dari BenchmarkService)
- *        + bobot.turunan   x bobot_turunan  (0..1, proporsi anak bermasalah)
- *
- * Kelas MURNI (tanpa DB). Angka aturan dari config/akar.php. Keluaran menyertakan
- * rincian tiap komponen supaya skor dapat ditelusuri.
- *
- * "Tidak Tersedia" harus disaring pemanggil: skor nol menyamakan "tanpa data"
- * dengan "sudah baik".
- */
 class PrioritasCalculator
 {
-    /** @var array<string, int|float> */
     private array $bobotKomponen;
 
-    /** @var array<string, float> */
     private array $nilaiLabel;
 
-    /** @var array<string, float> */
     private array $nilaiPerubahan;
 
-    /**
-     * @param  array<string, mixed>|null  $config  isi config/akar.php; null = ambil dari container
-     */
+    /** @param  array<string, mixed>|null  $config  isi config/akar.php; null = ambil dari container */
     public function __construct(?array $config = null)
     {
         $config ??= (array) config('akar');
@@ -85,9 +66,7 @@ class PrioritasCalculator
         ];
     }
 
-    /**
-     * @return array{kode: string, nama: string, bobot_maks: int|float, nilai_0_1: float, kontribusi: float}
-     */
+    /** @return array{kode: string, nama: string, bobot_maks: int|float, nilai_0_1: float, kontribusi: float} */
     private function komponen(string $kode, string $nama, float $nilai): array
     {
         $bobot = $this->bobotKomponen[$kode] ?? 0;

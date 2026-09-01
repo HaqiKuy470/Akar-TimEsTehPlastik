@@ -8,14 +8,6 @@ use App\Models\Indikator;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-/**
- * Membaca CSV Metadata indikator Rapor Pendidikan menjadi baris tabel `indikator`.
- * Diproses lebih dulu dari sheet provinsi: memuat ambang merah/kuning/hijau resmi,
- * dan sheet provinsi merujuk indikator lewat nomor.
- *
- * Dua tahap yang keduanya dapat diuji: parse() murni (CSV -> array), impor()
- * menyimpan idempoten.
- */
 class MetadataIndikatorParser
 {
     private const KOLOM_WAJIB = [
@@ -26,9 +18,7 @@ class MetadataIndikatorParser
         'Ketersediaan Indikator di Tingkat Kabupaten/Kota',
     ];
 
-    /**
-     * @return array<int, array<string, mixed>> daftar atribut indikator siap simpan
-     */
+    /** @return array<int, array<string, mixed>> daftar atribut indikator siap simpan */
     public function parse(string $path): array
     {
         if (! is_readable($path)) {
@@ -79,12 +69,7 @@ class MetadataIndikatorParser
         }
     }
 
-    /**
-     * Simpan hasil parse ke tabel `indikator`, idempoten lewat kunci
-     * (nomor, jenis_layanan, nama).
-     *
-     * @return int jumlah indikator yang tersimpan
-     */
+    /** @return int jumlah indikator yang tersimpan */
     public function impor(string $path): int
     {
         $baris = $this->parse($path);
@@ -145,10 +130,6 @@ class MetadataIndikatorParser
         ];
     }
 
-    /**
-     * Isi induk_id: induk dari 'A.1.1' dan 'A.1.skor' adalah 'A.1'. Dibatasi jenis
-     * layanan yang sama; induk ambigu -> dibiarkan kosong.
-     */
     private function petakanInduk(): void
     {
         $indikator = Indikator::query()->get(['id', 'nomor', 'jenis_layanan']);
@@ -182,9 +163,7 @@ class MetadataIndikatorParser
         return implode('.', $bagian);
     }
 
-    /**
-     * @param  array<int, mixed>  $baris
-     */
+    /** @param  array<int, mixed>  $baris */
     private function barisKosong(array $baris): bool
     {
         foreach ($baris as $sel) {

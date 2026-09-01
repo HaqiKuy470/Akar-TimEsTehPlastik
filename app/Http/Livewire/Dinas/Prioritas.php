@@ -22,11 +22,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * F3 — Deteksi & Prioritisasi Masalah, dengan penelusuran akar masalah (F4)
- * sebagai rincian tiap kartu. Komponen hanya mengurus pilihan pengguna, memicu
- * layanan, dan menyusun tampilan; perhitungan ada di app/Services/Akar/.
- */
 class Prioritas extends Component
 {
     #[Url]
@@ -44,10 +39,8 @@ class Prioritas extends Component
     #[Url]
     public string $statusSatuan = '';
 
-    /** Id analisis_prioritas yang rincian skornya sedang dibuka. @var list<int> */
     public array $rincianTerbuka = [];
 
-    /** Id analisis_prioritas yang akar masalahnya sedang ditelusuri. @var list<int> */
     public array $akarTerbuka = [];
 
     public function mount(): void
@@ -66,7 +59,6 @@ class Prioritas extends Component
         $this->statusSatuan = '';
     }
 
-    /** Tutup semua panel saat pilihan berganti agar tak menampilkan analisis lama. */
     public function updated(string $name): void
     {
         if (in_array($name, ['tahun', 'provinsi', 'wilayahId', 'jenisSatuan', 'statusSatuan'], true)) {
@@ -75,7 +67,6 @@ class Prioritas extends Component
         }
     }
 
-    /** @return Collection<int, int> */
     #[Computed]
     public function tahunTersedia(): Collection
     {
@@ -88,7 +79,6 @@ class Prioritas extends Component
             ->pluck('tahun_edisi');
     }
 
-    /** @return Collection<int, string> */
     #[Computed]
     public function provinsiTersedia(): Collection
     {
@@ -100,7 +90,6 @@ class Prioritas extends Component
             ->pluck('provinsi');
     }
 
-    /** @return Collection<int, Wilayah> */
     #[Computed]
     public function kabkotaTersedia(): Collection
     {
@@ -115,7 +104,6 @@ class Prioritas extends Component
             ->get(['id', 'kabupaten_kota']);
     }
 
-    /** @return Collection<int, string> */
     #[Computed]
     public function jenisSatuanTersedia(): Collection
     {
@@ -130,7 +118,6 @@ class Prioritas extends Component
             ->pluck('jenis_satuan');
     }
 
-    /** @return Collection<int, string> */
     #[Computed]
     public function statusSatuanTersedia(): Collection
     {
@@ -155,10 +142,6 @@ class Prioritas extends Component
             && $this->statusSatuan !== '';
     }
 
-    /**
-     * Analisis terakhir untuk kombinasi terpilih. Menjalankan ulang menambah
-     * baris baru; riwayat lama tetap tersimpan.
-     */
     #[Computed]
     public function analisis(): ?Analisis
     {
@@ -233,7 +216,6 @@ class Prioritas extends Component
     {
         $this->akarTerbuka = $this->toggle($this->akarTerbuka, $prioritasId);
 
-        // Telusuri hanya saat panel dibuka; hasilnya disimpan lalu dibaca saat render.
         if (in_array($prioritasId, $this->akarTerbuka, true)) {
             $prioritas = AnalisisPrioritas::with('indikator', 'analisis')->find($prioritasId);
             if ($prioritas !== null) {
@@ -263,9 +245,7 @@ class Prioritas extends Component
         ])->layout('layouts::app', ['header' => 'Prioritas & akar masalah']);
     }
 
-    /**
-     * @return list<array<string, mixed>>
-     */
+    /** @return list<array<string, mixed>> */
     private function susunDaftar(Analisis $analisis): array
     {
         $prioritas = $analisis->prioritas;
@@ -326,9 +306,7 @@ class Prioritas extends Component
         })->all();
     }
 
-    /**
-     * @return array{dipetakan: bool, induk_label: string, kandidat: list<array<string, mixed>>}
-     */
+    /** @return array{dipetakan: bool, induk_label: string, kandidat: list<array<string, mixed>>} */
     private function susunAkar(int $prioritasId, string $indukLabel): array
     {
         $akar = AnalisisAkar::query()

@@ -10,12 +10,6 @@ use App\Services\Akar\Parsers\MetadataIndikatorParser;
 use Illuminate\Console\Command;
 use Throwable;
 
-/**
- * Impor berkas Rapor Pendidikan di mesin lokal (ARCHITECTURE.md 4.1).
- *
- * .csv = Metadata indikator, .xlsx = Data Rapor Pendidikan. Impor Metadata
- * harus lebih dulu; sheet provinsi merujuk indikator lewat nomor dan namanya.
- */
 class ImporRaporCommand extends Command
 {
     protected $signature = 'akar:impor
@@ -68,8 +62,6 @@ class ImporRaporCommand extends Command
             return self::SUCCESS;
         }
 
-        // Satu sheet provinsi butuh memori lebih besar dari default; aman karena
-        // impor hanya jalan di mesin lokal.
         $sebelumnya = ini_get('memory_limit');
         ini_set('memory_limit', '1024M');
 

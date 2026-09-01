@@ -11,17 +11,11 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
-/**
- * Memproses berkas Rapor Pendidikan satuan pendidikan yang diunggah pengguna,
- * di luar siklus request HTTP (CLAUDE.md).
- */
 class ProsesImporSekolah implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * @param  string  $lokasiRelatif  path berkas pada disk `local`
-     */
+    /** @param  string  $lokasiRelatif  path berkas pada disk `local` */
     public function __construct(
         public int $imporId,
         public string $lokasiRelatif,

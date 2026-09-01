@@ -1,6 +1,4 @@
 @props(['judul' => null, 'sub' => null, 'rapat' => false])
-
-{{-- Kartu: batas tegas di atas latar krem, tanpa bayangan (DESIGN.md 5). --}}
 <section {{ $attributes->merge(['class' => 'overflow-hidden rounded-[--radius-kartu] border border-krem-300 bg-kartu']) }}>
     @if ($judul || isset($aksi))
         <header class="flex items-start justify-between gap-4 border-b border-krem-300 px-5 py-3.5">

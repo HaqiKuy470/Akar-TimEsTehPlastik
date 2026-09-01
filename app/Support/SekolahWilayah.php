@@ -8,11 +8,6 @@ use App\Models\Capaian;
 use App\Models\Wilayah;
 use Illuminate\Support\Collection;
 
-/**
- * Menjawab "sekolah mana di kabupaten X yang sudah punya data?", agar analis
- * dinas bisa memakai capaian sekolah sebagai konteks. Hanya sekolah yang
- * berkasnya sudah diunggah dan diproses yang muncul, bukan seluruh sekolah.
- */
 class SekolahWilayah
 {
     /**

@@ -2,18 +2,12 @@
 
 namespace App\Models;
 
-use Database\Factories\RencanaAksiItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Satu baris rencana tindak lanjut: masalah, akar masalah, kegiatan usulan,
- * penanggung jawab, indikator keberhasilan, dan perkiraan waktu.
- */
 class RencanaAksiItem extends Model
 {
-    /** @use HasFactory<RencanaAksiItemFactory> */
     use HasFactory;
 
     protected $table = 'rencana_aksi_item';

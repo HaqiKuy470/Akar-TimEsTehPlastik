@@ -1,7 +1,4 @@
 @props(['label' => null, 'hint' => null])
-
-{{-- Pemilih bergaya konsisten dengan sistem. Tetap memakai <select> asli
-     agar perilaku wire:model, papan ketik, dan layar kecil tidak berubah. --}}
 <label {{ $attributes->only('class')->merge(['class' => 'flex min-w-0 flex-col gap-1.5']) }}>
     @if ($label)
         <span class="text-[11px] font-semibold uppercase tracking-[0.05em] text-teks-500">{{ $label }}</span>

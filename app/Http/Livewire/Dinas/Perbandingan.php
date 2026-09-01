@@ -14,7 +14,6 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/** F5 — Perbandingan Antardaerah. Perhitungan peringkat ada di BenchmarkService. */
 class Perbandingan extends Component
 {
     #[Url]
@@ -35,10 +34,8 @@ class Perbandingan extends Component
     #[Url]
     public ?int $indikatorId = null;
 
-    /** Kolom pengurutan tabel peringkat: 'peringkat' atau 'nama'. */
     public string $urutKolom = 'peringkat';
 
-    /** Arah pengurutan: 'asc' atau 'desc'. */
     public string $urutArah = 'asc';
 
     public function mount(): void
@@ -64,7 +61,6 @@ class Perbandingan extends Component
         $this->indikatorId = null;
     }
 
-    /** Kolom sama membalik arah, kolom lain mulai menaik. */
     public function urutkan(string $kolom): void
     {
         if ($this->urutKolom === $kolom) {
@@ -77,9 +73,7 @@ class Perbandingan extends Component
         $this->urutArah = 'asc';
     }
 
-    /**
-     * @return Collection<int, int>
-     */
+    /** @return Collection<int, int> */
     #[Computed]
     public function tahunTersedia(): Collection
     {
@@ -92,9 +86,7 @@ class Perbandingan extends Component
             ->pluck('tahun_edisi');
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function provinsiTersedia(): Collection
     {
@@ -106,9 +98,7 @@ class Perbandingan extends Component
             ->pluck('provinsi');
     }
 
-    /**
-     * @return Collection<int, Wilayah>
-     */
+    /** @return Collection<int, Wilayah> */
     #[Computed]
     public function kabkotaTersedia(): Collection
     {
@@ -123,9 +113,7 @@ class Perbandingan extends Component
             ->get(['id', 'kabupaten_kota']);
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function jenisSatuanTersedia(): Collection
     {
@@ -140,9 +128,7 @@ class Perbandingan extends Component
             ->pluck('jenis_satuan');
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function statusSatuanTersedia(): Collection
     {
@@ -158,11 +144,7 @@ class Perbandingan extends Component
             ->pluck('status_satuan');
     }
 
-    /**
-     * Diurutkan natural menurut nomor ("A.2" sebelum "A.10").
-     *
-     * @return Collection<int, Indikator>
-     */
+    /** @return Collection<int, Indikator> */
     #[Computed]
     public function indikatorTersedia(): Collection
     {
@@ -187,7 +169,6 @@ class Perbandingan extends Component
             ->values();
     }
 
-    /** Pilihan pengguna, atau indikator pertama yang tersedia bila belum memilih. */
     #[Computed]
     public function indikatorAktif(): ?Indikator
     {

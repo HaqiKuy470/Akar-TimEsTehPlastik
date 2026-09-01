@@ -11,19 +11,6 @@ use App\Models\Wilayah;
 use App\Services\Akar\PemetaanJenisLayanan;
 use Illuminate\Support\Collection;
 
-/**
- * Menyusun profil capaian satu wilayah: indikator relevan untuk kombinasi
- * wilayah/tahun/jenjang/status, dikelompokkan menurut dimensi, lengkap dengan
- * label, arah perubahan, dan ambang resmi.
- *
- * "Indikator relevan" = indikator yang pernah muncul sebagai kolom di berkas
- * untuk jenjang itu, bukan seluruh 274 metadata. Kolom yang ada tapi tanpa baris
- * untuk wilayah terpilih diperlakukan "Tidak Tersedia" (baris seperti itu tidak
- * disimpan saat impor), ditampilkan terpisah, bukan nol.
- *
- * Mode satuan: sumber data berkas kepala sekolah (ImporBerkas jenis 'satuan'),
- * disaring kolom `tersedia_satuan`. Bentuk keluaran identik dengan jalur daerah.
- */
 class ProfilCapaianService
 {
     /**
@@ -113,7 +100,6 @@ class ProfilCapaianService
 
             $ringkasan['total']++;
 
-            // Hitungan per dimensi mencakup "Tidak Tersedia" untuk grafik komposisi.
             $kode = $indikator->dimensi;
             $dimensi[$kode] ??= [
                 'kode' => $kode,
@@ -134,7 +120,6 @@ class ProfilCapaianService
             $dimensi[$kode]['indikator'][] = $entri;
         }
 
-        // Dimensi yang hanya berisi "Tidak Tersedia": dibuang dari tabel, tetap di grafik.
         $dimensiGrafik = array_values(array_filter(
             $dimensi,
             static fn ($d) => array_sum($d['hitung']) > 0,
@@ -154,7 +139,6 @@ class ProfilCapaianService
         ];
     }
 
-    /** Impor berkas daerah terakhir yang berhasil untuk sebuah tahun edisi. */
     private function imporDaerah(int $tahun): ?ImporBerkas
     {
         return ImporBerkas::query()
@@ -165,7 +149,6 @@ class ProfilCapaianService
             ->first();
     }
 
-    /** Impor berkas satuan terakhir yang menghasilkan capaian untuk sekolah ini. */
     private function imporSatuan(Wilayah $wilayah, int $tahun): ?ImporBerkas
     {
         $imporIds = Capaian::query()
@@ -187,8 +170,6 @@ class ProfilCapaianService
     }
 
     /**
-     * Indikator yang jadi kolom di berkas untuk jenjang ini, terurut natural.
-     *
      * @param  string  $kolomKetersediaan  'tersedia_kabkota' (daerah) / 'tersedia_satuan' (sekolah)
      * @return Collection<int, Indikator>
      */
@@ -214,7 +195,6 @@ class ProfilCapaianService
             ->values();
     }
 
-    /** "A.1.10" -> "A.001.010" supaya A.1.10 tak diurutkan sebelum A.1.2. */
     private function kunciUrut(string $nomor): string
     {
         return preg_replace_callback('/\d+/', static fn ($m) => str_pad($m[0], 3, '0', STR_PAD_LEFT), $nomor) ?? $nomor;

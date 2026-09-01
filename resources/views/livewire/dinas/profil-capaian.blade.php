@@ -352,10 +352,6 @@
                     </details>
                 </section>
             @endif
-
-            {{-- Jembatan ke area sekolah: sekolah di kabupaten ini yang sudah
-                 mengunggah berkasnya sendiri. Dua area tetap terpisah; ini
-                 hanya tautan konteks. --}}
             @if ($this->sekolahDiWilayah->isNotEmpty())
                 <div class="akar-chart-wrap">
                     <div class="mb-3 flex items-center gap-3">

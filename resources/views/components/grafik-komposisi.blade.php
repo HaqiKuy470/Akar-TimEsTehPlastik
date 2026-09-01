@@ -32,8 +32,6 @@
             <h3 class="text-[13px] font-semibold uppercase tracking-[0.05em] text-teks-700">{{ $judul }}</h3>
             <span class="h-px flex-1 bg-krem-300"></span>
         </div>
-
-        {{-- Legenda: ikon + teks, tidak mengandalkan warna saja (DESIGN.md 2). --}}
         <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-[12px] text-teks-700">
             <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-[2px]" style="background:var(--color-grafik-kurang)"></span>Kurang</span>
             <span class="inline-flex items-center gap-1.5"><span class="size-2.5 rounded-[2px]" style="background:var(--color-grafik-sedang)"></span>Sedang</span>

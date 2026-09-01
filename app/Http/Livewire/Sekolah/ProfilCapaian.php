@@ -11,10 +11,6 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/**
- * Profil capaian satu sekolah (mode satuan pendidikan): wilayahnya tetap sekolah
- * milik pengguna, tanpa pemilih wilayah seperti versi dinas.
- */
 class ProfilCapaian extends Component
 {
     #[Url]
@@ -38,9 +34,7 @@ class ProfilCapaian extends Component
         return app(SekolahPengguna::class)->untuk(auth()->user());
     }
 
-    /**
-     * @return Collection<int, array{tahun: int, jenis_satuan: string, status_satuan: string}>
-     */
+    /** @return Collection<int, array{tahun: int, jenis_satuan: string, status_satuan: string}> */
     #[Computed]
     public function kombinasiTersedia(): Collection
     {
@@ -52,14 +46,12 @@ class ProfilCapaian extends Component
         return collect(app(SekolahPengguna::class)->kombinasi($sekolah));
     }
 
-    /** @return Collection<int, string> */
     #[Computed]
     public function jenjangTersedia(): Collection
     {
         return $this->kombinasiTersedia()->pluck('jenis_satuan')->unique()->values();
     }
 
-    /** @return Collection<int, string> */
     #[Computed]
     public function statusTersedia(): Collection
     {

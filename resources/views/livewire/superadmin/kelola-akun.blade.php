@@ -10,7 +10,6 @@
     @endif
 
     <div class="grid gap-6 lg:grid-cols-[360px_1fr]">
-        {{-- Formulir buat akun --}}
         <x-kartu judul="Buat akun baru">
             <form wire:submit="buatAkun" class="flex flex-col gap-4">
                 <label class="flex flex-col gap-1.5">
@@ -48,8 +47,6 @@
                 </x-tombol>
             </form>
         </x-kartu>
-
-        {{-- Daftar akun --}}
         <div class="flex flex-col gap-3">
             <x-judul-bagian judul="Akun terdaftar" :jumlah="$daftar->count().' akun'" />
 

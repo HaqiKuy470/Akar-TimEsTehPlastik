@@ -14,30 +14,13 @@ use App\Services\Akar\PemetaanJenisLayanan;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
-/**
- * F4 - Analisis Akar Masalah: menelusuri dari gejala (indikator prioritas merah)
- * ke penyebab lewat pohon keputusan di config/intervensi.php (bukan di kode).
- *
- * Per indikator prioritas: ambil kandidat akar dari konfigurasi (kosong = belum
- * dipetakan, pemanggil menyatakan "rekomendasi belum tersedia", tidak mengarang),
- * periksa label indikator pendukung, terapkan gerbang 'ambang'. Bila ada kandidat
- * lolos, hanya itu yang jadi hipotesis; bila tidak, semua dicatat dengan keyakinan
- * "tidak_cukup_bukti" (PRD F4). Keyakinan mengikuti ARCHITECTURE.md 6.3.
- *
- * Label "Tidak Tersedia" tidak dihitung sebagai bukti maupun populasi gerbang.
- */
 class AkarMasalahAnalyzer
 {
     private const LABEL_BUKTI = ['Kurang', 'Sedang'];
 
     private const TIDAK_TERSEDIA = 'Tidak Tersedia';
 
-    /**
-     * Telusuri akar masalah untuk satu indikator prioritas dan simpan hasilnya.
-     * Idempoten: baris analisis_akar lama dihapus lebih dulu.
-     *
-     * @return Collection<int, AnalisisAkar> diurutkan dari keyakinan terkuat
-     */
+    /** @return Collection<int, AnalisisAkar> diurutkan dari keyakinan terkuat */
     public function telusuri(AnalisisPrioritas $prioritas): Collection
     {
         $prioritas->loadMissing('indikator', 'analisis');
@@ -70,7 +53,6 @@ class AkarMasalahAnalyzer
 
         $baris = collect();
         foreach ($dinilai as $d) {
-            // Bila ada kandidat lolos gerbang, yang tidak lolos diabaikan.
             if ($adaYangLolos && ! $d['lolos']) {
                 continue;
             }
@@ -90,11 +72,7 @@ class AkarMasalahAnalyzer
             ->values();
     }
 
-    /**
-     * Telusuri akar masalah untuk seluruh indikator prioritas dalam satu analisis.
-     *
-     * @return Collection<int, AnalisisAkar>
-     */
+    /** @return Collection<int, AnalisisAkar> */
     public function telusuriAnalisis(Analisis $analisis): Collection
     {
         return $analisis->prioritas()
@@ -103,18 +81,13 @@ class AkarMasalahAnalyzer
             ->flatMap(fn (AnalisisPrioritas $prioritas) => $this->telusuri($prioritas));
     }
 
-    /**
-     * @return array<string, array<string, mixed>>
-     */
+    /** @return array<string, array<string, mixed>> */
     private function petaIntervensi(): array
     {
         return (array) config('intervensi', []);
     }
 
     /**
-     * Label capaian tiap indikator pendukung. Indikator tak dikenal atau tanpa
-     * baris capaian dilaporkan "Tidak Tersedia".
-     *
      * @param  list<string>  $nomorPeriksa
      * @return list<array{nomor: string, nama: string|null, label: string}>
      */
@@ -159,9 +132,7 @@ class AkarMasalahAnalyzer
         return $hasil;
     }
 
-    /**
-     * @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung
-     */
+    /** @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung */
     private function lolosAmbang(string $ambang, array $pendukung): bool
     {
         $kurang = $this->hitungLabel($pendukung, 'Kurang');
@@ -179,11 +150,7 @@ class AkarMasalahAnalyzer
         };
     }
 
-    /**
-     * Tabel keyakinan ARCHITECTURE.md 6.3.
-     *
-     * @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung
-     */
+    /** @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung */
     private function hitungKeyakinan(array $pendukung): Keyakinan
     {
         $kurang = $this->hitungLabel($pendukung, 'Kurang');
@@ -198,17 +165,13 @@ class AkarMasalahAnalyzer
         };
     }
 
-    /**
-     * @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung
-     */
+    /** @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung */
     private function hitungLabel(array $pendukung, string $label): int
     {
         return count(array_filter($pendukung, fn (array $p) => $p['label'] === $label));
     }
 
     /**
-     * Hanya pendukung berlabel Kurang/Sedang yang dicatat sebagai bukti.
-     *
      * @param  list<array{nomor: string, nama: string|null, label: string}>  $pendukung
      * @return list<array{nomor: string, nama: string|null, label: string}>
      */

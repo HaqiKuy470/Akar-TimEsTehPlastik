@@ -8,17 +8,8 @@ use App\Models\Capaian;
 use App\Models\Indikator;
 use App\Models\Wilayah;
 
-/**
- * F6 — Analisis Tren Lintas Tahun: indikator mana yang memburuk dua tahun
- * berturut-turut dan mana yang membaik konsisten.
- *
- * Perbandingan antar tahun memakai jenjang mutu label config/akar.php
- * (Baik > Sedang > Kurang). Tahun tanpa baris capaian = "Tidak Tersedia" pada
- * tahun itu; memutus rangkaian penilaian, bukan dianggap penurunan.
- */
 class TrenService
 {
-    /** Warna garis grafik per klasifikasi; lihat token --color-grafik-* di app.css. */
     private const WARNA_KLASIFIKASI = [
         'memburuk_berturut' => '#b4231a',
         'membaik_konsisten' => '#2f7d3f',
@@ -64,7 +55,6 @@ class TrenService
             return $rangka;
         }
 
-        /** @var array<int, array<int, string>> $labelPerIndikator [indikator_id][tahun] => label */
         $labelPerIndikator = [];
         foreach ($baris as $b) {
             $labelPerIndikator[$b->indikator_id][$b->tahun] = $b->label_capaian;
@@ -128,11 +118,7 @@ class TrenService
         return $rangka;
     }
 
-    /**
-     * Tahun edisi yang memuat jenjang & status ini, dari data capaian.
-     *
-     * @return list<int>
-     */
+    /** @return list<int> */
     private function tahunEdisi(string $jenisSatuan, string $statusSatuan): array
     {
         return Capaian::query()
@@ -145,9 +131,7 @@ class TrenService
             ->all();
     }
 
-    /**
-     * @param  list<int|null>  $nilai  nilai mutu per tahun terurut; null = Tidak Tersedia
-     */
+    /** @param  list<int|null>  $nilai  nilai mutu per tahun terurut; null = Tidak Tersedia */
     private function klasifikasikan(array $nilai): string
     {
         $turunBeruntunMaks = 0;
@@ -186,9 +170,6 @@ class TrenService
     }
 
     /**
-     * Grafik hanya menampilkan indikator yang bergerak; bila hampir tak ada,
-     * beberapa indikator stabil ditambahkan sebagai konteks. Maks 7 garis.
-     *
      * @param  list<array<string, mixed>>  $baris
      * @return list<array<string, mixed>>
      */
@@ -227,9 +208,6 @@ class TrenService
         return $seri;
     }
 
-    /**
-     * "A.1.10" -> "A.001.010" agar pengurutan tidak menaruh A.1.10 sebelum A.1.2.
-     */
     private function kunciUrut(string $nomor): string
     {
         return preg_replace_callback('/\d+/', static fn ($m) => str_pad($m[0], 3, '0', STR_PAD_LEFT), $nomor) ?? $nomor;

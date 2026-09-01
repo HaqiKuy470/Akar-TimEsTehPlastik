@@ -9,10 +9,6 @@ use App\Support\SekolahPengguna;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-/**
- * Beranda mode satuan pendidikan: mengajak mengunggah berkas bila belum ada,
- * atau menampilkan ringkasan capaian sekolah bila sudah.
- */
 class Beranda extends Component
 {
     #[Computed]
@@ -27,9 +23,7 @@ class Beranda extends Component
         return app(SekolahPengguna::class)->imporTerakhir(auth()->user());
     }
 
-    /**
-     * @return array{tahun: int, jenis_satuan: string, status_satuan: string}|null
-     */
+    /** @return array{tahun: int, jenis_satuan: string, status_satuan: string}|null */
     #[Computed]
     public function kombinasi(): ?array
     {

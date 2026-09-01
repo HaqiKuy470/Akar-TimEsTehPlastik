@@ -2,22 +2,13 @@
 
 namespace App\Models;
 
-use Database\Factories\AnalisisPrioritasFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * Skor prioritas satu indikator bermasalah dalam sebuah analisis.
- *
- * Kolom `komponen_skor` menyimpan rincian tiap komponen pembentuk skor
- * (label, perubahan, posisi relatif, dampak turunan) supaya skor dapat
- * ditelusuri, bukan sekadar satu angka.
- */
 class AnalisisPrioritas extends Model
 {
-    /** @use HasFactory<AnalisisPrioritasFactory> */
     use HasFactory;
 
     protected $table = 'analisis_prioritas';

@@ -8,15 +8,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Memisahkan area aplikasi (akun / dinas / sekolah) menurut peran. Pengguna di
- * luar wewenangnya dialihkan ke berandanya sendiri, bukan ditolak dengan galat.
- * Area sekolah tidak dibatasi peran karena datanya sudah terisolasi per
- * pengunggah (SekolahPengguna).
- *
- * Dipakai lewat nama kelas langsung di routes/web.php
- * (`AreaPeran::class.':dinas'`), tanpa alias di bootstrap/app.php.
- */
 class AreaPeran
 {
     public function handle(Request $request, Closure $next, string $area): Response

@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Akar\Analysis;
 
-/**
- * Merangkai kalimat penjelas Indonesia biasa untuk satu indikator prioritas,
- * dari fakta analisis (bukan angka skor mentah). Tidak pernah kosong: minimal
- * kondisi label dan arah perubahan selalu dijelaskan.
- */
 class PenjelasGenerator
 {
     /**
@@ -37,7 +32,6 @@ class PenjelasGenerator
             $kalimat[] = $peringkat;
         }
 
-        // Mode satuan: pembandingnya agregat kabupaten induk, bukan peringkat.
         $kabupaten = $this->kalimatKabupaten($konteks['pembanding_kabupaten'] ?? null, $konteks['label'] ?? null);
         if ($kabupaten !== null) {
             $kalimat[] = $kabupaten;
@@ -84,9 +78,7 @@ class PenjelasGenerator
         return "Berada di peringkat {$peringkat} dari {$dari} kabupaten/kota di provinsi yang sama.";
     }
 
-    /**
-     * @param  array{nama?: string, label?: string, tersedia?: bool}|null  $kabupaten
-     */
+    /** @param  array{nama?: string, label?: string, tersedia?: bool}|null  $kabupaten */
     private function kalimatKabupaten(?array $kabupaten, ?string $labelSekolah): ?string
     {
         if ($kabupaten === null || ($kabupaten['tersedia'] ?? false) !== true) {

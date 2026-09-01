@@ -15,16 +15,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use RuntimeException;
 
-/**
- * Sheet provinsi berkas Rapor Pendidikan Indonesia -> tabel `wilayah` + `capaian`.
- *
- * Memuat satu sheet sekaligus via PhpSpreadsheet lalu melepasnya; WithChunkReading
- * membuka ulang berkas 21 MB per potongan (terlalu lambat untuk 38 sheet). Impor
- * daerah hanya jalan di lokal, jadi memory_limit dinaikkan di perintah artisan.
- *
- * Baris berlabel "Tidak Tersedia" tidak disimpan (mayoritas kombinasi wilayah x
- * indikator kosong -> jutaan baris, menabrak kuota cPanel). Ketiadaan baris = kosong.
- */
 class CapaianDaerahParser
 {
     private const LABEL_SAH = ['Baik', 'Sedang', 'Kurang', 'Tidak Tersedia'];
@@ -44,19 +34,13 @@ class CapaianDaerahParser
      */
     private ?array $indeksIndikator = null;
 
-    /** Kunci "level|provinsi|kabkota" => id. */
     private array $cacheWilayah = [];
 
     private array $indikatorTakDikenal = [];
 
     public function __construct(private readonly HeaderResolver $headerResolver) {}
 
-    /**
-     * Impor seluruh sheet provinsi dari satu berkas .xlsx. Idempoten lewat hash
-     * berkas; percobaan ulang menghapus capaian lama lebih dulu.
-     *
-     * @param  callable(string $namaSheet, int $indeks, int $total): void|null  $laporProgres
-     */
+    /** @param  callable(string $namaSheet, int $indeks, int $total): void|null  $laporProgres */
     public function impor(string $path, ?callable $laporProgres = null): ImporBerkas
     {
         if (! is_file($path)) {
@@ -88,7 +72,6 @@ class CapaianDaerahParser
             'catatan_galat' => null,
         ])->save();
 
-        // Ulang dari bersih bila ini percobaan kedua.
         Capaian::where('impor_id', $impor->id)->delete();
 
         $this->indeksIndikator = null;
@@ -122,21 +105,12 @@ class CapaianDaerahParser
         return $impor;
     }
 
-    /**
-     * Daftar nama sheet provinsi (tanpa Metadata dan Nasional). Dipakai jalur
-     * antrean yang memecah impor menjadi satu job per sheet.
-     *
-     * @return list<string>
-     */
+    /** @return list<string> */
     public function sheetProvinsi(string $path): array
     {
         return $this->daftarSheetProvinsi($path);
     }
 
-    /**
-     * Deteksi tahun edisi dari isi berkas. Dipakai jalur antrean untuk mengunci
-     * tahun sebelum sheet dipecah menjadi job terpisah.
-     */
     public function deteksiTahunBerkas(string $path): int
     {
         $sheet = $this->daftarSheetProvinsi($path);
@@ -150,7 +124,6 @@ class CapaianDaerahParser
         return $this->deteksiTahun($path, $sheet[0]);
     }
 
-    /** Hapus capaian satu provinsi untuk sebuah impor, agar job sheet aman diulang. */
     public function bersihkanSheet(int $imporId, string $provinsi): void
     {
         Capaian::query()
@@ -159,7 +132,6 @@ class CapaianDaerahParser
             ->delete();
     }
 
-    /** Impor satu sheet provinsi; mengembalikan jumlah baris data yang diproses. */
     public function imporSheet(string $path, string $namaSheet, ImporBerkas $impor, ?int $tahun = null): int
     {
         $tahun ??= $this->deteksiTahun($path, $namaSheet);
@@ -202,7 +174,7 @@ class CapaianDaerahParser
             foreach ($pasangan as $p) {
                 $label = $this->bakukanLabel($this->sel($nilai, $p['kolom_label']));
                 if ($label === self::NILAI_KOSONG) {
-                    continue; // tidak disimpan, lihat catatan kelas
+                    continue;
                 }
 
                 $indikatorId = $this->indikatorId($p['nomor'], $p['nama'], $jenisLayanan);
@@ -240,16 +212,11 @@ class CapaianDaerahParser
             Capaian::insert($batch);
         }
 
-        // Lepas sheet dari memori sebelum sheet berikutnya.
         $sheet->getParent()?->disconnectWorksheets();
         gc_collect_cycles();
 
         return $jumlah;
     }
-
-    // ------------------------------------------------------------------
-    // Pembacaan berkas
-    // ------------------------------------------------------------------
 
     private function muatSheet(string $path, string $namaSheet): Worksheet
     {
@@ -268,9 +235,7 @@ class CapaianDaerahParser
         return $sheet;
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     private function daftarSheetProvinsi(string $path): array
     {
         $reader = new Xlsx;
@@ -282,10 +247,6 @@ class CapaianDaerahParser
         ));
     }
 
-    /**
-     * Tahun edisi dari isi berkas, bukan nama berkas (nama berkas kerap memuat
-     * dua tahun). Judul kolom baris 8 "Label Capaian 2025" -> 2025.
-     */
     private function deteksiTahun(string $path, string $namaSheet): int
     {
         $reader = new Xlsx;
@@ -315,9 +276,7 @@ class CapaianDaerahParser
         );
     }
 
-    /**
-     * @return array<int, string|int|float|null> nilai per nomor kolom (1-based)
-     */
+    /** @return array<int, string|int|float|null> nilai per nomor kolom (1-based) */
     private function bacaBaris(Row $baris, string $hurufTerakhir, int $kolomTerakhir): array
     {
         $nilai = [];
@@ -336,10 +295,6 @@ class CapaianDaerahParser
         return $nilai;
     }
 
-    // ------------------------------------------------------------------
-    // Peta header
-    // ------------------------------------------------------------------
-
     /**
      * @param  array<int, array<string, string|null>>  $peta
      * @return array<string, int> nama dimensi => nomor kolom
@@ -357,8 +312,6 @@ class CapaianDaerahParser
     }
 
     /**
-     * Pasangkan kolom label dengan kolom perubahan untuk tiap indikator.
-     *
      * @param  array<int, array<string, string|null>>  $peta
      * @return list<array{nomor:string, nama:string, kolom_label:int, kolom_perubahan:int|null}>
      */
@@ -386,7 +339,6 @@ class CapaianDaerahParser
                 continue;
             }
 
-            // peran perubahan
             if ($labelTertunda !== null && $labelTertunda['nomor'] === $entri['nomor']) {
                 $pasangan[] = $labelTertunda + ['kolom_perubahan' => $kolom];
                 $labelTertunda = null;
@@ -400,21 +352,13 @@ class CapaianDaerahParser
         return $pasangan;
     }
 
-    /**
-     * @param  array<int, array<string, string|null>>  $peta
-     */
+    /** @param  array<int, array<string, string|null>>  $peta */
     private function kolomTerakhir(array $peta): int
     {
         return $peta === [] ? 4 : max(array_keys($peta));
     }
 
-    // ------------------------------------------------------------------
-    // Pemetaan indikator
-    // ------------------------------------------------------------------
-
-    /**
-     * @return array{nomorNama: array<string,int>, nomorJenis: array<string,int>, nomor: array<string,list<int>>}
-     */
+    /** @return array{nomorNama: array<string,int>, nomorJenis: array<string,int>, nomor: array<string,list<int>>} */
     private function bangunIndeksIndikator(): array
     {
         $nomorNama = [];
@@ -435,10 +379,6 @@ class CapaianDaerahParser
         return ['nomorNama' => $nomorNama, 'nomorJenis' => $nomorJenis, 'nomor' => $nomor];
     }
 
-    /**
-     * Prioritas pencocokan: (nomor + nama) -> (nomor + jenis layanan) ->
-     * satu-satunya kandidat dengan nomor itu -> null.
-     */
     private function indikatorId(string $nomor, string $nama, string $jenisLayanan): ?int
     {
         $indeks = $this->indeksIndikator;
@@ -461,14 +401,6 @@ class CapaianDaerahParser
         return PemetaanJenisLayanan::dari($jenisSatuan);
     }
 
-    // ------------------------------------------------------------------
-    // Wilayah
-    // ------------------------------------------------------------------
-
-    /**
-     * Baris dengan Kabupaten/Kota bernilai "-" adalah agregat provinsi, disimpan
-     * sebagai wilayah level provinsi dan dipakai sebagai pembanding.
-     */
     private function wilayahId(string $provinsi, ?string $kabkota): int
     {
         $agregatProvinsi = $kabkota === null || $kabkota === '' || $kabkota === '-';
@@ -504,10 +436,6 @@ class CapaianDaerahParser
         return $this->cacheWilayah[$kunci] = $wilayah->id;
     }
 
-    // ------------------------------------------------------------------
-    // Pembakuan nilai
-    // ------------------------------------------------------------------
-
     private function bakukanLabel(string|int|float|null $nilai): string
     {
         $nilai = is_string($nilai) ? trim($nilai) : (string) ($nilai ?? '');
@@ -522,13 +450,7 @@ class CapaianDaerahParser
         return in_array($nilai, self::PERUBAHAN_SAH, true) ? $nilai : self::NILAI_KOSONG;
     }
 
-    // ------------------------------------------------------------------
-    // Utilitas kecil
-    // ------------------------------------------------------------------
-
-    /**
-     * @param  array<int, string|int|float|null>  $nilai
-     */
+    /** @param  array<int, string|int|float|null>  $nilai */
     private function sel(array $nilai, ?int $kolom): ?string
     {
         if ($kolom === null) {
@@ -543,9 +465,7 @@ class CapaianDaerahParser
         return $isi === '' ? null : $isi;
     }
 
-    /**
-     * @param  array<int, string|int|float|null>  $nilai
-     */
+    /** @param  array<int, string|int|float|null>  $nilai */
     private function barisKosong(array $nilai): bool
     {
         foreach ($nilai as $sel) {

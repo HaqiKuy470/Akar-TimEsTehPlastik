@@ -13,10 +13,6 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-/**
- * F9 — halaman masuk. Tanpa Fortify/Breeze: kebutuhannya sederhana (akun peran,
- * tanpa pendaftaran mandiri), jadi login ditangani langsung di komponen ini.
- */
 #[Layout('layouts.tamu')]
 #[Title('Masuk')]
 class Login extends Component
@@ -53,7 +49,6 @@ class Login extends Component
         $this->redirectIntended($beranda, navigate: true);
     }
 
-    /** Batasi 5 percobaan gagal per menit per pasangan email + IP. */
     private function pastikanTidakDibatasi(): void
     {
         if (! RateLimiter::tooManyAttempts($this->kunciPembatas(), maxAttempts: 5)) {

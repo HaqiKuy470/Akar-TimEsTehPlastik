@@ -12,11 +12,6 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/**
- * F6 — Analisis Tren Lintas Tahun. Perhitungan ada di TrenService.
- *
- * Tidak ada tahun yang dipilih pengguna: tren memakai seluruh edisi yang ada.
- */
 class Tren extends Component
 {
     #[Url]
@@ -36,9 +31,7 @@ class Tren extends Component
         $this->wilayahId = null;
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function provinsiTersedia(): Collection
     {
@@ -50,9 +43,7 @@ class Tren extends Component
             ->pluck('provinsi');
     }
 
-    /**
-     * @return Collection<int, Wilayah>
-     */
+    /** @return Collection<int, Wilayah> */
     #[Computed]
     public function kabkotaTersedia(): Collection
     {
@@ -67,18 +58,14 @@ class Tren extends Component
             ->get(['id', 'kabupaten_kota']);
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function jenisSatuanTersedia(): Collection
     {
         return Capaian::query()->orderBy('jenis_satuan')->distinct()->pluck('jenis_satuan');
     }
 
-    /**
-     * @return Collection<int, string>
-     */
+    /** @return Collection<int, string> */
     #[Computed]
     public function statusSatuanTersedia(): Collection
     {
@@ -93,9 +80,7 @@ class Tren extends Component
             ->pluck('status_satuan');
     }
 
-    /**
-     * @return array<string, mixed>|null
-     */
+    /** @return array<string, mixed>|null */
     #[Computed]
     public function tren(): ?array
     {

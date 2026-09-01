@@ -7,10 +7,6 @@ namespace App\Http\Livewire;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-/**
- * Halaman panduan penggunaan AKAR. Bobot skor dibaca dari config/akar.php
- * hanya untuk ditampilkan apa adanya.
- */
 #[Title('Panduan')]
 class Panduan extends Component
 {

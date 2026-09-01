@@ -2,22 +2,13 @@
 
 namespace App\Models;
 
-use Database\Factories\AnalisisFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * Satu kali proses analisis untuk kombinasi wilayah + tahun + jenjang + status.
- *
- * Kolom `bobot_dipakai` menyimpan salinan config/akar.php saat analisis
- * dijalankan, sehingga hasil lama tetap dapat direproduksi walau konfigurasi
- * berubah kemudian.
- */
 class Analisis extends Model
 {
-    /** @use HasFactory<AnalisisFactory> */
     use HasFactory;
 
     protected $table = 'analisis';

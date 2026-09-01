@@ -2,19 +2,13 @@
 
 namespace App\Models;
 
-use Database\Factories\RencanaAksiFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * Draf rencana tindak lanjut yang disusun dari hasil analisis. Pengguna
- * menyunting, menambah, dan menghapus item sebelum mengekspornya.
- */
 class RencanaAksi extends Model
 {
-    /** @use HasFactory<RencanaAksiFactory> */
     use HasFactory;
 
     protected $table = 'rencana_aksi';

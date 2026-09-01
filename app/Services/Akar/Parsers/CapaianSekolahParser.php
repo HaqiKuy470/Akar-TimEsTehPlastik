@@ -14,18 +14,6 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use RuntimeException;
 use Throwable;
 
-/**
- * Berkas Rapor Pendidikan tingkat satuan pendidikan -> tabel `wilayah`
- * (level `satuan`) + `capaian`.
- *
- * PERINGATAN: belum pernah diuji dengan berkas asli (PRD 4.3). Dibangun atas
- * dugaan bahwa strukturnya menyerupai berkas daerah (header 3 baris ter-merge,
- * dimensi kolom 1-4, pasangan label/perubahan per indikator). Berkas yang tak
- * cocok ditolak dengan pesan jelas, bukan dikarang.
- *
- * Berkas satuan kecil, jadi satu sheet dimuat penuh. "Tidak Tersedia" tidak
- * disimpan (konsisten dengan CapaianDaerahParser).
- */
 class CapaianSekolahParser
 {
     private const LABEL_SAH = ['Baik', 'Sedang', 'Kurang', 'Tidak Tersedia'];
@@ -34,18 +22,14 @@ class CapaianSekolahParser
 
     private const NILAI_KOSONG = 'Tidak Tersedia';
 
-    /** Baris judul yang bukan nama satuan pendidikan. */
     private const AWALAN_ABAIKAN = ['berdasarkan', 'catatan', 'sumber'];
 
-    /** @var array<string, int> cache wilayah dalam satu impor */
     private array $cacheWilayah = [];
 
-    /** @var array<string, list<int>> */
     private array $indeksIndikator = [];
 
     public function __construct(private readonly HeaderResolver $headerResolver) {}
 
-    /** Impor berkas satuan; catatan impor dikunci lewat hash isi berkas (idempoten). */
     public function impor(string $path, ?string $namaSatuan = null): ImporBerkas
     {
         if (! is_file($path)) {
@@ -58,10 +42,6 @@ class CapaianSekolahParser
         return $impor;
     }
 
-    /**
-     * Impor ke catatan impor yang sudah ada, agar transisi status berkas terlihat
-     * di antarmuka sepanjang proses.
-     */
     public function imporKe(ImporBerkas $impor, string $path, ?string $namaSatuan = null): void
     {
         if (! is_file($path)) {
@@ -119,7 +99,6 @@ class CapaianSekolahParser
             );
         }
 
-        // Header = tiga baris tepat di atas baris judul kolom.
         $b6 = $awal[$barisJudulKolom - 3] ?? [];
         $b7 = $awal[$barisJudulKolom - 2] ?? [];
         $b8 = $awal[$barisJudulKolom - 1] ?? [];
@@ -205,15 +184,13 @@ class CapaianSekolahParser
         return $jumlah;
     }
 
-    /**
-     * @param  array<int, array<int, mixed>>  $baris
-     */
+    /** @param  array<int, array<int, mixed>>  $baris */
     private function cariBarisLabelCapaian(array $baris): ?int
     {
         foreach ($baris as $i => $r) {
             foreach ($r as $sel) {
                 if (is_string($sel) && stripos($sel, 'Label Capaian') !== false) {
-                    return $i + 1; // 1-based
+                    return $i + 1;
                 }
             }
         }
@@ -221,12 +198,7 @@ class CapaianSekolahParser
         return null;
     }
 
-    /**
-     * Nama satuan dari baris judul. Format dugaan:
-     * "DATA HASIL RAPOR PENDIDIKAN 2025 - SD NEGERI ... (NPSN ...)".
-     *
-     * @param  array<int, array<int, mixed>>  $barisJudul
-     */
+    /** @param  array<int, array<int, mixed>>  $barisJudul */
     private function namaSatuanDari(array $barisJudul): string
     {
         foreach ($barisJudul as $r) {
@@ -245,7 +217,6 @@ class CapaianSekolahParser
                     }
                 }
 
-                // Ambil bagian setelah tanda pisah " - " bila ada.
                 if (str_contains($teks, ' - ')) {
                     $teks = trim(substr($teks, strrpos($teks, ' - ') + 3));
                 }
@@ -327,9 +298,7 @@ class CapaianSekolahParser
         return $pasangan;
     }
 
-    /**
-     * @return array<string, list<int>>
-     */
+    /** @return array<string, list<int>> */
     private function bangunIndeksIndikator(): array
     {
         $out = [];
@@ -396,9 +365,7 @@ class CapaianSekolahParser
         return $this->cacheWilayah[$kunci] = $satuan->id;
     }
 
-    /**
-     * @param  list<string>  $sah
-     */
+    /** @param  list<string>  $sah */
     private function bakukan(string|int|float|null $nilai, array $sah): string
     {
         $nilai = is_string($nilai) ? trim($nilai) : (string) ($nilai ?? '');
@@ -406,9 +373,7 @@ class CapaianSekolahParser
         return in_array($nilai, $sah, true) ? $nilai : self::NILAI_KOSONG;
     }
 
-    /**
-     * @param  array<int, mixed>  $nilai
-     */
+    /** @param  array<int, mixed>  $nilai */
     private function sel(array $nilai, ?int $kolom): ?string
     {
         if ($kolom === null) {
@@ -423,9 +388,7 @@ class CapaianSekolahParser
         return $isi === '' ? null : $isi;
     }
 
-    /**
-     * @param  array<int, mixed>  $nilai
-     */
+    /** @param  array<int, mixed>  $nilai */
     private function barisKosong(array $nilai): bool
     {
         foreach ($nilai as $sel) {

@@ -25,7 +25,6 @@
         lead="Cara membaca setiap halaman, arti label dan skor, serta batasan yang perlu diketahui sebelum memakai hasilnya untuk perencanaan." />
 
     <div class="grid gap-6 lg:grid-cols-[200px_1fr]">
-        {{-- Daftar isi lengket --}}
         <nav class="hidden lg:block">
             <div class="sticky top-20 flex flex-col gap-1 text-[13px]">
                 <span class="px-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-teks-400">Isi panduan</span>
@@ -37,7 +36,6 @@
         </nav>
 
         <div class="flex flex-col gap-5">
-            {{-- ALUR --}}
             <section id="alur" class="scroll-mt-20">
                 <x-kartu judul="Alur kerja">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -64,8 +62,6 @@
                     </ol>
                 </x-kartu>
             </section>
-
-            {{-- PROFIL --}}
             <section id="profil" class="scroll-mt-20">
                 <x-kartu judul="Membaca profil capaian">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -96,8 +92,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- PRIORITAS --}}
             <section id="prioritas" class="scroll-mt-20">
                 <x-kartu judul="Skor prioritas">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -128,8 +122,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- AKAR --}}
             <section id="akar" class="scroll-mt-20">
                 <x-kartu judul="Akar masalah & tingkat keyakinan">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -161,8 +153,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- BANDING --}}
             <section id="banding" class="scroll-mt-20">
                 <x-kartu judul="Perbandingan antardaerah">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -179,8 +169,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- TREN --}}
             <section id="tren" class="scroll-mt-20">
                 <x-kartu judul="Tren lintas tahun">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -191,8 +179,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- RENCANA --}}
             <section id="rencana" class="scroll-mt-20">
                 <x-kartu judul="Rencana tindak lanjut & ekspor">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -207,8 +193,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- IMPOR --}}
             <section id="impor" class="scroll-mt-20">
                 <x-kartu judul="Impor berkas">
                     <p class="text-[13.5px] leading-relaxed text-teks-700">
@@ -224,8 +208,6 @@
                     </p>
                 </x-kartu>
             </section>
-
-            {{-- SUMBER --}}
             <section id="sumber" class="scroll-mt-20">
                 <x-kartu judul="Sumber data & batasan">
                     <ul class="flex flex-col gap-2.5 text-[13px] leading-relaxed text-teks-700">
