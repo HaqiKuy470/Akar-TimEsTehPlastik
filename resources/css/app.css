@@ -170,6 +170,16 @@
         line-height: 1;
     }
 
+    /* Tagline di samping wordmark: serif miring, lebih halus. */
+    .merek-tagline {
+        font-family: var(--font-merek);
+        font-optical-sizing: auto;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 0.005em;
+        line-height: 1;
+    }
+
     /* Kerangka berdenyut untuk keadaan memuat (DESIGN.md 6). */
     .rangka-muat {
         background-color: var(--color-krem-200);
