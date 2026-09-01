@@ -73,7 +73,7 @@ class PrioritasTest extends TestCase
     {
         Livewire::test(Prioritas::class)
             ->assertOk()
-            ->assertSee('Prioritas masalah')
+            ->assertSee('perlu didahulukan')
             ->assertSee('Jalankan analisis');
     }
 
@@ -87,7 +87,7 @@ class PrioritasTest extends TestCase
         $this->capaian($this->indikator('A.1', 'Kemampuan literasi'), 'Kurang', 'Turun');
 
         $this->komponen()
-            ->assertSee('Belum ada analisis untuk kombinasi ini')
+            ->assertSee('Data sudah lengkap')
             ->assertDontSee('Skor prioritas');
     }
 
@@ -169,7 +169,7 @@ class PrioritasTest extends TestCase
 
         $this->komponen()
             ->call('jalankan')
-            ->assertSee('Tidak ada indikator bermasalah');
+            ->assertSee('Tidak ditemukan indikator bermasalah');
     }
 
     public function test_mengganti_wilayah_menutup_panel(): void
