@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Masuk' }} — AKAR</title>
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +14,8 @@
 <body class="grid min-h-full lg:grid-cols-[1fr_460px]">
     {{-- Kolom kiri: pernyataan produk, hanya di layar lebar. --}}
     <aside class="relative hidden flex-col justify-between bg-navy-900 p-12 text-white lg:flex">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
+            <img src="{{ asset('logo.svg') }}" alt="" class="size-9 shrink-0 rounded-md bg-white/95 p-1">
             <span class="text-[17px] font-bold tracking-[0.08em]">AKAR</span>
             <span class="text-[12px] text-biru-300">Analisis Kausal dan Rekomendasi</span>
         </div>
@@ -41,9 +43,12 @@
     {{-- Kolom kanan: formulir. --}}
     <main class="flex items-center justify-center bg-krem-100 p-6">
         <div class="w-full max-w-sm">
-            <div class="mb-7 lg:hidden">
-                <div class="text-[20px] font-bold tracking-[0.06em] text-navy-900">AKAR</div>
-                <p class="mt-0.5 text-[12px] text-teks-500">Analisis Kausal dan Rekomendasi</p>
+            <div class="mb-7 flex items-center gap-2.5 lg:hidden">
+                <img src="{{ asset('logo.svg') }}" alt="" class="size-9 rounded-md border border-krem-300 p-1">
+                <div>
+                    <div class="text-[18px] font-bold tracking-[0.06em] text-navy-900">AKAR</div>
+                    <p class="text-[11px] text-teks-500">Analisis Kausal dan Rekomendasi</p>
+                </div>
             </div>
 
             {{ $slot }}

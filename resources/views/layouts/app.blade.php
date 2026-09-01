@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ ($header ?? null) ? $header.' — AKAR' : 'AKAR — Analisis Kausal dan Rekomendasi' }}</title>
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
@@ -51,7 +52,8 @@
 
     <div class="flex h-screen overflow-hidden">
         <aside class="hidden w-[248px] shrink-0 flex-col overflow-y-auto bg-navy-900 text-white lg:flex">
-            <div class="flex h-14 shrink-0 items-center gap-2 border-b border-white/10 px-5">
+            <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-white/10 px-5">
+                <img src="{{ asset('logo.svg') }}" alt="" class="size-7 shrink-0 rounded bg-white/95 p-0.5">
                 <span class="text-[15px] font-bold tracking-[0.08em]">AKAR</span>
                 <span class="text-[11px] text-biru-300">Rapor Pendidikan</span>
             </div>
@@ -90,7 +92,7 @@
         <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
             <header class="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-krem-300 bg-navy-900 px-6 text-white">
                 <div class="flex items-center gap-2 text-[13px] font-semibold">
-                    <span class="lg:hidden">AKAR</span>
+                    <img src="{{ asset('logo.svg') }}" alt="AKAR" class="size-6 rounded bg-white/95 p-0.5 lg:hidden">
                     <span class="hidden lg:inline">{{ $header ?? 'Beranda' }}</span>
                 </div>
                 @auth
