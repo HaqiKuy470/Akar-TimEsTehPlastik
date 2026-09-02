@@ -20,12 +20,12 @@
             <span class="merek-tagline text-[15px] text-biru-300">Analisis Kausal dan Rekomendasi</span>
         </div>
 
-        <div class="max-w-md">
-            <p class="text-[22px] font-semibold leading-snug">
+        <div class="max-w-2xl">
+            <p class="text-[35px] font-bold leading-snug">
                 Rapor Pendidikan memberi tahu bahwa nilainya merah.
                 AKAR memberi tahu apa yang harus dilakukan Senin pagi.
             </p>
-            <p class="mt-4 text-[13px] leading-relaxed text-white/60">
+            <p class="mt-4 text-[17px] leading-relaxed  text-white/60">
                 Satu logika analisis, dua level pengguna: dinas melihat seluruh
                 kabupatennya, kepala sekolah melihat sekolahnya sendiri.
             </p>
