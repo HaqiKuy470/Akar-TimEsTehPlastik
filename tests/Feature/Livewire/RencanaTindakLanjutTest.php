@@ -62,7 +62,7 @@ class RencanaTindakLanjutTest extends TestCase
 
     public function test_komponen_dapat_dirender(): void
     {
-        Livewire::test(RencanaTindakLanjut::class)->assertOk()->assertSee('Rencana tindak lanjut');
+        Livewire::test(RencanaTindakLanjut::class)->assertOk()->assertSee('Susun draf pembenahan dari hasil analisis akar masalah');
     }
 
     public function test_susun_draf_menghasilkan_item_yang_dapat_disunting(): void
