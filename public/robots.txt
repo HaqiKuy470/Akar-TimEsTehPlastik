@@ -1,0 +1,7 @@
+# AKAR — Analisis Kausal dan Rekomendasi
+# https://akar.lokashaka.id
+#
+# Seluruh isi situs boleh diindeks dan diakses.
+
+User-agent: *
+Allow: /
