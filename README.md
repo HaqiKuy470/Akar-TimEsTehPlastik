@@ -154,7 +154,7 @@ npm run build
 
 Basis data mengikuti `DB_CONNECTION` di `.env`. Untuk pengembangan cepat, SQLite
 sudah cukup (`DB_CONNECTION=sqlite`, `touch database/database.sqlite`). Produksi
-memakai MySQL — lihat `DEPLOYMENT.md`.
+memakai MySQL.
 
 ### Basis data siap-demo
 
@@ -213,17 +213,6 @@ Pendidikan sungguhan.
 
 ---
 
-## Deployment
-
-Target produksi adalah shared hosting **cPanel** dengan MySQL, antrean lewat
-cron, dan tanpa Node/Composer di server. Domain: **akar.lokashaka.id**.
-
-Langkah lengkap ada di `DEPLOYMENT.md`. Berkas pendukung ada di `deploy/`
-(`index.php` untuk `public_html`, `dump-db.sh` untuk menyiapkan dump data), dan
-`.env.production.example` sebagai templat `.env`.
-
----
-
 ## Dokumen rujukan
 
 | Berkas | Isi |
@@ -231,7 +220,6 @@ Langkah lengkap ada di `DEPLOYMENT.md`. Berkas pendukung ada di `deploy/`
 | `PRD.md` | Kebutuhan produk, ruang lingkup, jadwal |
 | `ARCHITECTURE.md` | Arsitektur teknis, struktur berkas sumber, skema basis data |
 | `DESIGN.md` | Sistem visual — warna, tipografi, komponen |
-| `DEPLOYMENT.md` | Panduan pasang di cPanel |
 | `PANDUAN-PENGEMBANGAN.md` | Aturan kerja & konvensi kode |
 | `c4.md` | Sumber diagram C4 (Mermaid) |
 

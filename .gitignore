@@ -7,9 +7,13 @@
 .env
 .env.*
 !.env.example
-!.env.production.example
 /auth.json
 /storage/*.key
+
+# Catatan operasional internal (tidak untuk repo)
+/DEPLOYMENT.md
+/deploy/
+/.env.production.example
 
 # Dependensi (dipasang dengan composer install / npm install)
 /vendor
