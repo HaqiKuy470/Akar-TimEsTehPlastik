@@ -29,6 +29,7 @@ _ide_helper.php
 
 # Catatan kerja lokal (tidak untuk repo)
 *.local.md
+/c4.md
 /akar-deploy/
 /akar-deploy*.zip
 
