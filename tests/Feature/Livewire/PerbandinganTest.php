@@ -85,7 +85,7 @@ class PerbandinganTest extends TestCase
 
     public function test_komponen_render_dengan_judul(): void
     {
-        Livewire::test(Perbandingan::class)->assertOk()->assertSee('Perbandingan antardaerah');
+        Livewire::test(Perbandingan::class)->assertOk()->assertSee('Bandingkan capaian satu kabupaten/kota');
     }
 
     public function test_tahun_terisi_otomatis_dari_edisi_terbaru(): void

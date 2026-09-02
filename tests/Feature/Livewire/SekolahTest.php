@@ -103,7 +103,7 @@ class SekolahTest extends TestCase
     {
         Livewire::actingAs($this->kepalaSekolah())
             ->test(Beranda::class)
-            ->assertSee('mengunggah Rapor Pendidikan sekolah')
+            ->assertSee('Unggah data satuan pendidikan')
             ->assertSee(route('sekolah.unggah'));
     }
 
@@ -165,7 +165,7 @@ class SekolahTest extends TestCase
 
         Livewire::actingAs($b)
             ->test(Beranda::class)
-            ->assertSee('mengunggah Rapor Pendidikan sekolah')
+            ->assertSee('Unggah data satuan pendidikan')
             ->assertDontSee('SMP Negeri 1 Surabaya');
     }
 }
