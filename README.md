@@ -221,7 +221,6 @@ Pendidikan sungguhan.
 | `ARCHITECTURE.md` | Arsitektur teknis, struktur berkas sumber, skema basis data |
 | `DESIGN.md` | Sistem visual — warna, tipografi, komponen |
 | `PANDUAN-PENGEMBANGAN.md` | Aturan kerja & konvensi kode |
-| `c4.md` | Sumber diagram C4 (Mermaid) |
 
 ---
 
