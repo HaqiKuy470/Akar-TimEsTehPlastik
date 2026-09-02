@@ -37,6 +37,9 @@ _ide_helper.php
 /README-PENGUMPULAN.md
 /akar-deploy/
 /akar-deploy*.zip
+/akar-source*.zip
+/akar-app.zip
+/akar-public.zip
 
 # Sistem operasi dan editor
 .DS_Store
